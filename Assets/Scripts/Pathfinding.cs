@@ -5,13 +5,13 @@ using System.Diagnostics;
 using System;
 
 public class Pathfinding : MonoBehaviour {
-    Grid grid;
     PathRequestManager requestManager;
+    Grid grid;
 
     private void Awake()
     {
-        grid = GetComponent<Grid>();
         requestManager = GetComponent<PathRequestManager>();
+        grid = GetComponent<Grid>();
     }
 
     public void StartFindPath(Vector3 startPos, Vector3 targetPos)
@@ -96,6 +96,7 @@ public class Pathfinding : MonoBehaviour {
             path.Add(currentNode);
             currentNode = currentNode.parent;
         }
+        path.Add(startNode);
         Vector3[] waypoints = SimplifyPath(path);
         Array.Reverse(waypoints);
         return waypoints;
@@ -112,7 +113,7 @@ public class Pathfinding : MonoBehaviour {
             Vector2 directionNew = new Vector2(path[i - 1].gridX - path[i].gridX, path[i - 1].gridY - path[i].gridY);
             if (directionNew != directionOld)
             {
-                waypoints.Add(path[i].worldPosition);
+                waypoints.Add(path[i - 1].worldPosition);
             }
             directionOld = directionNew;
         }
