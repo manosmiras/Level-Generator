@@ -27,10 +27,13 @@ public class Pathfinding : MonoBehaviour {
         Vector3[] waypoints = new Vector3[0];
         bool pathSuccess = false;
 
+        print("target position is: " + targetPos);
+
         // Get start and target node based on startPos and targetPos respectively
+        // TODO: fix NodeFromWorldPoint method
         Node startNode = grid.NodeFromWorldPoint(startPos);
         Node targetNode = grid.NodeFromWorldPoint(targetPos);
-
+        print(targetNode.worldPosition);
         if (startNode.walkable && targetNode.walkable)
         {
 
@@ -90,7 +93,7 @@ public class Pathfinding : MonoBehaviour {
     {
         List<Node> path = new List<Node>();
         Node currentNode = endNode;
-
+        print("end node (target) position is: " + endNode.worldPosition);
         while (currentNode != startNode)
         {
             path.Add(currentNode);
