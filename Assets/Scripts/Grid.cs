@@ -7,6 +7,7 @@ public class Grid : MonoBehaviour
     public bool displayGridGizmos;
     public Transform start;
     public LayerMask unwalkableMask;
+    public LayerMask walkableMask;
     public Vector2 gridWorldSize;
     public float nodeRadius;
     Node[,] grid;
@@ -44,7 +45,7 @@ public class Grid : MonoBehaviour
                 Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius)
                                                     + Vector3.forward * (y * nodeDiameter + nodeRadius);
                 // Not walkable if collision
-                bool walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
+                bool walkable = Physics.CheckSphere(worldPoint, nodeRadius, walkableMask);//!(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
                 grid[x, y] = new Node(walkable, worldPoint, x, y);
             }
         }
