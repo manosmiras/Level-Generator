@@ -8,13 +8,13 @@ public class LevelGenerator : MonoBehaviour
 {
     public static int overlapPenalty = 0;
     public static List<string> collisions = new List<string>();
-
+    public static bool generated = false;
     public GameObject cross;
     public GameObject t_junction;
     public GameObject hall;
     public GameObject corner;
     public GameObject room;
-
+    public GameObject aStar;
     List<DesignElement> population = new List<DesignElement>();
 
     float positionModifier = 2.5f;
@@ -89,6 +89,9 @@ public class LevelGenerator : MonoBehaviour
                     break;
             }
         }
+        generated = true;
+        // Initialise pathfinding
+        Instantiate(aStar, new Vector3(), new Quaternion());
     }
     //void OnCollisionStay()
     //{
