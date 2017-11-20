@@ -5,9 +5,10 @@ using UnityEngine;
 public class Grid : MonoBehaviour
 {
     public bool displayGridGizmos;
-    public Transform start;
+    //public Transform start;
     public LayerMask unwalkableMask;
     public LayerMask walkableMask;
+    public LayerMask entryMask;
     public Vector2 gridWorldSize;
     public float nodeRadius;
     Node[,] grid;
@@ -46,13 +47,25 @@ public class Grid : MonoBehaviour
                                                     + Vector3.forward * (y * nodeDiameter + nodeRadius);
                 // Not walkable if collision
                 bool walkable = Physics.CheckSphere(worldPoint, nodeRadius, walkableMask);//!(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
-
+                bool entry = Physics.CheckSphere(worldPoint, nodeRadius, entryMask);
                 if (walkable)
                 {
-                    walkable = !(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
+                    walkable = !Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask);
                 }
+                if (!walkable)
+                {
+                    walkable = Physics.CheckSphere(worldPoint, nodeRadius, entryMask);
+                    //walkable = entry;
+                }
+                //else
+                //{
+                //    //walkable = Physics.CheckSphere(worldPoint, nodeRadius, entryMask);
+                //}
 
-                grid[x, y] = new Node(walkable, worldPoint, x, y);
+                
+                
+
+                grid[x, y] = new Node(walkable, entry, worldPoint, x, y);
             }
         }
     }
@@ -108,8 +121,12 @@ public class Grid : MonoBehaviour
         {
             foreach (Node node in grid)
             {
-                // White if walkable, red if not
+                // White if walkable, red if unwalkable, green if entry
                 Gizmos.color = node.walkable ? new Color(1,1,1,0.25f) : new Color(1, 0, 0, 0.25f);
+                if (node.entry)
+                {
+                    Gizmos.color = new Color(0, 1, 0, 0.25f);
+                }
                 Gizmos.DrawCube(node.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
             }
         }

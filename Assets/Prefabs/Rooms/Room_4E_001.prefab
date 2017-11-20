@@ -155,7 +155,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4940493467859778}
-  - component: {fileID: 114115746998958410}
   m_Layer: 8
   m_Name: Room_4E_001
   m_TagString: Untagged
@@ -1930,14 +1929,3 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1121478555727830}
   m_Mesh: {fileID: 4300000, guid: 6fbff882f7957524b9dd16101427fd8c, type: 3}
---- !u!114 &114115746998958410
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1201466669339096}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a935cd6961fcfd443abea05b452cee34, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

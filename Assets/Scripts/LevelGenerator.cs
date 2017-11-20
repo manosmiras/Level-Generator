@@ -7,7 +7,10 @@ using UnityEditor;
 public class LevelGenerator : MonoBehaviour
 {
     public static int overlapPenalty = 0;
-    public static List<string> collisions = new List<string>();
+    public static int connectedCount = 0;
+    public static int disconnectPenalty = 0;
+    public static List<string> overlapping = new List<string>();
+    public static List<string> connected = new List<string>();
     public static bool generated = false;
     public GameObject cross;
     public GameObject t_junction;
@@ -16,9 +19,9 @@ public class LevelGenerator : MonoBehaviour
     public GameObject room;
     public GameObject aStar;
     List<DesignElement> population = new List<DesignElement>();
-
+    
     float positionModifier = 2.5f;
-    int populationSize = 50;
+    public static int populationSize = 50;
     // Use this for initialization
     void Start()
     {
@@ -33,6 +36,7 @@ public class LevelGenerator : MonoBehaviour
     void Update()
     {
         Debug.Log("Overlap penalty: " + overlapPenalty);
+        Debug.Log("Disconnect penalty: " + (populationSize - connectedCount));
     }
     // Generates a random population
     public void GenerateRandomPopulation()
@@ -92,17 +96,6 @@ public class LevelGenerator : MonoBehaviour
         generated = true;
         // Initialise pathfinding
         Instantiate(aStar, new Vector3(), new Quaternion());
-    }
-    //void OnCollisionStay()
-    //{
-    //    print(gameObject.name + " collided with another object");
-    //}
-
-    void OnTriggerStay(Collider collisionInfo)
-    {
-        Debug.Log("Detected collision between " + gameObject.name + " and " + collisionInfo.name);
-        //print("There are " + collisionInfo.contacts.Length + " point(s) of contacts");
-        //print("Their relative velocity is " + collisionInfo.relativeVelocity);
     }
 
 }
