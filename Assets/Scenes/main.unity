@@ -271,7 +271,7 @@ MonoBehaviour:
   hall: {fileID: 1531126560688648, guid: f2a5ce33044b86a499d805c56f2c3a70, type: 2}
   corner: {fileID: 1025679030023330, guid: c9c2d954dfb8121429ebf388ff7c6b94, type: 2}
   room: {fileID: 1628928118763918, guid: 26b3e9888adaec5429af3bfa71bdaa14, type: 2}
-  aStar: {fileID: 1507329457084226, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
+  aStar: {fileID: 1344125825484124, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
 --- !u!4 &110116972
 Transform:
   m_ObjectHideFlags: 0
@@ -1987,64 +1987,44 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 4215702401003716, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
+    - target: {fileID: 4763535700426696, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
       propertyPath: m_LocalPosition.x
       value: -4.1
       objectReference: {fileID: 0}
-    - target: {fileID: 4215702401003716, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
+    - target: {fileID: 4763535700426696, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4215702401003716, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
+    - target: {fileID: 4763535700426696, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4215702401003716, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
+    - target: {fileID: 4763535700426696, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
       propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4215702401003716, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
+    - target: {fileID: 4763535700426696, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
       propertyPath: m_LocalRotation.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4215702401003716, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
+    - target: {fileID: 4763535700426696, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4215702401003716, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
+    - target: {fileID: 4763535700426696, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
       propertyPath: m_LocalRotation.w
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 4215702401003716, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
+    - target: {fileID: 4763535700426696, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
       propertyPath: m_RootOrder
       value: 15
       objectReference: {fileID: 0}
-    - target: {fileID: 1507329457084226, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114909025986826480, guid: 5369ec25bf6247147b718fd7d537ae17,
-        type: 2}
-      propertyPath: entryMask.m_Bits
-      value: 1024
-      objectReference: {fileID: 0}
-    - target: {fileID: 114909025986826480, guid: 5369ec25bf6247147b718fd7d537ae17,
-        type: 2}
-      propertyPath: displayGridGizmos
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114909025986826480, guid: 5369ec25bf6247147b718fd7d537ae17,
-        type: 2}
-      propertyPath: gridWorldSize.x
-      value: 90.3
-      objectReference: {fileID: 0}
-    - target: {fileID: 114909025986826480, guid: 5369ec25bf6247147b718fd7d537ae17,
-        type: 2}
-      propertyPath: gridWorldSize.y
-      value: 75.4
+    - target: {fileID: 1344125825484124, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
+      propertyPath: m_Name
+      value: A_
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 5369ec25bf6247147b718fd7d537ae17, type: 2}
+  m_ParentPrefab: {fileID: 100100000, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &1966654850
 GameObject:
