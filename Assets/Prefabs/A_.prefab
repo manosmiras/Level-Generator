@@ -28,7 +28,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4763535700426696
 Transform:
   m_ObjectHideFlags: 1
@@ -63,8 +63,8 @@ MonoBehaviour:
   entryMask:
     serializedVersion: 2
     m_Bits: 1024
-  gridWorldSize: {x: 90.3, y: 75.4}
-  nodeRadius: 0.25
+  gridWorldSize: {x: 150, y: 150}
+  nodeRadius: 1
 --- !u!114 &114252764482651926
 MonoBehaviour:
   m_ObjectHideFlags: 1

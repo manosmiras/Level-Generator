@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 using UnityEditor;
+public class ReadOnlyAttribute : PropertyAttribute { }
 
 public class LevelGenerator : MonoBehaviour
 {
+    // Public properties
     public static int overlapPenalty = 0;
     public static int connectedCount = 0;
     public static int disconnectPenalty = 0;
@@ -18,32 +20,92 @@ public class LevelGenerator : MonoBehaviour
     public GameObject corner;
     public GameObject room;
     public GameObject aStar;
-    private int currentIndividual = 0;
+    [ReadOnly] public int currentIndividual = 0;
+    [ReadOnly] public int generation = 1;
+    [ReadOnly] public int fittest;
+    [ReadOnly] public int fitness = 0;
+    public static int genomeLength = 50;
+    public static int populationSize = 75;
+    [ReadOnly] public bool initialised;
+    // Private properties
     private float cooldown = 0;
-    private bool displaying = false;
-    //List<DesignElement> individual = new List<DesignElement>();
-    List<Individual> population = new List<Individual>();
-    
-    float positionModifier = 2.5f;
-    public static int populationSize = 50;
+    private static int tournamentSize = 5;
+    [ReadOnly] public bool displaying = false;
+    private Population population = new Population();
+    private float positionModifier = 2.5f;
+    [ReadOnly] public bool elitism;
+    private static int mutationRate = 15;
     // Use this for initialization
     void Start()
     {
-        //if (GUILayout.Button("Generate"))
-        //{
-        GenerateRandomPopulation(100);
+        initialised = false;
+        GenerateRandomPopulation(populationSize);
         
-
-        //}
+        generation = 1;
+        fittest = int.MaxValue;
+        elitism = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log("Overlap penalty: " + overlapPenalty);
-        //Debug.Log("Disconnect penalty: " + (populationSize - connectedCount));
         DisplayPopulation();
+
+        //if (initialised)
+        //{
+        //    EvolvePopulation();
+        //}
+        if (initialised)
+        {
+            generation++;
+            //System.out.println("Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness());
+            population = EvolvePopulation();
+
+            currentIndividual = 0;
+            initialised = false;
+            
+        }
     }
+
+    Population EvolvePopulation()
+    {
+        Population newPopulation = new Population();
+
+        // Keep our best individual
+        if (elitism)
+        {
+            newPopulation.Add(population.GetFittest());
+        }
+
+        int elitismOffset;
+        if (elitism)
+        {
+            elitismOffset = 1;
+        }
+        else
+        {
+            elitismOffset = 0;
+        }
+
+        // Loop over the population size and create new individuals with
+        // crossover
+        for (int i = elitismOffset; i < populationSize; i++)
+        {
+            Individual individual1 = TournamentSelection();
+            Individual individual2 = TournamentSelection();
+            Individual newIndividual = Crossover(individual1, individual2);
+            newPopulation.Add(newIndividual);
+        }
+
+        // Mutate population
+        for (int i = elitismOffset; i < newPopulation.individuals.Count; i++)
+        {
+            Mutate(newPopulation.individuals[i]);
+        }
+
+        return newPopulation;
+    }
+
     // Generates a random population
     public void GenerateRandomPopulation(int size)
     {
@@ -57,12 +119,12 @@ public class LevelGenerator : MonoBehaviour
     {
         Individual individual = new Individual();
         
-        // Clear population
+        // Clear
         individual.designElements.Clear();
-        for (int i = 0; i < populationSize; i++)
+        for (int i = 0; i < genomeLength; i++)
         {
-            Vector2 position = new Vector2(Random.Range(-populationSize / 2, populationSize / 2) * positionModifier,
-                                           Random.Range(-populationSize / 2, populationSize / 2) * positionModifier);
+            Vector2 position = new Vector2(Random.Range(-genomeLength / 2, genomeLength / 2) * positionModifier,
+                                           Random.Range(-genomeLength / 2, genomeLength / 2) * positionModifier);
             float rotation = Random.Range(0, 2);
             rotation *= 90f;
             int roomType = Random.Range(0, 4);
@@ -70,14 +132,11 @@ public class LevelGenerator : MonoBehaviour
             individual.designElements.Add(piece);
         }
         population.Add(individual);
-        //Debug.Log("Population size: " + population.Count);
-        //Debug.Log("Population: " + individual);
-        //Debug.Log(Quaternion.identity);
     }
     // Displays the population in Unity
     void DisplayPopulation()
     {        
-        if (!displaying && currentIndividual < population.Count)
+        if (!displaying && currentIndividual < population.individuals.Count)
         {
             // Reset variables
             overlapPenalty = 0;
@@ -90,7 +149,7 @@ public class LevelGenerator : MonoBehaviour
             // Reset cooldown
             cooldown = 0;
             // Display the individual
-            DisplayIndividual(population[currentIndividual]);
+            DisplayIndividual(population.individuals[currentIndividual]);
 
             displaying = true;
 
@@ -101,19 +160,24 @@ public class LevelGenerator : MonoBehaviour
             if (cooldown >= .1)
             {
                 // Calculate fitness for current individual
-                population[currentIndividual].fitness = overlapPenalty + (populationSize - connectedCount);
-
-                Debug.Log("I am individual number: " + currentIndividual + ", my OVERLAP penalty is: " + overlapPenalty +
-                ", my DISCONNECT penalty is: " + (populationSize - connectedCount));
+                population.individuals[currentIndividual].fitness = overlapPenalty + (genomeLength - connectedCount);
+                fitness = population.individuals[currentIndividual].fitness;
+                // Closest to 0 is fittest
+                if (fitness < fittest)
+                {
+                    fittest = fitness;
+                }
+                //Debug.Log("I am individual number: " + currentIndividual + ", my OVERLAP penalty is: " + overlapPenalty +
+                //", my DISCONNECT penalty is: " + (populationSize - connectedCount));
 
                 currentIndividual++;
+                if (currentIndividual == populationSize)
+                {
+                    initialised = true;
+                }
                 displaying = false;
             }
         }
-        //foreach (List<DesignElement> individual in population)
-        //{
-        //    DisplayIndividual(individual);
-        //}
 
     }
 
@@ -127,15 +191,59 @@ public class LevelGenerator : MonoBehaviour
             // 50% chance to copy design element from individual 1
             if (rand <= 0.5f)
             {
-                offspring.designElements[i] = individual1.designElements[i];
+                offspring.designElements.Add(individual1.designElements[i]);
             }
             // 50% chance to copy design element from individual 2
             else
             {
-                offspring.designElements[i] = individual2.designElements[i];
+                offspring.designElements.Add(individual2.designElements[i]);
             }
         }
         return offspring;
+    }
+
+    Individual TournamentSelection()
+    {
+        // Create a tournament population
+        Population tournamentPopulation = new Population();
+
+        // For each place in the tournament get a random individual
+        for (int i = 0; i < tournamentSize; i++)
+        {
+            int randomId = Random.Range(0, populationSize);
+            tournamentPopulation.Add(population.individuals[randomId]);
+        }
+
+        Individual fittest = tournamentPopulation.individuals[0];
+        // Get the fittest
+        for (int i = 0; i < tournamentSize; i++)
+        {
+            if (fittest.fitness <= tournamentPopulation.individuals[i].fitness)
+            {
+                fittest = tournamentPopulation.individuals[i];
+            }
+        }
+        return fittest;
+    }
+
+    // Mutate an individual
+    void Mutate(Individual individual)
+    {
+        // Loop through genes
+        for (int i = 0; i < individual.designElements.Count; i++)
+        {
+            if (Random.Range(0, 100) <= mutationRate)
+            {
+                Vector2 position = new Vector2(Random.Range(-genomeLength / 2, genomeLength / 2) * positionModifier,
+                                               Random.Range(-genomeLength / 2, genomeLength / 2) * positionModifier);
+                float rotation = Random.Range(0, 2);
+                rotation *= 90f;
+                int roomType = Random.Range(0, 4);
+                LevelPiece piece = new LevelPiece(position, rotation, (LevelPiece.Type)roomType);
+
+                individual.designElements[i] = piece;
+            }
+        }
     }
 
     void DisplayIndividual(Individual individual)
@@ -178,9 +286,6 @@ public class LevelGenerator : MonoBehaviour
         generated = true;
         // Initialise pathfinding
         Instantiate(aStar, new Vector3(), new Quaternion());
-
-        //currentIndividual++;
-        //generated = false;
     }
 
     void ClearScene()
@@ -195,20 +300,4 @@ public class LevelGenerator : MonoBehaviour
     }
 
 
-}
-
-// Creates a custom Label on the inspector for all the scripts named ScriptName
-// Make sure you have a ScriptName script in your
-// project, else this will not work.
-[CustomEditor(typeof(LevelGenerator))]
-public class TestOnInspector : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-        //if (GUILayout.Button("Generate"))
-        //{
-
-        //}
-    }
 }
