@@ -1,0 +1,48 @@
+{
+   FITNESS: 15
+   Position: (-30.0, -45.0),
+   Rotation: 360,
+   Type: Hall
+   Position: (15.0, -45.0),
+   Rotation: 90,
+   Type: T_Junction
+   Position: (30.0, -45.0),
+   Rotation: 180,
+   Type: Cross
+   Position: (0.0, -30.0),
+   Rotation: 90,
+   Type: Cross
+   Position: (-45.0, 15.0),
+   Rotation: 270,
+   Type: Cross
+   Position: (15.0, -30.0),
+   Rotation: 270,
+   Type: Corner
+   Position: (30.0, -30.0),
+   Rotation: 90,
+   Type: Cross
+   Position: (-15.0, -30.0),
+   Rotation: 270,
+   Type: Cross
+   Position: (-30.0, 15.0),
+   Rotation: 90,
+   Type: T_Junction
+   Position: (-45.0, 15.0),
+   Rotation: 90,
+   Type: Hall
+   Position: (30.0, 15.0),
+   Rotation: 90,
+   Type: Hall
+   Position: (-30.0, 30.0),
+   Rotation: 90,
+   Type: T_Junction
+   Position: (-30.0, 30.0),
+   Rotation: 270,
+   Type: T_Junction
+   Position: (0.0, -15.0),
+   Rotation: 180,
+   Type: Cross
+   Position: (30.0, 30.0),
+   Rotation: 180,
+   Type: T_Junction
+}

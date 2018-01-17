@@ -1,0 +1,93 @@
+{
+   FITNESS: 44
+   Position: (45.0, 0.0),
+   Rotation: 270,
+   Type: Corner
+   Position: (30.0, 45.0),
+   Rotation: 0,
+   Type: T_Junction
+   Position: (60.0, 15.0),
+   Rotation: 90,
+   Type: Hall
+   Position: (60.0, -60.0),
+   Rotation: 0,
+   Type: Cross
+   Position: (-30.0, 45.0),
+   Rotation: 270,
+   Type: Room
+   Position: (-75.0, 45.0),
+   Rotation: 270,
+   Type: Corner
+   Position: (15.0, 15.0),
+   Rotation: 0,
+   Type: Hall
+   Position: (-15.0, 60.0),
+   Rotation: 0,
+   Type: Room
+   Position: (15.0, -15.0),
+   Rotation: 180,
+   Type: Cross
+   Position: (-45.0, 60.0),
+   Rotation: 270,
+   Type: Room
+   Position: (-30.0, -15.0),
+   Rotation: 270,
+   Type: Corner
+   Position: (15.0, 0.0),
+   Rotation: 270,
+   Type: Cross
+   Position: (30.0, 60.0),
+   Rotation: 270,
+   Type: Cross
+   Position: (-60.0, -60.0),
+   Rotation: 180,
+   Type: Room
+   Position: (-30.0, 0.0),
+   Rotation: 90,
+   Type: Cross
+   Position: (-30.0, -15.0),
+   Rotation: 0,
+   Type: T_Junction
+   Position: (30.0, -15.0),
+   Rotation: 90,
+   Type: Hall
+   Position: (45.0, 45.0),
+   Rotation: 270,
+   Type: T_Junction
+   Position: (0.0, 0.0),
+   Rotation: 0,
+   Type: T_Junction
+   Position: (45.0, 0.0),
+   Rotation: 90,
+   Type: Corner
+   Position: (30.0, -45.0),
+   Rotation: 0,
+   Type: T_Junction
+   Position: (0.0, 45.0),
+   Rotation: 270,
+   Type: Room
+   Position: (-60.0, -15.0),
+   Rotation: 0,
+   Type: T_Junction
+   Position: (60.0, 0.0),
+   Rotation: 270,
+   Type: Room
+   Position: (-75.0, -60.0),
+   Rotation: 0,
+   Type: Hall
+   Position: (-15.0, -45.0),
+   Rotation: 270,
+   Type: Hall
+   Position: (0.0, -75.0),
+   Rotation: 0,
+   Type: Cross
+   Position: (-75.0, -45.0),
+   Rotation: 90,
+   Type: Room
+   Position: (45.0, -45.0),
+   Rotation: 90,
+   Type: Cross
+   Position: (60.0, -75.0),
+   Rotation: 180,
+   Type: Cross
+}

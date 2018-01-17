@@ -6,6 +6,7 @@ TagManager:
   tags:
   - LevelPiece
   - A*
+  - LevelGenerator
   layers:
   - Default
   - TransparentFX

@@ -1,0 +1,18 @@
+{
+   FITNESS: 0
+   Position: (-15.0, -15.0),
+   Rotation: 180,
+   Type: Corner
+   Position: (-15.0, 0.0),
+   Rotation: 0,
+   Type: Cross
+   Position: (0.0, 0.0),
+   Rotation: 180,
+   Type: Hall
+   Position: (-15.0, 15.0),
+   Rotation: 0,
+   Type: T_Junction
+   Position: (0.0, 15.0),
+   Rotation: 360,
+   Type: Cross
+}

@@ -35,4 +35,19 @@ public class Population
         }
         return fittest;
     }
+
+    public void Print()
+    {
+        foreach (Individual individual in individuals)
+        {
+            individual.Print();
+        }
+    }
+    public void Sort()
+    {
+        foreach (Individual individual in individuals)
+        {
+            individual.Sort();
+        }
+    }
 }

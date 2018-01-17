@@ -24,17 +24,23 @@ public class LevelGenerator : MonoBehaviour
     [ReadOnly] public int generation = 1;
     [ReadOnly] public int fittest;
     [ReadOnly] public int fitness = 0;
-    public static int genomeLength = 50;
-    public static int populationSize = 75;
+    [ReadOnly] public int overlap = 0;
+    [ReadOnly] public int connection = 0;
+    public int genomeLength = 10;
+    public static int populationSize = 100;
+    public Population population = new Population();
+    public Individual fittestIndividual = new Individual();
+    public string time;
     [ReadOnly] public bool initialised;
     // Private properties
     private float cooldown = 0;
-    private static int tournamentSize = 5;
+    private static int tournamentSize = 3;
     [ReadOnly] public bool displaying = false;
-    private Population population = new Population();
-    private float positionModifier = 2.5f;
+
+    private float positionModifier = 15f;
     [ReadOnly] public bool elitism;
-    private static int mutationRate = 15;
+    private static float uniformRate = 0.5f;
+    private static float mutationRate = 0.1f;
     // Use this for initialization
     void Start()
     {
@@ -49,21 +55,30 @@ public class LevelGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        DisplayPopulation();
-
-        //if (initialised)
-        //{
-        //    EvolvePopulation();
-        //}
-        if (initialised)
+        if (fittest != 0)
         {
-            generation++;
-            //System.out.println("Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness());
-            population = EvolvePopulation();
+            int minutes = Mathf.FloorToInt(Time.time / 60F);
+            int seconds = Mathf.FloorToInt(Time.time - minutes * 60);
+            time = string.Format("{0:0}:{1:00}", minutes, seconds);
+            DisplayPopulation();
 
-            currentIndividual = 0;
-            initialised = false;
-            
+            //if (initialised)
+            //{
+            //    EvolvePopulation();
+            //}
+            if (initialised)
+            {
+                population.Sort();
+                //population.Print();
+
+                generation++;
+                //System.out.println("Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness());
+                population = EvolvePopulation();
+
+                currentIndividual = 0;
+                initialised = false;
+
+            }
         }
     }
 
@@ -93,7 +108,7 @@ public class LevelGenerator : MonoBehaviour
         {
             Individual individual1 = TournamentSelection();
             Individual individual2 = TournamentSelection();
-            Individual newIndividual = Crossover(individual1, individual2);
+            Individual newIndividual = SinglePointCrossover(individual1, individual2);
             newPopulation.Add(newIndividual);
         }
 
@@ -123,11 +138,11 @@ public class LevelGenerator : MonoBehaviour
         individual.designElements.Clear();
         for (int i = 0; i < genomeLength; i++)
         {
-            Vector2 position = new Vector2(Random.Range(-genomeLength / 2, genomeLength / 2) * positionModifier,
-                                           Random.Range(-genomeLength / 2, genomeLength / 2) * positionModifier);
-            float rotation = Random.Range(0, 2);
+            Vector2 position = new Vector2(Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier,
+                                           Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier);
+            float rotation = Random.Range(0, 4);
             rotation *= 90f;
-            int roomType = Random.Range(0, 4);
+            int roomType = Random.Range(0, 5);
             LevelPiece piece = new LevelPiece(position, rotation, (LevelPiece.Type)roomType);
             individual.designElements.Add(piece);
         }
@@ -160,12 +175,16 @@ public class LevelGenerator : MonoBehaviour
             if (cooldown >= .1)
             {
                 // Calculate fitness for current individual
-                population.individuals[currentIndividual].fitness = overlapPenalty + (genomeLength - connectedCount);
+                //population.individuals[currentIndividual].fitness = overlapPenalty + (genomeLength - connectedCount);
+                population.individuals[currentIndividual].fitness = overlapPenalty * 2 + (genomeLength - connectedCount) * 5;
                 fitness = population.individuals[currentIndividual].fitness;
                 // Closest to 0 is fittest
                 if (fitness < fittest)
                 {
                     fittest = fitness;
+                    overlap = overlapPenalty;
+                    connection = (genomeLength - connectedCount);
+                    fittestIndividual = population.individuals[currentIndividual];
                 }
                 //Debug.Log("I am individual number: " + currentIndividual + ", my OVERLAP penalty is: " + overlapPenalty +
                 //", my DISCONNECT penalty is: " + (populationSize - connectedCount));
@@ -181,7 +200,7 @@ public class LevelGenerator : MonoBehaviour
 
     }
 
-    Individual Crossover(Individual individual1, Individual individual2)
+    Individual UniformCrossover(Individual individual1, Individual individual2)
     {
         Individual offspring = new Individual();
         // Loop through all design elements
@@ -189,7 +208,7 @@ public class LevelGenerator : MonoBehaviour
         {
             float rand = Random.Range(0.0f, 1.0f);
             // 50% chance to copy design element from individual 1
-            if (rand <= 0.5f)
+            if (rand <= uniformRate)
             {
                 offspring.designElements.Add(individual1.designElements[i]);
             }
@@ -197,6 +216,42 @@ public class LevelGenerator : MonoBehaviour
             else
             {
                 offspring.designElements.Add(individual2.designElements[i]);
+            }
+        }
+        return offspring;
+    }
+
+    Individual SinglePointCrossover(Individual individual1, Individual individual2)
+    {
+        Individual offspring = new Individual();
+        int point = genomeLength / 2;
+        float rand = Random.Range(0.0f, 1.0f);
+        // Loop through all design elements
+        for (int i = 0; i < individual1.designElements.Count; i++)
+        {
+            if (rand <= 0.5)
+            {
+                // Copies half of individual 1 and half of individual 2
+                if (i <= point)
+                {
+                    offspring.designElements.Add(individual1.designElements[i]);
+                }
+                else
+                {
+                    offspring.designElements.Add(individual2.designElements[i]);
+                }
+            }
+            else
+            {
+                // Copies half of individual 1 and half of individual 2
+                if (i <= point)
+                {
+                    offspring.designElements.Add(individual2.designElements[i]);
+                }
+                else
+                {
+                    offspring.designElements.Add(individual1.designElements[i]);
+                }
             }
         }
         return offspring;
@@ -232,16 +287,34 @@ public class LevelGenerator : MonoBehaviour
         // Loop through genes
         for (int i = 0; i < individual.designElements.Count; i++)
         {
-            if (Random.Range(0, 100) <= mutationRate)
+            // mutationRate % chance of mutating
+            if (Random.Range(0.0f, 1.0f) <= mutationRate)
             {
-                Vector2 position = new Vector2(Random.Range(-genomeLength / 2, genomeLength / 2) * positionModifier,
-                                               Random.Range(-genomeLength / 2, genomeLength / 2) * positionModifier);
-                float rotation = Random.Range(0, 2);
+                Vector2 position = new Vector2(Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier,
+                                               Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier);
+                float rotation = Random.Range(0, 5);
                 rotation *= 90f;
                 int roomType = Random.Range(0, 4);
-                LevelPiece piece = new LevelPiece(position, rotation, (LevelPiece.Type)roomType);
+                float rand = Random.Range(0.0f, 1.0f);
+                // 5% chance of mutating the piece type
+                if (rand <= 0.05)
+                {
+                    LevelPiece piece = new LevelPiece(position, rotation, (LevelPiece.Type)roomType);
+                    individual.designElements[i] = piece;
+                }
+                // 60% chance to mutate the rotation only
+                else if (rand <= 0.6)
+                {
+                    individual.designElements[i].rotation = rotation;
+                }
+                // 35% chance to mutate the position only
+                else
+                {
+                    individual.designElements[i].position = position;
+                }
 
-                individual.designElements[i] = piece;
+
+
             }
         }
     }
@@ -255,29 +328,33 @@ public class LevelGenerator : MonoBehaviour
             switch (piece.type)
             {
                 case LevelPiece.Type.Cross:
-                    GameObject tempCross = Instantiate(cross, new Vector3(piece.position.x, 0, piece.position.y), new Quaternion(0, piece.rotation, 0, 1)) as GameObject;
+                    GameObject tempCross = Instantiate(cross, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                     tempCross.transform.parent = gameObject.transform;
-                    tempCross.name += count;
+                    //tempCross.name += count;
                     tempCross.tag = "LevelPiece";
                     break;
                 case LevelPiece.Type.T_Junction:
-                    GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y), new Quaternion(0, piece.rotation, 0, 1)) as GameObject;
+                    GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                     tempT_Junction.transform.parent = gameObject.transform;
+                    //tempT_Junction.name += count;
                     tempT_Junction.tag = "LevelPiece";
                     break;
                 case LevelPiece.Type.Hall:
-                    GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), new Quaternion(0, piece.rotation, 0, 1)) as GameObject;
+                    GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                     tempHall.transform.parent = gameObject.transform;
+                    //tempHall.name += count;
                     tempHall.tag = "LevelPiece";
                     break;
                 case LevelPiece.Type.Corner:
-                    GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y), new Quaternion(0, piece.rotation, 0, 1)) as GameObject;
+                    GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                     tempCorner.transform.parent = gameObject.transform;
+                    //tempCorner.name += count;
                     tempCorner.tag = "LevelPiece";
                     break;
                 case LevelPiece.Type.Room:
-                    GameObject tempRoom = Instantiate(room, new Vector3(piece.position.x, 0, piece.position.y), new Quaternion(0, piece.rotation, 0, 1)) as GameObject;
+                    GameObject tempRoom = Instantiate(room, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                     tempRoom.transform.parent = gameObject.transform;
+                    //tempRoom.name += count;
                     tempRoom.tag = "LevelPiece";
                     break;
             }
