@@ -27,7 +27,7 @@ public class LevelGenerator : MonoBehaviour
     [ReadOnly] public int overlap = 0;
     [ReadOnly] public int connection = 0;
     public int genomeLength = 10;
-    public static int populationSize = 100;
+    public static int populationSize = 50;
     public Population population = new Population();
     public Individual fittestIndividual = new Individual();
     public string time;
@@ -185,6 +185,11 @@ public class LevelGenerator : MonoBehaviour
                     overlap = overlapPenalty;
                     connection = (genomeLength - connectedCount);
                     fittestIndividual = population.individuals[currentIndividual];
+                    LevelGeneratorEditor.load = true;
+                    ScreenCapture.CaptureScreenshot("Assets/FittestLevel.png");
+#if UNITY_EDITOR
+                    AssetDatabase.Refresh();
+#endif
                 }
                 //Debug.Log("I am individual number: " + currentIndividual + ", my OVERLAP penalty is: " + overlapPenalty +
                 //", my DISCONNECT penalty is: " + (populationSize - connectedCount));
@@ -296,22 +301,34 @@ public class LevelGenerator : MonoBehaviour
                 rotation *= 90f;
                 int roomType = Random.Range(0, 4);
                 float rand = Random.Range(0.0f, 1.0f);
-                // 5% chance of mutating the piece type
-                if (rand <= 0.05)
+
+                if (rand <= mutationRate)
                 {
                     LevelPiece piece = new LevelPiece(position, rotation, (LevelPiece.Type)roomType);
                     individual.designElements[i] = piece;
                 }
-                // 60% chance to mutate the rotation only
-                else if (rand <= 0.6)
-                {
-                    individual.designElements[i].rotation = rotation;
-                }
-                // 35% chance to mutate the position only
-                else
-                {
-                    individual.designElements[i].position = position;
-                }
+                // Always mutate rotation and position
+                individual.designElements[i].rotation = rotation;
+                individual.designElements[i].position = position;
+
+                // Split chances method
+
+                //// 5% chance of mutating the piece type
+                //if (rand <= 0.05)
+                //{
+                //    LevelPiece piece = new LevelPiece(position, rotation, (LevelPiece.Type)roomType);
+                //    individual.designElements[i] = piece;
+                //}
+                //// 60% chance to mutate the rotation only
+                //else if (rand <= 0.6)
+                //{
+                //    individual.designElements[i].rotation = rotation;
+                //}
+                //// 35% chance to mutate the position only
+                //else
+                //{
+                //    individual.designElements[i].position = position;
+                //}
 
 
 
