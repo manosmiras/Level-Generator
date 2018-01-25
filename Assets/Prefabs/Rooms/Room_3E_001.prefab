@@ -114,7 +114,7 @@ GameObject:
   - component: {fileID: 54010409031824670}
   m_Layer: 8
   m_Name: Room_3E_001
-  m_TagString: Untagged
+  m_TagString: Room3
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2050,8 +2050,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 5, z: 5}
-  m_Center: {x: -7, y: 0, z: 0}
+  m_Size: {x: 1, y: 5, z: 4}
+  m_Center: {x: -7.5, y: 0, z: 0}
 --- !u!65 &65464372326831410
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -2086,8 +2086,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 5, y: 5, z: 1}
-  m_Center: {x: 0, y: 0, z: 7}
+  m_Size: {x: 4, y: 5, z: 1}
+  m_Center: {x: 0, y: 0, z: 7.5}
 --- !u!65 &65657485786277844
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -2098,8 +2098,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 5, y: 5, z: 1}
-  m_Center: {x: 0, y: 0, z: -7}
+  m_Size: {x: 4, y: 5, z: 1}
+  m_Center: {x: 0, y: 0, z: -7.5}
 --- !u!65 &65663222475162416
 BoxCollider:
   m_ObjectHideFlags: 1

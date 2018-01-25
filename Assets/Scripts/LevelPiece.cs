@@ -10,9 +10,12 @@ public class LevelPiece : DesignElement
     {
         Cross = 0,
         T_Junction = 1,
-        Hall = 2,
-        Corner = 3,
-        Room = 4
+        //Hall = 2,
+        Corner = 2,
+        Room1 = 3,
+        Room2 = 4,
+        Room3 = 5
+
     }
     [SerializeField]
     public Type type;
@@ -21,5 +24,13 @@ public class LevelPiece : DesignElement
         this.position = position;
         this.rotation = rotation;
         this.type = type;
+    }
+
+    public override bool Equals(DesignElement other)
+    {
+        LevelPiece otherLP = (LevelPiece)other;
+        return (position == otherLP.position
+            && rotation == otherLP.rotation
+            && type == otherLP.type);
     }
 }

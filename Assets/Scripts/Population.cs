@@ -19,7 +19,7 @@ public class Population
     // Public constructor with argument
     public Population(List<Individual> individuals)
     {
-        this.individuals = individuals;
+        this.individuals = new List<Individual>(individuals);
     }
     // Gets fittest individual in the population
     public Individual GetFittest()
@@ -28,7 +28,7 @@ public class Population
         // Get the fittest
         for (int i = 0; i < individuals.Count; i++)
         {
-            if (fittest.fitness <= individuals[i].fitness)
+            if (individuals[i].fitness <= fittest.fitness)
             {
                 fittest = individuals[i];
             }

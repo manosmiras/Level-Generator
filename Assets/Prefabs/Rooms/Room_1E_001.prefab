@@ -333,7 +333,7 @@ GameObject:
   - component: {fileID: 54819254923462666}
   m_Layer: 8
   m_Name: Room_1E_001
-  m_TagString: Untagged
+  m_TagString: Room1
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2326,8 +2326,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 5, y: 5, z: 1}
-  m_Center: {x: 0, y: 0, z: 7}
+  m_Size: {x: 4, y: 5, z: 1}
+  m_Center: {x: 0, y: 0, z: 7.5}
 --- !u!65 &65647493228150590
 BoxCollider:
   m_ObjectHideFlags: 1

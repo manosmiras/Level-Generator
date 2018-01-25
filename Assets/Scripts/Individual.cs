@@ -6,15 +6,21 @@ using System;
 using System.IO;
 
 [Serializable]
-public class Individual
+public class Individual : IEquatable<Individual>
 {
-    
+
     public List<DesignElement> designElements = new List<DesignElement>();
     public int fitness;
 
     public Individual()
     {
-        
+
+    }
+
+    public Individual(Individual individual)
+    {
+        this.designElements = individual.designElements;
+        this.fitness = individual.fitness;
     }
 
     public Individual(List<DesignElement> designElements)
@@ -33,7 +39,7 @@ public class Individual
         foreach (DesignElement de in designElements)
         {
             output += "Position:" + de.position + ", Rotation: " + de.rotation + "\n";
-            
+
         }
         Debug.Log(output);
     }
@@ -59,6 +65,21 @@ public class Individual
 
     }
 
+    public bool Equals(Individual other)
+    {
+        int equalCount = 0;
+        for (int i = 0; i < designElements.Count; i++)
+        {
+            // Sum the number of same design elements
+            if (designElements[i].Equals(other.designElements[i]))
+            {
+                equalCount++;
+            }
+        }
+        // Individuals are equal if all the design elements have the same values
+        if (equalCount == designElements.Count)
+            return true;
+        return false;
 
-
+    }
 }

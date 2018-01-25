@@ -28,7 +28,7 @@ GameObject:
   - component: {fileID: 54152933390576702}
   m_Layer: 8
   m_Name: Room_2E_001
-  m_TagString: Untagged
+  m_TagString: Room2
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2224,8 +2224,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 5, y: 5, z: 1}
-  m_Center: {x: 0, y: 0, z: 7}
+  m_Size: {x: 4, y: 5, z: 1}
+  m_Center: {x: 0, y: 0, z: 7.5}
 --- !u!65 &65820019869757770
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -2236,8 +2236,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 5, y: 5, z: 1}
-  m_Center: {x: 0, y: 0, z: -7}
+  m_Size: {x: 4, y: 5, z: 1}
+  m_Center: {x: 0, y: 0, z: -7.5}
 --- !u!65 &65828710086554534
 BoxCollider:
   m_ObjectHideFlags: 1

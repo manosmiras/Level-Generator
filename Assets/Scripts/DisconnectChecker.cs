@@ -7,7 +7,7 @@ public class DisconnectChecker : MonoBehaviour
     int count = 0;
     void OnTriggerEnter(Collider other)
     {
-        // Checks for overlapping rooms/halls
+        // Checks for collisions of room entries
         if (gameObject.name.Equals("Entry_Colliders") && other.name.Equals("Entry_Colliders"))
         {
             //Debug.Log("Checking: " + transform.parent.name);

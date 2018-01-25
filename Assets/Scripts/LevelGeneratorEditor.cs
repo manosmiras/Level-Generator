@@ -13,7 +13,12 @@ public class LevelGeneratorEditor : Editor
 
         if (load)
         {
-            image = Resources.Load("FittestLevel.png", typeof(Texture2D)) as Texture2D;
+            // Load fittest level image
+            image = Resources.Load("FittestLevel", typeof(Texture2D)) as Texture2D;
+            // Scale down image size
+            //image.Resize(100, 100, image.format, true);
+            //image.height = 100;
+            //image.width = 100;
             load = false;
         }
         if (image != null)
@@ -22,9 +27,10 @@ public class LevelGeneratorEditor : Editor
         }
         else
         {
-            Debug.Log("image is null");
+            //Debug.Log("image is null");
         }
 
+        // Save fittest level in json
         if (GUILayout.Button("Save fittest"))
         {
             GameObject levelGen = GameObject.FindGameObjectWithTag("LevelGenerator");

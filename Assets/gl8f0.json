@@ -1,0 +1,27 @@
+{
+   FITNESS: 0
+   Position: (15.0, 15.0),
+   Rotation: 0,
+   Type: T_Junction
+   Position: (-15.0, 15.0),
+   Rotation: 90,
+   Type: Room
+   Position: (-30.0, -15.0),
+   Rotation: 270,
+   Type: Cross
+   Position: (-15.0, -30.0),
+   Rotation: 180,
+   Type: T_Junction
+   Position: (-30.0, -30.0),
+   Rotation: 270,
+   Type: Hall
+   Position: (0.0, 0.0),
+   Rotation: 90,
+   Type: T_Junction
+   Position: (-30.0, 0.0),
+   Rotation: 0,
+   Type: Corner
+   Position: (0.0, 15.0),
+   Rotation: 0,
+   Type: T_Junction
+}

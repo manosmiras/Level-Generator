@@ -7,6 +7,13 @@ TagManager:
   - LevelPiece
   - A*
   - LevelGenerator
+  - Corner
+  - T_Junction
+  - Cross
+  - Room1
+  - Hall
+  - Room2
+  - Room3
   layers:
   - Default
   - TransparentFX

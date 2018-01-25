@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// LevelGenerator.cs
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -16,9 +18,11 @@ public class LevelGenerator : MonoBehaviour
     public static bool generated = false;
     public GameObject cross;
     public GameObject t_junction;
-    public GameObject hall;
+    //public GameObject hall;
     public GameObject corner;
-    public GameObject room;
+    public GameObject room1;
+    public GameObject room2;
+    public GameObject room3;
     public GameObject aStar;
     [ReadOnly] public int currentIndividual = 0;
     [ReadOnly] public int generation = 1;
@@ -26,30 +30,36 @@ public class LevelGenerator : MonoBehaviour
     [ReadOnly] public int fitness = 0;
     [ReadOnly] public int overlap = 0;
     [ReadOnly] public int connection = 0;
+    [ReadOnly] public int populationDiversity = 0;
+    [ReadOnly] public float populationArea = 0;
+    public int overlapPenaltyMultiplier = 1;
+    public int connectionPenaltyMultiplier = 2;
     public int genomeLength = 10;
-    public static int populationSize = 50;
+    public int populationSize = 500;
+    public float positionModifier = 15f;
+    [Range(0.0f, 1.0f)]
+    public float mutationRate = 0.05f;
+    public bool elitism = true;
+    public int tournamentSize;
     public Population population = new Population();
     public Individual fittestIndividual = new Individual();
     public string time;
     [ReadOnly] public bool initialised;
     // Private properties
     private float cooldown = 0;
-    private static int tournamentSize = 3;
-    [ReadOnly] public bool displaying = false;
+    private bool displaying = false;
 
-    private float positionModifier = 15f;
-    [ReadOnly] public bool elitism;
-    private static float uniformRate = 0.5f;
-    private static float mutationRate = 0.1f;
+    private static float uniformRate = 0.6f;
+
     // Use this for initialization
     void Start()
     {
         initialised = false;
         GenerateRandomPopulation(populationSize);
-        
+
         generation = 1;
         fittest = int.MaxValue;
-        elitism = true;
+        //elitism = true;
     }
 
     // Update is called once per frame
@@ -68,28 +78,38 @@ public class LevelGenerator : MonoBehaviour
             //}
             if (initialised)
             {
+                Debug.Log("fitnesses: " + fittestIndividual.fitness + ", " + population.GetFittest().fitness);
                 population.Sort();
                 //population.Print();
 
                 generation++;
                 //System.out.println("Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness());
-                population = EvolvePopulation();
+                population = EvolvePopulation(population);
 
                 currentIndividual = 0;
-                initialised = false;
+                initialised = false; // a
 
             }
         }
+
     }
 
-    Population EvolvePopulation()
+    Population EvolvePopulation(Population pop)
     {
         Population newPopulation = new Population();
 
         // Keep our best individual
         if (elitism)
         {
-            newPopulation.Add(population.GetFittest());
+
+            // Add fittest that will not be changed
+            //newPopulation.Add(new Individual(fittestIndividual));
+            // Add fittest which could be potentially changed
+            //newPopulation.Add(new Individual(fittestIndividual));
+            //newPopulation.Add(fittestIndividual);
+            newPopulation.Add(pop.GetFittest());
+            //newPopulation.Add(new Individual(population.GetFittest()));
+
         }
 
         int elitismOffset;
@@ -104,19 +124,55 @@ public class LevelGenerator : MonoBehaviour
 
         // Loop over the population size and create new individuals with
         // crossover
-        for (int i = elitismOffset; i < populationSize; i++)
+        for (int i = elitismOffset; i < pop.individuals.Count; i++)
         {
-            Individual individual1 = TournamentSelection();
-            Individual individual2 = TournamentSelection();
-            Individual newIndividual = SinglePointCrossover(individual1, individual2);
+            Individual individual1 = TournamentSelection(pop);
+            Individual individual2 = TournamentSelection(pop);
+            Individual newIndividual = UniformCrossover(individual1, individual2);
+
             newPopulation.Add(newIndividual);
         }
 
         // Mutate population
-        for (int i = elitismOffset; i < newPopulation.individuals.Count; i++)
+        for (int i = elitismOffset; i < pop.individuals.Count; i++)
         {
-            Mutate(newPopulation.individuals[i]);
+            //if (i == elitismOffset)
+            //{
+            //    Debug.Log("before mutation:\n");
+            //    newPopulation.individuals[i].Print();
+            //}
+            // mutationRate % chance of mutating
+            if (Random.Range(0.0f, 1.0f) <= mutationRate)
+            {
+                Mutate(newPopulation.individuals[i]);
+            }
+            //if (i == elitismOffset)
+            //{
+            //    Debug.Log("after mutation:\n");
+            //    newPopulation.individuals[i].Print();
+            //}
         }
+
+        // Diversity check
+        for (int i = elitismOffset; i < newPopulation.individuals.Count - 1; i++)
+        {
+            populationDiversity = newPopulation.individuals.Count;
+            // Compare current individual with next in population
+            if (newPopulation.individuals[i].Equals(newPopulation.individuals[i + 1]))
+            {
+                Debug.Log("Diversity mutation");
+                // Mutate one of them if they are the same
+                Mutate(newPopulation.individuals[i]);
+
+                // Check again
+                if (newPopulation.individuals[i].Equals(newPopulation.individuals[i + 1]))
+                {
+                    populationDiversity--;
+                }
+            }
+        }
+
+        //newPopulation.individuals[0] = fittestIndividual;
 
         return newPopulation;
     }
@@ -133,16 +189,67 @@ public class LevelGenerator : MonoBehaviour
     public void GenerateRandomIndividual()
     {
         Individual individual = new Individual();
-        
+
         // Clear
         individual.designElements.Clear();
         for (int i = 0; i < genomeLength; i++)
         {
-            Vector2 position = new Vector2(Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier,
-                                           Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier);
+            //Vector2 position = new Vector2(Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier,
+            //                               Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier);
+
+            //Vector2 position = new Vector2(Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier,
+            //                               Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier);
+
+            float xMax = Mathf.RoundToInt(Mathf.Sqrt(genomeLength));
+            float yMax = Mathf.CeilToInt(genomeLength / xMax);
+            Debug.Log("xMax is: " + (int)xMax + "(" + xMax + ")");
+            Debug.Log("yMax is: " + (int)yMax + "(" + yMax + ")");
+
+            Vector2 position = new Vector2(Random.Range(0, (int)xMax) * positionModifier,
+                               Random.Range(0, (int)yMax) * positionModifier);
+
+            //Vector2 position = new Vector2(i * positionModifier,
+            //                               i * positionModifier);
+
+            //float result = Mathf.Sqrt(genomeLength);
+            //bool isSquare = result % 1 == 0;
+
+            //if (!isSquare)
+            //{
+            //    if (genomeLength % 2 == 0)
+            //    {
+            //        position = new Vector2(Random.Range(0, (int)Mathf.Ceil(Mathf.Sqrt(genomeLength))) * positionModifier,
+            //                               Random.Range(0, (int)Mathf.Floor(Mathf.Sqrt(genomeLength))) * positionModifier);
+            //    }
+            //    else
+            //    {
+            //        position = new Vector2(Random.Range(0, (int)Mathf.Ceil((float)genomeLength / 2)) * positionModifier,
+            //                               Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier);
+
+            //    }
+            //}
+
+            //if (position.x < 0)
+            //{
+            //    position.x = -Mathf.Sqrt(Mathf.Abs(position.x));
+            //}
+            //else
+            //{
+            //    position.x = Mathf.Sqrt(position.x);
+            //}
+
+            //if (position.y < 0)
+            //{
+            //    position.y = -Mathf.Sqrt(Mathf.Abs(position.y));
+            //}
+            //else
+            //{
+            //    position.y = Mathf.Sqrt(position.y);
+            //}
+
             float rotation = Random.Range(0, 4);
             rotation *= 90f;
-            int roomType = Random.Range(0, 5);
+            int roomType = Random.Range(0, 6);
             LevelPiece piece = new LevelPiece(position, rotation, (LevelPiece.Type)roomType);
             individual.designElements.Add(piece);
         }
@@ -150,7 +257,7 @@ public class LevelGenerator : MonoBehaviour
     }
     // Displays the population in Unity
     void DisplayPopulation()
-    {        
+    {
         if (!displaying && currentIndividual < population.individuals.Count)
         {
             // Reset variables
@@ -176,20 +283,56 @@ public class LevelGenerator : MonoBehaviour
             {
                 // Calculate fitness for current individual
                 //population.individuals[currentIndividual].fitness = overlapPenalty + (genomeLength - connectedCount);
-                population.individuals[currentIndividual].fitness = overlapPenalty * 2 + (genomeLength - connectedCount) * 5;
+                population.individuals[currentIndividual].fitness = overlapPenalty * overlapPenaltyMultiplier + (genomeLength - connectedCount) * connectionPenaltyMultiplier;
+
+
+                //int cross = 0, t_junction = 0, hall = 0, corner = 0, room = 0;
+                //foreach (LevelPiece lp in population.individuals[currentIndividual].designElements)
+                //{
+                //    switch (lp.type)
+                //    {
+                //        case LevelPiece.Type.Cross:
+                //            cross++;
+                //            break;
+                //        case LevelPiece.Type.T_Junction:
+                //            t_junction++;
+                //            break;
+                //        case LevelPiece.Type.Hall:
+                //            hall++;
+                //            break;
+                //        case LevelPiece.Type.Corner:
+                //            corner++;
+                //            break;
+                //        case LevelPiece.Type.Room:
+                //            room++;
+                //            break;
+                //    }
+                //    if (cross >= genomeLength || t_junction >= genomeLength || hall >= genomeLength || corner >= genomeLength || room >= genomeLength)
+                //    {
+                //        population.individuals[currentIndividual].fitness += genomeLength;
+                //    }
+                //}
+                populationArea = 0;
+                //List<GameObject> levelPieces = CollectLevelPieces();
+
+                //foreach (GameObject levelPiece in levelPieces)
+                //{
+                //    populationArea += Area(levelPiece);
+                //}
+
                 fitness = population.individuals[currentIndividual].fitness;
                 // Closest to 0 is fittest
-                if (fitness < fittest)
+                if (fitness <= fittest)
                 {
                     fittest = fitness;
                     overlap = overlapPenalty;
                     connection = (genomeLength - connectedCount);
-                    fittestIndividual = population.individuals[currentIndividual];
-                    LevelGeneratorEditor.load = true;
-                    ScreenCapture.CaptureScreenshot("Assets/FittestLevel.png");
-#if UNITY_EDITOR
-                    AssetDatabase.Refresh();
-#endif
+                    fittestIndividual = new Individual(population.individuals[currentIndividual]);
+                    //                    LevelGeneratorEditor.load = true;
+                    //                    ScreenCapture.CaptureScreenshot("Assets/Resources/FittestLevel.png");
+                    //#if UNITY_EDITOR
+                    //                    AssetDatabase.Refresh();
+                    //#endif
                 }
                 //Debug.Log("I am individual number: " + currentIndividual + ", my OVERLAP penalty is: " + overlapPenalty +
                 //", my DISCONNECT penalty is: " + (populationSize - connectedCount));
@@ -211,16 +354,33 @@ public class LevelGenerator : MonoBehaviour
         // Loop through all design elements
         for (int i = 0; i < individual1.designElements.Count; i++)
         {
-            float rand = Random.Range(0.0f, 1.0f);
-            // 50% chance to copy design element from individual 1
-            if (rand <= uniformRate)
+            if (individual1.fitness > individual2.fitness)
             {
-                offspring.designElements.Add(individual1.designElements[i]);
+                float rand = Random.Range(0.0f, 1.0f);
+                // 60% chance to copy design element from individual 1
+                if (rand <= uniformRate)
+                {
+                    offspring.designElements.Add(individual1.designElements[i]);
+                }
+                // 40% chance to copy design element from individual 2
+                else
+                {
+                    offspring.designElements.Add(individual2.designElements[i]);
+                }
             }
-            // 50% chance to copy design element from individual 2
             else
             {
-                offspring.designElements.Add(individual2.designElements[i]);
+                float rand = Random.Range(0.0f, 1.0f);
+                // 60% chance to copy design element from individual 2
+                if (rand <= uniformRate)
+                {
+                    offspring.designElements.Add(individual2.designElements[i]);
+                }
+                // 40% chance to copy design element from individual 1
+                else
+                {
+                    offspring.designElements.Add(individual1.designElements[i]);
+                }
             }
         }
         return offspring;
@@ -262,7 +422,7 @@ public class LevelGenerator : MonoBehaviour
         return offspring;
     }
 
-    Individual TournamentSelection()
+    Individual TournamentSelection(Population pop)
     {
         // Create a tournament population
         Population tournamentPopulation = new Population();
@@ -270,19 +430,12 @@ public class LevelGenerator : MonoBehaviour
         // For each place in the tournament get a random individual
         for (int i = 0; i < tournamentSize; i++)
         {
-            int randomId = Random.Range(0, populationSize);
-            tournamentPopulation.Add(population.individuals[randomId]);
+            int randomId = Random.Range(0, pop.individuals.Count);
+            tournamentPopulation.Add(pop.individuals[randomId]);
         }
-
-        Individual fittest = tournamentPopulation.individuals[0];
         // Get the fittest
-        for (int i = 0; i < tournamentSize; i++)
-        {
-            if (fittest.fitness <= tournamentPopulation.individuals[i].fitness)
-            {
-                fittest = tournamentPopulation.individuals[i];
-            }
-        }
+        Individual fittest = tournamentPopulation.GetFittest();
+
         return fittest;
     }
 
@@ -292,48 +445,96 @@ public class LevelGenerator : MonoBehaviour
         // Loop through genes
         for (int i = 0; i < individual.designElements.Count; i++)
         {
-            // mutationRate % chance of mutating
-            if (Random.Range(0.0f, 1.0f) <= mutationRate)
+
+            int mutationType = Random.Range(0, 3);
+            //Debug.Log("Mutation type: " + mutationType);
+            if (mutationType == 0)
             {
-                Vector2 position = new Vector2(Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier,
-                                               Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier);
-                float rotation = Random.Range(0, 5);
-                rotation *= 90f;
-                int roomType = Random.Range(0, 4);
-                float rand = Random.Range(0.0f, 1.0f);
-
-                if (rand <= mutationRate)
-                {
-                    LevelPiece piece = new LevelPiece(position, rotation, (LevelPiece.Type)roomType);
-                    individual.designElements[i] = piece;
-                }
-                // Always mutate rotation and position
-                individual.designElements[i].rotation = rotation;
-                individual.designElements[i].position = position;
-
-                // Split chances method
-
-                //// 5% chance of mutating the piece type
-                //if (rand <= 0.05)
-                //{
-                //    LevelPiece piece = new LevelPiece(position, rotation, (LevelPiece.Type)roomType);
-                //    individual.designElements[i] = piece;
-                //}
-                //// 60% chance to mutate the rotation only
-                //else if (rand <= 0.6)
-                //{
-                //    individual.designElements[i].rotation = rotation;
-                //}
-                //// 35% chance to mutate the position only
-                //else
-                //{
-                //    individual.designElements[i].position = position;
-                //}
-
-
-
+                MutatePosition(individual.designElements[i]);
             }
+            else if (mutationType == 1)
+            {
+                MutateRotation(individual.designElements[i]);
+            }
+            else if (mutationType == 2)
+            {
+                MutateLevelPiece((LevelPiece)individual.designElements[i]);
+            }
+
         }
+    }
+
+    void MutatePosition(DesignElement designElement)
+    {
+        // Select a random position
+        //Vector2 position = new Vector2(Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier,
+        //                               Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier);
+        //Vector2 position = new Vector2(Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier,
+        //                               Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier);
+
+        float xMax = Mathf.Sqrt(genomeLength);
+        float yMax = Mathf.CeilToInt(genomeLength / xMax);
+
+        Vector2 position = new Vector2(Random.Range(0, (int)xMax) * positionModifier,
+                           Random.Range(0, (int)yMax) * positionModifier);
+
+        //float result = Mathf.Sqrt(genomeLength);
+        //bool isSquare = result % 1 == 0;
+
+        //if (!isSquare)
+        //{
+        //    if (genomeLength % 2 == 0)
+        //    {
+        //        position = new Vector2(Random.Range(0, (int)Mathf.Ceil(Mathf.Sqrt(genomeLength))) * positionModifier,
+        //                               Random.Range(0, (int)Mathf.Floor(Mathf.Sqrt(genomeLength))) * positionModifier);
+        //    }
+        //    else
+        //    {
+        //        position = new Vector2(Random.Range(0, (int)Mathf.Ceil((float)genomeLength / 2)) * positionModifier,
+        //                               Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier);
+
+        //    }
+        //}
+
+        // Keep re-positioning until value is different
+        while (position == designElement.position)
+        {
+            //position = new Vector2(Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier,
+            //                                   Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier);
+
+            position = new Vector2(Random.Range(0, (int)xMax) * positionModifier,
+                               Random.Range(0, (int)yMax) * positionModifier);
+            //Debug.Log("gotta change position");
+        }
+        designElement.position = position;
+    }
+
+    void MutateRotation(DesignElement designElement)
+    {
+        // Select a random rotation between 0, 90, 180, 270 degrees
+        float rotation = Random.Range(0, 4);
+        // Keep rotating until value is different
+        while (rotation * 90f == designElement.rotation)
+        {
+            rotation = Random.Range(0, 4);
+            //Debug.Log("gotta change rotation");
+        }
+        rotation *= 90f;
+        //Debug.Log(rotation);
+        designElement.rotation = rotation;
+    }
+
+    void MutateLevelPiece(LevelPiece levelPiece)
+    {
+        // Select random room type
+        int roomType = Random.Range(0, 6);
+        // Keep chaning piece until it's different
+        while ((LevelPiece.Type)roomType == levelPiece.type)
+        {
+            roomType = Random.Range(0, 6);
+            //Debug.Log("gotta change room type");
+        }
+        levelPiece.type = (LevelPiece.Type)roomType;
     }
 
     void DisplayIndividual(Individual individual)
@@ -347,32 +548,44 @@ public class LevelGenerator : MonoBehaviour
                 case LevelPiece.Type.Cross:
                     GameObject tempCross = Instantiate(cross, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                     tempCross.transform.parent = gameObject.transform;
-                    //tempCross.name += count;
-                    tempCross.tag = "LevelPiece";
+                    tempCross.name += count;
+                    //tempCross.tag = "LevelPiece";
                     break;
                 case LevelPiece.Type.T_Junction:
                     GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                     tempT_Junction.transform.parent = gameObject.transform;
-                    //tempT_Junction.name += count;
-                    tempT_Junction.tag = "LevelPiece";
+                    tempT_Junction.name += count;
+                    //tempT_Junction.tag = "LevelPiece";
                     break;
-                case LevelPiece.Type.Hall:
-                    GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-                    tempHall.transform.parent = gameObject.transform;
-                    //tempHall.name += count;
-                    tempHall.tag = "LevelPiece";
-                    break;
+                //case LevelPiece.Type.Hall:
+                //    GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                //    tempHall.transform.parent = gameObject.transform;
+                //    tempHall.name += count;
+                //    tempHall.tag = "LevelPiece";
+                //    break;
                 case LevelPiece.Type.Corner:
                     GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                     tempCorner.transform.parent = gameObject.transform;
-                    //tempCorner.name += count;
-                    tempCorner.tag = "LevelPiece";
+                    tempCorner.name += count; //a
+                    //tempCorner.tag = "LevelPiece";
                     break;
-                case LevelPiece.Type.Room:
-                    GameObject tempRoom = Instantiate(room, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-                    tempRoom.transform.parent = gameObject.transform;
-                    //tempRoom.name += count;
-                    tempRoom.tag = "LevelPiece";
+                case LevelPiece.Type.Room1:
+                    GameObject tempRoom1 = Instantiate(room1, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                    tempRoom1.transform.parent = gameObject.transform;
+                    tempRoom1.name += count;
+                    //tempRoom.tag = "LevelPiece";
+                    break;
+                case LevelPiece.Type.Room2:
+                    GameObject tempRoom2 = Instantiate(room2, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                    tempRoom2.transform.parent = gameObject.transform;
+                    tempRoom2.name += count;
+                    //tempRoom.tag = "LevelPiece";
+                    break;
+                case LevelPiece.Type.Room3:
+                    GameObject tempRoom3 = Instantiate(room3, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                    tempRoom3.transform.parent = gameObject.transform;
+                    tempRoom3.name += count;
+                    //tempRoom.tag = "LevelPiece";
                     break;
             }
         }
@@ -382,16 +595,60 @@ public class LevelGenerator : MonoBehaviour
         Instantiate(aStar, new Vector3(), new Quaternion());
     }
 
+    List<GameObject> CollectLevelPieces()
+    {
+        GameObject[] corners = GameObject.FindGameObjectsWithTag("Corner");
+        GameObject[] crosses = GameObject.FindGameObjectsWithTag("Cross");
+        GameObject[] halls = GameObject.FindGameObjectsWithTag("Hall");
+        GameObject[] t_junctions = GameObject.FindGameObjectsWithTag("T_Junction");
+        GameObject[] rooms1 = GameObject.FindGameObjectsWithTag("Room1");
+        GameObject[] rooms2 = GameObject.FindGameObjectsWithTag("Room2");
+        GameObject[] rooms3 = GameObject.FindGameObjectsWithTag("Room3");
+
+        List<GameObject> levelPieces = new List<GameObject>(corners);
+        levelPieces.AddRange(crosses);
+        levelPieces.AddRange(halls);
+        levelPieces.AddRange(t_junctions);
+        levelPieces.AddRange(rooms1);
+        levelPieces.AddRange(rooms2);
+        levelPieces.AddRange(rooms3);
+
+        return levelPieces;
+    }
+
     void ClearScene()
     {
         // Destroys A* prefab and any level pieces that were spawned
         Destroy(GameObject.FindGameObjectWithTag("A*"));
-        GameObject[] levelPieces = GameObject.FindGameObjectsWithTag("LevelPiece");
+        List<GameObject> levelPieces = CollectLevelPieces();
         foreach (GameObject levelPiece in levelPieces)
         {
             DestroyImmediate(levelPiece, true);
         }
     }
 
+    public float Area(GameObject gameObject)
+    {
+        //Transform transform = gameObject.transform.Find(gameObject.name.Substring(0, gameObject.name.Length - 8));
+        //Debug.Log("looking for: " + gameObject.name.Substring(0, gameObject.name.Length - 8));
+        MeshFilter[] meshFilters = transform.gameObject.GetComponentsInChildren<MeshFilter>();
+
+        Vector3 result = Vector3.zero;
+        foreach (MeshFilter mf in meshFilters)
+        {
+            Mesh mesh = mf.mesh;
+            Vector3[] vertices = mesh.vertices;
+
+
+            for (int p = vertices.Length - 1, q = 0; q < vertices.Length; p = q++)
+            {
+                result += Vector3.Cross(vertices[q], vertices[p]);
+            }
+            result *= 0.5f;
+
+        }
+        Debug.Log("Area of " + gameObject.tag + ": " + result.magnitude);
+        return result.magnitude;
+    }
 
 }
