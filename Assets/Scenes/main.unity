@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43667546, g: 0.48427135, b: 0.5645225, a: 1}
+  m_IndirectSpecularColor: {r: 0.44726145, g: 0.49718755, b: 0.57519716, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -281,9 +281,9 @@ MonoBehaviour:
   connection: 0
   populationDiversity: 0
   populationArea: 0
-  overlapPenaltyMultiplier: 4
-  connectionPenaltyMultiplier: 3
-  genomeLength: 14
+  overlapPenaltyMultiplier: 1
+  connectionPenaltyMultiplier: 1
+  genomeLength: 40
   populationSize: 50
   positionModifier: 15
   mutationRate: 0.1
@@ -364,13 +364,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 164757232}
-  m_LocalRotation: {x: 0.6830127, y: -0.18301266, z: 0.18301266, w: 0.6830127}
+  m_LocalRotation: {x: 0.39287743, y: -0.23644292, z: 0.10527117, w: 0.8824172}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 90, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 48, y: -30, z: 0}
 --- !u!1001 &210709059
 Prefab:
   m_ObjectHideFlags: 0

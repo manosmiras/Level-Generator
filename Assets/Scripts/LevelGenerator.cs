@@ -49,7 +49,7 @@ public class LevelGenerator : MonoBehaviour
     private float cooldown = 0;
     private bool displaying = false;
 
-    private static float uniformRate = 0.6f;
+    private static float uniformRate = 0.5f;
 
     // Use this for initialization
     void Start()
@@ -79,7 +79,7 @@ public class LevelGenerator : MonoBehaviour
             if (initialised)
             {
                 Debug.Log("fitnesses: " + fittestIndividual.fitness + ", " + population.GetFittest().fitness);
-                population.Sort();
+                //population.Sort();
                 //population.Print();
 
                 generation++;
@@ -200,13 +200,13 @@ public class LevelGenerator : MonoBehaviour
             //Vector2 position = new Vector2(Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier,
             //                               Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier);
 
-            float xMax = Mathf.RoundToInt(Mathf.Sqrt(genomeLength));
-            float yMax = Mathf.CeilToInt(genomeLength / xMax);
-            Debug.Log("xMax is: " + (int)xMax + "(" + xMax + ")");
-            Debug.Log("yMax is: " + (int)yMax + "(" + yMax + ")");
+            //float xMax = Mathf.RoundToInt(Mathf.Sqrt(genomeLength));
+            //float yMax = Mathf.CeilToInt(genomeLength / xMax);
+            //Debug.Log("xMax is: " + (int)xMax + "(" + xMax + ")");
+            //Debug.Log("yMax is: " + (int)yMax + "(" + yMax + ")");
 
-            Vector2 position = new Vector2(Random.Range(0, (int)xMax) * positionModifier,
-                               Random.Range(0, (int)yMax) * positionModifier);
+            //Vector2 position = new Vector2(Random.Range(0, (int)xMax) * positionModifier,
+            //                   Random.Range(0, (int)yMax) * positionModifier);
 
             //Vector2 position = new Vector2(i * positionModifier,
             //                               i * positionModifier);
@@ -250,7 +250,7 @@ public class LevelGenerator : MonoBehaviour
             float rotation = Random.Range(0, 4);
             rotation *= 90f;
             int roomType = Random.Range(0, 6);
-            LevelPiece piece = new LevelPiece(position, rotation, (LevelPiece.Type)roomType);
+            LevelPiece piece = new LevelPiece(Vector2.zero, rotation, (LevelPiece.Type)roomType);
             individual.designElements.Add(piece);
         }
         population.Add(individual);
@@ -446,17 +446,17 @@ public class LevelGenerator : MonoBehaviour
         for (int i = 0; i < individual.designElements.Count; i++)
         {
 
-            int mutationType = Random.Range(0, 3);
+            int mutationType = Random.Range(0, 2);
             //Debug.Log("Mutation type: " + mutationType);
+            //if (mutationType == 0)
+            //{
+            //    MutatePosition(individual.designElements[i]);
+            //}
             if (mutationType == 0)
-            {
-                MutatePosition(individual.designElements[i]);
-            }
-            else if (mutationType == 1)
             {
                 MutateRotation(individual.designElements[i]);
             }
-            else if (mutationType == 2)
+            else if (mutationType == 1)
             {
                 MutateLevelPiece((LevelPiece)individual.designElements[i]);
             }
@@ -472,7 +472,7 @@ public class LevelGenerator : MonoBehaviour
         //Vector2 position = new Vector2(Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier,
         //                               Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier);
 
-        float xMax = Mathf.Sqrt(genomeLength);
+        float xMax = Mathf.RoundToInt(Mathf.Sqrt(genomeLength));
         float yMax = Mathf.CeilToInt(genomeLength / xMax);
 
         Vector2 position = new Vector2(Random.Range(0, (int)xMax) * positionModifier,
@@ -540,55 +540,123 @@ public class LevelGenerator : MonoBehaviour
     void DisplayIndividual(Individual individual)
     {
         int count = 0;
-        foreach (LevelPiece piece in individual.designElements)
+        float xMax = Mathf.RoundToInt(Mathf.Sqrt(genomeLength));
+        float yMax = Mathf.CeilToInt(genomeLength / xMax);
+
+        for (int x = 0; x < (int)xMax; x++)
         {
-            count++;
-            switch (piece.type)
+            for (int y = 0; y < (int)yMax; y++)
             {
-                case LevelPiece.Type.Cross:
-                    GameObject tempCross = Instantiate(cross, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-                    tempCross.transform.parent = gameObject.transform;
-                    tempCross.name += count;
-                    //tempCross.tag = "LevelPiece";
+                //Debug.Log(new Vector2(x, y));
+                if (count < genomeLength)
+                {
+                    LevelPiece piece = (LevelPiece)individual.designElements[count];
+                    piece.position.x = (x * positionModifier) - genomeLength;
+                    piece.position.y = (y * positionModifier) - genomeLength;
+                    switch (piece.type)
+                    {
+                        case LevelPiece.Type.Cross:
+                            GameObject tempCross = Instantiate(cross, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            tempCross.transform.parent = gameObject.transform;
+                            tempCross.name += count;
+                            //tempCross.tag = "LevelPiece";
+                            break;
+                        case LevelPiece.Type.T_Junction:
+                            GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            tempT_Junction.transform.parent = gameObject.transform;
+                            tempT_Junction.name += count;
+                            //tempT_Junction.tag = "LevelPiece";
+                            break;
+                        //case LevelPiece.Type.Hall:
+                        //    GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                        //    tempHall.transform.parent = gameObject.transform;
+                        //    tempHall.name += count;
+                        //    tempHall.tag = "LevelPiece";
+                        //    break;
+                        case LevelPiece.Type.Corner:
+                            GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            tempCorner.transform.parent = gameObject.transform;
+                            tempCorner.name += count;
+                            //tempCorner.tag = "LevelPiece";
+                            break;
+                        case LevelPiece.Type.Room1:
+                            GameObject tempRoom1 = Instantiate(room1, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            tempRoom1.transform.parent = gameObject.transform;
+                            tempRoom1.name += count;
+                            //tempRoom.tag = "LevelPiece";
+                            break;
+                        case LevelPiece.Type.Room2:
+                            GameObject tempRoom2 = Instantiate(room2, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            tempRoom2.transform.parent = gameObject.transform;
+                            tempRoom2.name += count;
+                            //tempRoom.tag = "LevelPiece";
+                            break;
+                        case LevelPiece.Type.Room3:
+                            GameObject tempRoom3 = Instantiate(room3, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            tempRoom3.transform.parent = gameObject.transform;
+                            tempRoom3.name += count;
+                            //tempRoom.tag = "LevelPiece";
+                            break;
+                    }
+                }
+                else
+                {
                     break;
-                case LevelPiece.Type.T_Junction:
-                    GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-                    tempT_Junction.transform.parent = gameObject.transform;
-                    tempT_Junction.name += count;
-                    //tempT_Junction.tag = "LevelPiece";
-                    break;
-                //case LevelPiece.Type.Hall:
-                //    GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-                //    tempHall.transform.parent = gameObject.transform;
-                //    tempHall.name += count;
-                //    tempHall.tag = "LevelPiece";
-                //    break;
-                case LevelPiece.Type.Corner:
-                    GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-                    tempCorner.transform.parent = gameObject.transform;
-                    tempCorner.name += count; //a
-                    //tempCorner.tag = "LevelPiece";
-                    break;
-                case LevelPiece.Type.Room1:
-                    GameObject tempRoom1 = Instantiate(room1, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-                    tempRoom1.transform.parent = gameObject.transform;
-                    tempRoom1.name += count;
-                    //tempRoom.tag = "LevelPiece";
-                    break;
-                case LevelPiece.Type.Room2:
-                    GameObject tempRoom2 = Instantiate(room2, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-                    tempRoom2.transform.parent = gameObject.transform;
-                    tempRoom2.name += count;
-                    //tempRoom.tag = "LevelPiece";
-                    break;
-                case LevelPiece.Type.Room3:
-                    GameObject tempRoom3 = Instantiate(room3, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-                    tempRoom3.transform.parent = gameObject.transform;
-                    tempRoom3.name += count;
-                    //tempRoom.tag = "LevelPiece";
-                    break;
+                }
+                count++;
             }
         }
+
+        //foreach (LevelPiece piece in individual.designElements)
+        //{
+
+        //    count++;
+        //    switch (piece.type)
+        //    {
+        //        case LevelPiece.Type.Cross:
+        //            GameObject tempCross = Instantiate(cross, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+        //            tempCross.transform.parent = gameObject.transform;
+        //            tempCross.name += count;
+        //            //tempCross.tag = "LevelPiece";
+        //            break;
+        //        case LevelPiece.Type.T_Junction:
+        //            GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+        //            tempT_Junction.transform.parent = gameObject.transform;
+        //            tempT_Junction.name += count;
+        //            //tempT_Junction.tag = "LevelPiece";
+        //            break;
+        //        //case LevelPiece.Type.Hall:
+        //        //    GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+        //        //    tempHall.transform.parent = gameObject.transform;
+        //        //    tempHall.name += count;
+        //        //    tempHall.tag = "LevelPiece";
+        //        //    break;
+        //        case LevelPiece.Type.Corner:
+        //            GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+        //            tempCorner.transform.parent = gameObject.transform;
+        //            tempCorner.name += count; //a
+        //            //tempCorner.tag = "LevelPiece";
+        //            break;
+        //        case LevelPiece.Type.Room1:
+        //            GameObject tempRoom1 = Instantiate(room1, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+        //            tempRoom1.transform.parent = gameObject.transform;
+        //            tempRoom1.name += count;
+        //            //tempRoom.tag = "LevelPiece";
+        //            break;
+        //        case LevelPiece.Type.Room2:
+        //            GameObject tempRoom2 = Instantiate(room2, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+        //            tempRoom2.transform.parent = gameObject.transform;
+        //            tempRoom2.name += count;
+        //            //tempRoom.tag = "LevelPiece";
+        //            break;
+        //        case LevelPiece.Type.Room3:
+        //            GameObject tempRoom3 = Instantiate(room3, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+        //            tempRoom3.transform.parent = gameObject.transform;
+        //            tempRoom3.name += count;
+        //            //tempRoom.tag = "LevelPiece";
+        //            break;
+        //    }
+        //}
         // TODO: Fix overlap and disconnected penalties detection to work, maybe make coroutine or async?
         generated = true;
         // Initialise pathfinding
