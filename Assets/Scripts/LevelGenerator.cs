@@ -18,12 +18,13 @@ public class LevelGenerator : MonoBehaviour
     public static bool generated = false;
     public GameObject cross;
     public GameObject t_junction;
-    //public GameObject hall;
+    public GameObject hall;
     public GameObject corner;
     public GameObject room1;
     public GameObject room2;
     public GameObject room3;
     public GameObject aStar;
+    public GameObject spikeTrap;
     [ReadOnly] public int currentIndividual = 0;
     [ReadOnly] public int generation = 1;
     [ReadOnly] public int fittest;
@@ -32,6 +33,7 @@ public class LevelGenerator : MonoBehaviour
     [ReadOnly] public int connection = 0;
     [ReadOnly] public int populationDiversity = 0;
     [ReadOnly] public float populationArea = 0;
+    [ReadOnly] public int connectedComponents = 0;
     public int overlapPenaltyMultiplier = 1;
     public int connectionPenaltyMultiplier = 2;
     public int genomeLength = 10;
@@ -41,15 +43,19 @@ public class LevelGenerator : MonoBehaviour
     public float mutationRate = 0.05f;
     public bool elitism = true;
     public int tournamentSize;
+    public float evaluationTime = 0.1f;
     public Population population = new Population();
     public Individual fittestIndividual = new Individual();
     public string time;
+    
     [ReadOnly] public bool initialised;
     // Private properties
     private float cooldown = 0;
     private bool displaying = false;
 
     private static float uniformRate = 0.5f;
+
+    private List<Vector3> trapPositions = new List<Vector3>();
 
     // Use this for initialization
     void Start()
@@ -65,7 +71,7 @@ public class LevelGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (fittest != 0)
+        if (fittest != 1) // if (currentIndividual != 3) //
         {
             int minutes = Mathf.FloorToInt(Time.time / 60F);
             int seconds = Mathf.FloorToInt(Time.time - minutes * 60);
@@ -87,7 +93,7 @@ public class LevelGenerator : MonoBehaviour
                 population = EvolvePopulation(population);
 
                 currentIndividual = 0;
-                initialised = false; // a
+                initialised = false;
 
             }
         }
@@ -249,9 +255,10 @@ public class LevelGenerator : MonoBehaviour
 
             float rotation = Random.Range(0, 4);
             rotation *= 90f;
-            int roomType = Random.Range(0, 6);
+            int roomType = Random.Range(0, 7);
             LevelPiece piece = new LevelPiece(Vector2.zero, rotation, (LevelPiece.Type)roomType);
             individual.designElements.Add(piece);
+
         }
         population.Add(individual);
     }
@@ -279,11 +286,22 @@ public class LevelGenerator : MonoBehaviour
         if (displaying)
         {
             cooldown += Time.deltaTime;
-            if (cooldown >= .1)
+            if (cooldown >= evaluationTime)
             {
+                //if (currentIndividual == 0)
+                //{
+                // Display graph
+                //Graph.Print();
+                connectedComponents = Graph.CalculateConnectivity();
+                GraphEditor.InitRects(genomeLength);
+
+                //}
                 // Calculate fitness for current individual
                 //population.individuals[currentIndividual].fitness = overlapPenalty + (genomeLength - connectedCount);
-                population.individuals[currentIndividual].fitness = overlapPenalty * overlapPenaltyMultiplier + (genomeLength - connectedCount) * connectionPenaltyMultiplier;
+                int maxConnections = CalculateMaxConnections(population.individuals[currentIndividual]);
+
+                //population.individuals[currentIndividual].fitness = overlapPenalty * overlapPenaltyMultiplier + (maxConnections - connectedCount) * connectionPenaltyMultiplier;
+                population.individuals[currentIndividual].fitness = connectedComponents;
 
 
                 //int cross = 0, t_junction = 0, hall = 0, corner = 0, room = 0;
@@ -319,14 +337,13 @@ public class LevelGenerator : MonoBehaviour
                 //{
                 //    populationArea += Area(levelPiece);
                 //}
-
                 fitness = population.individuals[currentIndividual].fitness;
                 // Closest to 0 is fittest
                 if (fitness <= fittest)
                 {
                     fittest = fitness;
                     overlap = overlapPenalty;
-                    connection = (genomeLength - connectedCount);
+                    connection = (maxConnections - connectedCount);
                     fittestIndividual = new Individual(population.individuals[currentIndividual]);
                     //                    LevelGeneratorEditor.load = true;
                     //                    ScreenCapture.CaptureScreenshot("Assets/Resources/FittestLevel.png");
@@ -527,11 +544,11 @@ public class LevelGenerator : MonoBehaviour
     void MutateLevelPiece(LevelPiece levelPiece)
     {
         // Select random room type
-        int roomType = Random.Range(0, 6);
+        int roomType = Random.Range(0, 7);
         // Keep chaning piece until it's different
         while ((LevelPiece.Type)roomType == levelPiece.type)
         {
-            roomType = Random.Range(0, 6);
+            roomType = Random.Range(0, 7);
             //Debug.Log("gotta change room type");
         }
         levelPiece.type = (LevelPiece.Type)roomType;
@@ -542,7 +559,10 @@ public class LevelGenerator : MonoBehaviour
         int count = 0;
         float xMax = Mathf.RoundToInt(Mathf.Sqrt(genomeLength));
         float yMax = Mathf.CeilToInt(genomeLength / xMax);
-
+        // Initialise graph
+        Graph.nodes = new List<GraphNode>();
+        // Initialise trap positions list
+        trapPositions = new List<Vector3>();
         for (int x = 0; x < (int)xMax; x++)
         {
             for (int y = 0; y < (int)yMax; y++)
@@ -550,51 +570,78 @@ public class LevelGenerator : MonoBehaviour
                 //Debug.Log(new Vector2(x, y));
                 if (count < genomeLength)
                 {
+
                     LevelPiece piece = (LevelPiece)individual.designElements[count];
-                    piece.position.x = (x * positionModifier) - genomeLength;
-                    piece.position.y = (y * positionModifier) - genomeLength;
+                    piece.position.x = (x * positionModifier) - xMax;
+                    piece.position.y = (y * positionModifier) - yMax;
+
                     switch (piece.type)
                     {
                         case LevelPiece.Type.Cross:
                             GameObject tempCross = Instantiate(cross, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempCross.transform.parent = gameObject.transform;
                             tempCross.name += count;
+                            // Add a new node to graph
+                            Graph.nodes.Add(new GraphNode(tempCross.name, count));
+                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempCross.tag = "LevelPiece";
                             break;
                         case LevelPiece.Type.T_Junction:
                             GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempT_Junction.transform.parent = gameObject.transform;
                             tempT_Junction.name += count;
+                            // Add a new node to graph
+                            Graph.nodes.Add(new GraphNode(tempT_Junction.name, count));
+
+                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
+                            //trapPositions.Add(new Vector3(tempT_Junction.transform.forward.x, tempT_Junction.transform.forward.y, tempT_Junction.transform.forward.z) + new Vector3(-1,0,0));
+                            //trapPositions.Add(tempT_Junction.transform.forward + new Vector3(2.5f, 0, 0));
+                            //trapPositions.Add(tempT_Junction.transform.forward - new Vector3(2.5f, 0, 0));
                             //tempT_Junction.tag = "LevelPiece";
                             break;
-                        //case LevelPiece.Type.Hall:
-                        //    GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-                        //    tempHall.transform.parent = gameObject.transform;
-                        //    tempHall.name += count;
-                        //    tempHall.tag = "LevelPiece";
-                        //    break;
+                        case LevelPiece.Type.Hall:
+                            GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            tempHall.transform.parent = gameObject.transform;
+                            tempHall.name += count;
+                            // Add a new node to graph
+                            Graph.nodes.Add(new GraphNode(tempHall.name, count));
+                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
+                            //tempHall.tag = "LevelPiece";
+                            break;
                         case LevelPiece.Type.Corner:
                             GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempCorner.transform.parent = gameObject.transform;
                             tempCorner.name += count;
+                            // Add a new node to graph
+                            Graph.nodes.Add(new GraphNode(tempCorner.name, count));
+                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempCorner.tag = "LevelPiece";
                             break;
                         case LevelPiece.Type.Room1:
                             GameObject tempRoom1 = Instantiate(room1, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom1.transform.parent = gameObject.transform;
                             tempRoom1.name += count;
+                            // Add a new node to graph
+                            Graph.nodes.Add(new GraphNode(tempRoom1.name, count));
+                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempRoom.tag = "LevelPiece";
                             break;
                         case LevelPiece.Type.Room2:
                             GameObject tempRoom2 = Instantiate(room2, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom2.transform.parent = gameObject.transform;
                             tempRoom2.name += count;
+                            // Add a new node to graph
+                            Graph.nodes.Add(new GraphNode(tempRoom2.name, count));
+                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempRoom.tag = "LevelPiece";
                             break;
                         case LevelPiece.Type.Room3:
                             GameObject tempRoom3 = Instantiate(room3, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom3.transform.parent = gameObject.transform;
                             tempRoom3.name += count;
+                            // Add a new node to graph
+                            Graph.nodes.Add(new GraphNode(tempRoom3.name, count));
+                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempRoom.tag = "LevelPiece";
                             break;
                     }
@@ -605,6 +652,19 @@ public class LevelGenerator : MonoBehaviour
                 }
                 count++;
             }
+        }
+        trapPositions = CollectPossibleTrapPositions();
+        // TEST
+        for (int i = 0; i < genomeLength; i++)
+        {
+            // Choose a position randomly
+            int randPos = Random.Range(0, trapPositions.Count);
+            // Spawn trap
+            GameObject tempSpikeTrap = Instantiate(spikeTrap, new Vector3(trapPositions[randPos].x, trapPositions[randPos].y - 2.5f, trapPositions[randPos].z), Quaternion.AngleAxis(0, Vector3.up)) as GameObject;
+            tempSpikeTrap.transform.parent = gameObject.transform;
+            tempSpikeTrap.name += i;
+            // Remove currently selected position
+            trapPositions.Remove(trapPositions[randPos]);
         }
 
         //foreach (LevelPiece piece in individual.designElements)
@@ -684,14 +744,43 @@ public class LevelGenerator : MonoBehaviour
         return levelPieces;
     }
 
+    List<GameObject> CollectTraps()
+    {
+        GameObject[] spikeTraps = GameObject.FindGameObjectsWithTag("SpikeTrap");
+
+        List<GameObject> traps = new List<GameObject>(spikeTraps);
+
+        return traps;
+    }
+    List<Vector3> CollectPossibleTrapPositions()
+    {
+        GameObject[] possiblePositions = GameObject.FindGameObjectsWithTag("TrapPosition");
+
+        List<Vector3> positions = new List<Vector3>();
+
+        foreach (GameObject go in possiblePositions)
+        {
+            positions.Add(go.transform.position);
+        }
+
+        return positions;
+    }
+
     void ClearScene()
     {
-        // Destroys A* prefab and any level pieces that were spawned
+        // Destroys A* prefab
         Destroy(GameObject.FindGameObjectWithTag("A*"));
+        // Destroy any level pieces that were spawned
         List<GameObject> levelPieces = CollectLevelPieces();
         foreach (GameObject levelPiece in levelPieces)
         {
             DestroyImmediate(levelPiece, true);
+        }
+        // Destroy any Traps that were spawned
+        List<GameObject> traps = CollectTraps();
+        foreach (GameObject trap in traps)
+        {
+            DestroyImmediate(trap, true);
         }
     }
 
@@ -717,6 +806,22 @@ public class LevelGenerator : MonoBehaviour
         }
         Debug.Log("Area of " + gameObject.tag + ": " + result.magnitude);
         return result.magnitude;
+    }
+
+    public int CalculateMaxConnections(Individual individual)
+    {
+        GameObject[] corners = GameObject.FindGameObjectsWithTag("Corner");
+        GameObject[] crosses = GameObject.FindGameObjectsWithTag("Cross");
+        GameObject[] halls = GameObject.FindGameObjectsWithTag("Hall");
+        GameObject[] t_junctions = GameObject.FindGameObjectsWithTag("T_Junction");
+        GameObject[] rooms1 = GameObject.FindGameObjectsWithTag("Room1");
+        GameObject[] rooms2 = GameObject.FindGameObjectsWithTag("Room2");
+        GameObject[] rooms3 = GameObject.FindGameObjectsWithTag("Room3");
+
+        int maxConnections = corners.Length * 2 + crosses.Length * 4 + halls.Length * 2 +
+            t_junctions.Length * 3 + rooms1.Length + rooms2.Length * 2 + rooms3.Length * 3;
+
+        return maxConnections;
     }
 
 }

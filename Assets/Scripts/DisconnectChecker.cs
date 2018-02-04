@@ -4,19 +4,44 @@ using UnityEngine;
 
 public class DisconnectChecker : MonoBehaviour
 {
-    int count = 0;
+    List<string> otherCollisions = new List<string>();
     void OnTriggerEnter(Collider other)
     {
-        // Checks for collisions of room entries
-        if (gameObject.name.Equals("Entry_Colliders") && other.name.Equals("Entry_Colliders"))
+        //// Checks for collisions of room entries
+        //if (gameObject.name.Equals("Entry_Colliders") && other.name.Equals("Entry_Colliders"))
+        //{
+        //    //Debug.Log("Checking: " + transform.parent.name);
+        //    // Check if already added
+        //    if (!LevelGenerator.connected.Contains(transform.parent.name))
+        //    {
+        //        LevelGenerator.connected.Add(transform.parent.name);
+        //        LevelGenerator.connectedCount++;
+        //        //Debug.Log("Number of rooms connected: " + LevelGenerator.connectedCount);
+        //    }
+        //}
+
+        // If parent exists
+        if (other.transform.parent)
         {
-            //Debug.Log("Checking: " + transform.parent.name);
-            // Check if already added
-            if (!LevelGenerator.connected.Contains(transform.parent.name))
+            // Get parent name
+            string otherColliderName = other.transform.parent.name;
+
+            // Checks for collisions of room entries
+            if (gameObject.name.Equals("Entry_Colliders") && other.name.Equals("Entry_Colliders") && !otherCollisions.Contains(otherColliderName))
             {
-                LevelGenerator.connected.Add(transform.parent.name);
+                //Debug.Log("name: " + other.name + ", go name " + transform.parent.name);
+                otherCollisions.Add(otherColliderName);
+
+                // Check if the other piece already contains this piece as a child, if so, don't add
+                //if (!Graph.Get(otherColliderName).children.Contains(Graph.Get(transform.parent.name)))
+                //{
+                    // Add child piece to current piece
+                    Graph.Get(transform.parent.name).children.Add(Graph.Get(otherColliderName));
+                //}
+
                 LevelGenerator.connectedCount++;
-                //Debug.Log("Number of rooms connected: " + LevelGenerator.connectedCount);
+                //TextMesh tm = gameObject.GetComponentInChildren<TextMesh>();
+                //tm.text = otherCollisions.Count.ToString();
             }
         }
     }
