@@ -36,7 +36,7 @@ public class DisconnectChecker : MonoBehaviour
                 //if (!Graph.Get(otherColliderName).children.Contains(Graph.Get(transform.parent.name)))
                 //{
                     // Add child piece to current piece
-                    Graph.Get(transform.parent.name).children.Add(Graph.Get(otherColliderName));
+                    LevelGenerator.graph.Get(transform.parent.name).children.Add(LevelGenerator.graph.Get(otherColliderName));
                 //}
 
                 LevelGenerator.connectedCount++;

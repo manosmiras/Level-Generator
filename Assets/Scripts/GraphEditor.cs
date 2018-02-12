@@ -65,7 +65,7 @@ public class GraphEditor : EditorWindow
 
     public static void DrawConnections()
     {
-        foreach (GraphNode parent in Graph.nodes)
+        foreach (GraphNode parent in LevelGenerator.graph.nodes)
         {
             foreach (GraphNode child in parent.children)
             {

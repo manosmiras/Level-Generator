@@ -51,6 +51,7 @@ public class LevelGenerator : MonoBehaviour
     public string time;
     public string timeMs;
     [ReadOnly] public bool initialised;
+    public static Graph graph = new Graph();
     // Private properties
     private float cooldown = 0;
     private bool displaying = false;
@@ -73,7 +74,7 @@ public class LevelGenerator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (fittest != 1) // if (currentIndividual != 3) //
+        if (fittest != 1) //if (currentIndividual != 1)
         {
             timeMs = Time.time.ToString("F2");
             int minutes = Mathf.FloorToInt(Time.time / 60F);
@@ -295,7 +296,9 @@ public class LevelGenerator : MonoBehaviour
                 //{
                 // Display graph
                 //Graph.Print();
-                connectedComponents = Graph.CalculateConnectivity();
+                connectedComponents = graph.CalculateConnectivity();
+                //graph.CalculateStrongConnectivity();
+                Debug.Log("Connected components: " + connectedComponents + ", strongly connected: " + graph.CalculateStrongConnectivity());
                 GraphEditor.InitRects(genomeLength);
 
                 //}
@@ -563,7 +566,7 @@ public class LevelGenerator : MonoBehaviour
         float xMax = Mathf.RoundToInt(Mathf.Sqrt(genomeLength));
         float yMax = Mathf.CeilToInt(genomeLength / xMax);
         // Initialise graph
-        Graph.nodes = new List<GraphNode>();
+        graph.nodes = new List<GraphNode>();
         // Initialise trap positions list
         trapPositions = new List<Vector3>();
         List<Vector3> piecePositions = new List<Vector3>();
@@ -586,7 +589,7 @@ public class LevelGenerator : MonoBehaviour
                             tempCross.transform.parent = gameObject.transform;
                             tempCross.name += count;
                             // Add a new node to graph
-                            Graph.nodes.Add(new GraphNode(tempCross.name, count));
+                            graph.nodes.Add(new GraphNode(tempCross.name, count));
                             //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempCross.tag = "LevelPiece";
                             break;
@@ -595,7 +598,7 @@ public class LevelGenerator : MonoBehaviour
                             tempT_Junction.transform.parent = gameObject.transform;
                             tempT_Junction.name += count;
                             // Add a new node to graph
-                            Graph.nodes.Add(new GraphNode(tempT_Junction.name, count));
+                            graph.nodes.Add(new GraphNode(tempT_Junction.name, count));
 
                             //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //trapPositions.Add(new Vector3(tempT_Junction.transform.forward.x, tempT_Junction.transform.forward.y, tempT_Junction.transform.forward.z) + new Vector3(-1,0,0));
@@ -608,7 +611,7 @@ public class LevelGenerator : MonoBehaviour
                             tempHall.transform.parent = gameObject.transform;
                             tempHall.name += count;
                             // Add a new node to graph
-                            Graph.nodes.Add(new GraphNode(tempHall.name, count));
+                            graph.nodes.Add(new GraphNode(tempHall.name, count));
                             //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempHall.tag = "LevelPiece";
                             break;
@@ -617,7 +620,7 @@ public class LevelGenerator : MonoBehaviour
                             tempCorner.transform.parent = gameObject.transform;
                             tempCorner.name += count;
                             // Add a new node to graph
-                            Graph.nodes.Add(new GraphNode(tempCorner.name, count));
+                            graph.nodes.Add(new GraphNode(tempCorner.name, count));
                             //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempCorner.tag = "LevelPiece";
                             break;
@@ -626,7 +629,7 @@ public class LevelGenerator : MonoBehaviour
                             tempRoom1.transform.parent = gameObject.transform;
                             tempRoom1.name += count;
                             // Add a new node to graph
-                            Graph.nodes.Add(new GraphNode(tempRoom1.name, count));
+                            graph.nodes.Add(new GraphNode(tempRoom1.name, count));
                             //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempRoom.tag = "LevelPiece";
                             break;
@@ -635,7 +638,7 @@ public class LevelGenerator : MonoBehaviour
                             tempRoom2.transform.parent = gameObject.transform;
                             tempRoom2.name += count;
                             // Add a new node to graph
-                            Graph.nodes.Add(new GraphNode(tempRoom2.name, count));
+                            graph.nodes.Add(new GraphNode(tempRoom2.name, count));
                             //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempRoom.tag = "LevelPiece";
                             break;
@@ -644,7 +647,7 @@ public class LevelGenerator : MonoBehaviour
                             tempRoom3.transform.parent = gameObject.transform;
                             tempRoom3.name += count;
                             // Add a new node to graph
-                            Graph.nodes.Add(new GraphNode(tempRoom3.name, count));
+                            graph.nodes.Add(new GraphNode(tempRoom3.name, count));
                             //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
                             //tempRoom.tag = "LevelPiece";
                             break;

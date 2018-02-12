@@ -11,6 +11,10 @@ public class Grid : MonoBehaviour
     public LayerMask entryMask;
     public Vector2 gridWorldSize;
     public float nodeRadius;
+    public TerrainType[] walkableRegions;
+    LayerMask weightsWalkableMask;
+    Dictionary<int, int> walkableRegionsDictionary = new Dictionary<int, int>();
+
     Node[,] grid;
 
     float nodeDiameter;
@@ -24,6 +28,13 @@ public class Grid : MonoBehaviour
         gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
         // How many nodes can fit into world size y
         gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
+
+        foreach (TerrainType region in walkableRegions)
+        {
+            weightsWalkableMask.value |= region.terrainMask.value;
+            walkableRegionsDictionary.Add((int)Mathf.Log(region.terrainMask.value, 2),region.terrainPenalty);
+        }
+
         CreateGrid();
     }
 
@@ -62,10 +73,22 @@ public class Grid : MonoBehaviour
                 //    //walkable = Physics.CheckSphere(worldPoint, nodeRadius, entryMask);
                 //}
 
-                
-                
 
-                grid[x, y] = new Node(walkable, entry, worldPoint, x, y);
+
+                int movementPenalty = 0;
+
+                // raycast
+                if (walkable)
+                {
+                    Ray ray = new Ray(worldPoint + Vector3.up * 50, Vector3.down);
+                    RaycastHit hit;
+                    if (Physics.Raycast(ray, out hit, 100, weightsWalkableMask))
+                    {
+                        walkableRegionsDictionary.TryGetValue(hit.collider.gameObject.layer, out movementPenalty);
+                    }
+                }
+
+                grid[x, y] = new Node(walkable, entry, worldPoint, x, y, movementPenalty);
             }
         }
     }
@@ -122,13 +145,24 @@ public class Grid : MonoBehaviour
             foreach (Node node in grid)
             {
                 // White if walkable, red if unwalkable, green if entry
-                Gizmos.color = node.walkable ? new Color(1,1,1,0.25f) : new Color(1, 0, 0, 0.25f);
-                if (node.entry)
+                //Gizmos.color = node.walkable ? new Color(1,1,1,0.25f) : new Color(1, 0, 0, 0.25f);
+                //if (node.entry)
+                //{
+                //    Gizmos.color = new Color(0, 1, 0, 0.25f);
+                //}
+                //Gizmos.DrawCube(node.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
+                if (node.movementPenalty > 0)
                 {
-                    Gizmos.color = new Color(0, 1, 0, 0.25f);
+                    Gizmos.color = new Color(1, 0, 0, 0.25f);
+                    Gizmos.DrawCube(node.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
                 }
-                Gizmos.DrawCube(node.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
             }
         }
+    }
+    [System.Serializable]
+    public class TerrainType
+    {
+        public LayerMask terrainMask;
+        public int terrainPenalty;
     }
 }

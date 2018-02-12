@@ -328,7 +328,7 @@ MonoBehaviour:
   connectedComponents: 0
   overlapPenaltyMultiplier: 1
   connectionPenaltyMultiplier: 1
-  genomeLength: 25
+  genomeLength: 15
   populationSize: 50
   positionModifier: 15
   mutationRate: 0.05

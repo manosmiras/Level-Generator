@@ -277,7 +277,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4079906213754600}
-  m_Layer: 0
+  - component: {fileID: 65316175993071100}
+  m_Layer: 11
   m_Name: Traps
   m_TagString: SpikeTrap
   m_Icon: {fileID: 0}
@@ -379,7 +380,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1769948916603860}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4748841203319604}
@@ -951,6 +952,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1741191938141658}
   m_Mesh: {fileID: 4300004, guid: eca14c6b56f7dd946b4307734063d358, type: 3}
+--- !u!65 &65316175993071100
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1769948916603860}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 5, y: 1, z: 5}
+  m_Center: {x: -0.05, y: 0, z: 0.2}
 --- !u!95 &95013263478676900
 Animator:
   serializedVersion: 3
