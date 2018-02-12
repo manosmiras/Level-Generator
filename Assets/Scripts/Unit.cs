@@ -12,6 +12,7 @@ public class Unit : MonoBehaviour {
 
     private void Start()
     {
+        target = GameObject.FindGameObjectWithTag("Target").transform;
         PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
     }
 
@@ -20,8 +21,8 @@ public class Unit : MonoBehaviour {
         if (pathSuccesful)
         {
             path = newPath;
-            StopCoroutine("FollowPath");
-            StartCoroutine("FollowPath");
+            //StopCoroutine("FollowPath");
+            //StartCoroutine("FollowPath");
         }
 
     }
@@ -54,7 +55,7 @@ public class Unit : MonoBehaviour {
         {
             for (int i = targetIndex; i < path.Length; i++)
             {
-                Gizmos.color = Color.black;
+                Gizmos.color = Color.green;
                 Gizmos.DrawCube(path[i], Vector3.one);
 
                 if (i == targetIndex)

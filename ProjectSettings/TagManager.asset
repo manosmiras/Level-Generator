@@ -17,6 +17,8 @@ TagManager:
   - Text_Mesh
   - SpikeTrap
   - TrapPosition
+  - Target
+  - Seeker
   layers:
   - Default
   - TransparentFX

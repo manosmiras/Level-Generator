@@ -25,6 +25,8 @@ public class LevelGenerator : MonoBehaviour
     public GameObject room3;
     public GameObject aStar;
     public GameObject spikeTrap;
+    public GameObject seeker;
+    public GameObject target;
     [ReadOnly] public int currentIndividual = 0;
     [ReadOnly] public int generation = 1;
     [ReadOnly] public int fittest;
@@ -47,7 +49,7 @@ public class LevelGenerator : MonoBehaviour
     public Population population = new Population();
     public Individual fittestIndividual = new Individual();
     public string time;
-    
+    public string timeMs;
     [ReadOnly] public bool initialised;
     // Private properties
     private float cooldown = 0;
@@ -73,6 +75,7 @@ public class LevelGenerator : MonoBehaviour
     {
         if (fittest != 1) // if (currentIndividual != 3) //
         {
+            timeMs = Time.time.ToString("F2");
             int minutes = Mathf.FloorToInt(Time.time / 60F);
             int seconds = Mathf.FloorToInt(Time.time - minutes * 60);
             time = string.Format("{0:0}:{1:00}", minutes, seconds);
@@ -563,6 +566,7 @@ public class LevelGenerator : MonoBehaviour
         Graph.nodes = new List<GraphNode>();
         // Initialise trap positions list
         trapPositions = new List<Vector3>();
+        List<Vector3> piecePositions = new List<Vector3>();
         for (int x = 0; x < (int)xMax; x++)
         {
             for (int y = 0; y < (int)yMax; y++)
@@ -574,7 +578,7 @@ public class LevelGenerator : MonoBehaviour
                     LevelPiece piece = (LevelPiece)individual.designElements[count];
                     piece.position.x = (x * positionModifier) - xMax;
                     piece.position.y = (y * positionModifier) - yMax;
-
+                    piecePositions.Add(new Vector3(piece.position.x, 0, piece.position.y));
                     switch (piece.type)
                     {
                         case LevelPiece.Type.Cross:
@@ -721,6 +725,20 @@ public class LevelGenerator : MonoBehaviour
         generated = true;
         // Initialise pathfinding
         Instantiate(aStar, new Vector3(), new Quaternion());
+        float distance = 0;
+        Vector3 furthest = new Vector3();
+        for (int i = 1; i < piecePositions.Count; i++)
+        {
+            float currentDistance = ManhattanDistance(piecePositions[0], piecePositions[i]);
+            if (currentDistance > distance)
+            {
+                furthest = piecePositions[i];
+                distance = currentDistance;
+            }
+        }
+
+        Instantiate(target, furthest, new Quaternion());
+        Instantiate(seeker, piecePositions[0], new Quaternion());
     }
 
     List<GameObject> CollectLevelPieces()
@@ -770,6 +788,10 @@ public class LevelGenerator : MonoBehaviour
     {
         // Destroys A* prefab
         Destroy(GameObject.FindGameObjectWithTag("A*"));
+        // Destroys Seeker prefab
+        Destroy(GameObject.FindGameObjectWithTag("Seeker"));
+        // Destroys Target prefab
+        Destroy(GameObject.FindGameObjectWithTag("Target"));
         // Destroy any level pieces that were spawned
         List<GameObject> levelPieces = CollectLevelPieces();
         foreach (GameObject levelPiece in levelPieces)
@@ -822,6 +844,11 @@ public class LevelGenerator : MonoBehaviour
             t_junctions.Length * 3 + rooms1.Length + rooms2.Length * 2 + rooms3.Length * 3;
 
         return maxConnections;
+    }
+
+    public float ManhattanDistance(Vector3 a, Vector3 b)
+    {
+        return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y) + Mathf.Abs(a.z - b.z);
     }
 
 }

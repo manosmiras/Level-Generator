@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 4040979056637510}
   m_Layer: 8
   m_Name: Trap_Position (6)
-  m_TagString: Untagged
+  m_TagString: TrapPosition
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -160,7 +160,7 @@ GameObject:
   - component: {fileID: 4873330155576282}
   m_Layer: 8
   m_Name: Trap_Position (4)
-  m_TagString: Untagged
+  m_TagString: TrapPosition
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -192,7 +192,7 @@ GameObject:
   - component: {fileID: 4154352524420136}
   m_Layer: 8
   m_Name: Trap_Position (5)
-  m_TagString: Untagged
+  m_TagString: TrapPosition
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -275,7 +275,7 @@ GameObject:
   - component: {fileID: 4786947633367486}
   m_Layer: 8
   m_Name: Trap_Position (8)
-  m_TagString: Untagged
+  m_TagString: TrapPosition
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -324,7 +324,7 @@ GameObject:
   - component: {fileID: 4811918672102928}
   m_Layer: 8
   m_Name: Trap_Position (3)
-  m_TagString: Untagged
+  m_TagString: TrapPosition
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -424,7 +424,7 @@ GameObject:
   - component: {fileID: 4669598881258124}
   m_Layer: 8
   m_Name: Trap_Position (7)
-  m_TagString: Untagged
+  m_TagString: TrapPosition
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -475,7 +475,7 @@ GameObject:
   - component: {fileID: 4623865530906428}
   m_Layer: 8
   m_Name: Trap_Position (1)
-  m_TagString: Untagged
+  m_TagString: TrapPosition
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -558,7 +558,7 @@ GameObject:
   - component: {fileID: 4512549745986004}
   m_Layer: 8
   m_Name: Trap_Position (2)
-  m_TagString: Untagged
+  m_TagString: TrapPosition
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -675,7 +675,7 @@ GameObject:
   - component: {fileID: 4823735206559620}
   m_Layer: 8
   m_Name: Trap_Position
-  m_TagString: Untagged
+  m_TagString: TrapPosition
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -825,7 +825,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1009672517134532}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 22.661644, y: -2.47, z: 7.9792523}
+  m_LocalPosition: {x: 68.122284, y: -2.47, z: 42.89585}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4788716528587430}

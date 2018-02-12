@@ -47,16 +47,16 @@ public class Grid : MonoBehaviour
                                                     + Vector3.forward * (y * nodeDiameter + nodeRadius);
                 // Not walkable if collision
                 bool walkable = Physics.CheckSphere(worldPoint, nodeRadius, walkableMask);//!(Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask));
-                bool entry = Physics.CheckSphere(worldPoint, nodeRadius, entryMask);
+                bool entry = false;//Physics.CheckSphere(worldPoint, nodeRadius, entryMask);
                 if (walkable)
                 {
                     walkable = !Physics.CheckSphere(worldPoint, nodeRadius, unwalkableMask);
                 }
-                if (!walkable)
-                {
-                    walkable = Physics.CheckSphere(worldPoint, nodeRadius, entryMask);
-                    //walkable = entry;
-                }
+                //if (!walkable)
+                //{
+                //    walkable = Physics.CheckSphere(worldPoint, nodeRadius, entryMask);
+                //    //walkable = entry;
+                //}
                 //else
                 //{
                 //    //walkable = Physics.CheckSphere(worldPoint, nodeRadius, entryMask);
