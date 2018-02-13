@@ -25,7 +25,8 @@ public class LevelGenerator : MonoBehaviour
     public GameObject room3;
     public GameObject aStar;
     public GameObject spikeTrap;
-    public GameObject seeker;
+    public GameObject seekerFast;
+    public GameObject seekerSafe;
     public GameObject target;
     [ReadOnly] public int currentIndividual = 0;
     [ReadOnly] public int generation = 1;
@@ -579,8 +580,8 @@ public class LevelGenerator : MonoBehaviour
                 {
 
                     LevelPiece piece = (LevelPiece)individual.designElements[count];
-                    piece.position.x = (x * positionModifier) - xMax;
-                    piece.position.y = (y * positionModifier) - yMax;
+                    piece.position.x = (x * positionModifier) - (xMax * positionModifier) / 2;
+                    piece.position.y = (y * positionModifier) - (yMax * positionModifier) / 2;
                     piecePositions.Add(new Vector3(piece.position.x, 0, piece.position.y));
                     switch (piece.type)
                     {
@@ -741,7 +742,8 @@ public class LevelGenerator : MonoBehaviour
         }
 
         Instantiate(target, furthest, new Quaternion());
-        Instantiate(seeker, piecePositions[0], new Quaternion());
+        Instantiate(seekerFast, piecePositions[0], new Quaternion());
+        Instantiate(seekerSafe, piecePositions[0], new Quaternion());
     }
 
     List<GameObject> CollectLevelPieces()
@@ -791,8 +793,6 @@ public class LevelGenerator : MonoBehaviour
     {
         // Destroys A* prefab
         Destroy(GameObject.FindGameObjectWithTag("A*"));
-        // Destroys Seeker prefab
-        Destroy(GameObject.FindGameObjectWithTag("Seeker"));
         // Destroys Target prefab
         Destroy(GameObject.FindGameObjectWithTag("Target"));
         // Destroy any level pieces that were spawned
@@ -803,9 +803,16 @@ public class LevelGenerator : MonoBehaviour
         }
         // Destroy any Traps that were spawned
         List<GameObject> traps = CollectTraps();
+        
         foreach (GameObject trap in traps)
         {
             DestroyImmediate(trap, true);
+        }
+        GameObject[] seekers = GameObject.FindGameObjectsWithTag("Seeker");
+        // Destroys Seeker prefab
+        foreach (GameObject seeker in seekers)
+        {
+            DestroyImmediate(seeker, true);
         }
     }
 

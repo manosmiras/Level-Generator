@@ -315,7 +315,8 @@ MonoBehaviour:
   room3: {fileID: 1124444945981548, guid: 89cd62dffbfc507418de507eeee87855, type: 2}
   aStar: {fileID: 1344125825484124, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
   spikeTrap: {fileID: 1769948916603860, guid: a57e1625f8d9ccb4f8a5ea380ed09e78, type: 2}
-  seeker: {fileID: 1586609201474592, guid: e326f36da50842949920f146f9518104, type: 2}
+  seekerFast: {fileID: 1586609201474592, guid: e326f36da50842949920f146f9518104, type: 2}
+  seekerSafe: {fileID: 1586609201474592, guid: 4479f3b191a26c14f8ff71a752440f25, type: 2}
   target: {fileID: 1917319722232294, guid: 73f1927d5520dae44968981643d75800, type: 2}
   currentIndividual: 0
   generation: 0
@@ -328,13 +329,13 @@ MonoBehaviour:
   connectedComponents: 0
   overlapPenaltyMultiplier: 1
   connectionPenaltyMultiplier: 1
-  genomeLength: 15
-  populationSize: 50
+  genomeLength: 25
+  populationSize: 100
   positionModifier: 15
   mutationRate: 0.05
   elitism: 1
   tournamentSize: 3
-  evaluationTime: 0.15
+  evaluationTime: 0.2
   fittestIndividual:
     fitness: 0
   time: 
@@ -1272,6 +1273,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1608137749}
+  weighting: 0
 --- !u!23 &774321063
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1572,6 +1574,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 1608137749}
+  weighting: 0
 --- !u!23 &1184287596
 MeshRenderer:
   m_ObjectHideFlags: 0

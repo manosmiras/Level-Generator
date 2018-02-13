@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 23391552447079232}
   - component: {fileID: 114760981605720302}
   m_Layer: 0
-  m_Name: Seeker
+  m_Name: SeekerFast
   m_TagString: Seeker
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -94,6 +94,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  weighting: 0
 --- !u!136 &136746662114744496
 CapsuleCollider:
   m_ObjectHideFlags: 1

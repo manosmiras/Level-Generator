@@ -9,11 +9,12 @@ public class Unit : MonoBehaviour {
     float speed = 10;
     Vector3[] path;
     int targetIndex;
+    public bool weighting = false;
 
     private void Start()
     {
         target = GameObject.FindGameObjectWithTag("Target").transform;
-        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound);
+        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, weighting);
     }
 
     public void OnPathFound(Vector3[] newPath, bool pathSuccesful)
@@ -55,7 +56,10 @@ public class Unit : MonoBehaviour {
         {
             for (int i = targetIndex; i < path.Length; i++)
             {
-                Gizmos.color = Color.green;
+                if(weighting)
+                    Gizmos.color = Color.green;
+                else
+                    Gizmos.color = Color.red;
                 Gizmos.DrawCube(path[i], Vector3.one);
 
                 if (i == targetIndex)
