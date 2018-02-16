@@ -327,19 +327,22 @@ MonoBehaviour:
   populationDiversity: 0
   populationArea: 0
   connectedComponents: 0
+  pairVertexConnected: 0
   overlapPenaltyMultiplier: 1
   connectionPenaltyMultiplier: 1
-  genomeLength: 25
-  populationSize: 100
+  genomeLength: 6
+  populationSize: 50
   positionModifier: 15
-  mutationRate: 0.05
+  mutationRate: 0
   elitism: 1
   tournamentSize: 3
-  evaluationTime: 0.2
+  evaluationTime: 0.1
   fittestIndividual:
     fitness: 0
   time: 
   timeMs: 
+  runtimeInSeconds: 300
+  terminate: 0
   initialised: 0
 --- !u!4 &110116972
 Transform:

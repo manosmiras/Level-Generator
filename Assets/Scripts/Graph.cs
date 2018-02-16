@@ -37,6 +37,48 @@ public class Graph
         }
         return null;
     }
+
+    public int CalculateNumberOfConnections()
+    {
+        int connections = 0;
+
+        foreach (GraphNode node in nodes)
+        {
+            foreach (GraphNode child in node.children)
+            {
+                connections++;
+            }
+        }
+
+        return connections;
+    }
+    // Checks if a graph is k-vertex-connected
+    public bool IsKConnected(int k)
+    {
+        foreach (GraphNode node in nodes)
+        {
+            // If k is larger than the amount of children in the node, 
+            // the graph contains a node that is less than k connected
+            if (k > node.children.Count)
+                return false;
+        }
+        // All nodes are at least k connected
+        return true;
+    }
+
+    public int CalculateKConnectivity(int k)
+    {
+        int kConnectivity = 0;
+        foreach (GraphNode node in nodes)
+        {
+            // If k is larger than the amount of children in the node, 
+            // the graph contains a node that is less than k connected
+            if (node.children.Count >= k)
+                kConnectivity++;
+        }
+        return kConnectivity;
+    }
+
     // https://www.geeksforgeeks.org/connected-components-in-an-undirected-graph/
     public void DFSUtil(int v, bool[] visited, ref string output)
     {

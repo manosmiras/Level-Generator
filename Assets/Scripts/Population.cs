@@ -16,6 +16,11 @@ public class Population
     {
 
     }
+    // Copy constructor
+    public Population(Population pop)
+    {
+        this.individuals = new List<Individual>(pop.individuals);
+    }
     // Public constructor with argument
     public Population(List<Individual> individuals)
     {
@@ -26,14 +31,21 @@ public class Population
     {
         Individual fittest = individuals[0];
         // Get the fittest
-        for (int i = 0; i < individuals.Count; i++)
+        for (int i = 1; i < individuals.Count; i++)
         {
-            if (individuals[i].fitness <= fittest.fitness)
+            if (individuals[i].fitness > fittest.fitness)
             {
                 fittest = individuals[i];
             }
         }
         return fittest;
+    }
+
+    public Population DeepCopy()
+    {
+        Population other = (Population)this.MemberwiseClone();
+        other.individuals = new List<Individual>(this.individuals);
+        return other;
     }
 
     public void Print()

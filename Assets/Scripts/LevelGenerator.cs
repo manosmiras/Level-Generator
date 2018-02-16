@@ -37,6 +37,7 @@ public class LevelGenerator : MonoBehaviour
     [ReadOnly] public int populationDiversity = 0;
     [ReadOnly] public float populationArea = 0;
     [ReadOnly] public int connectedComponents = 0;
+    [ReadOnly] public bool pairVertexConnected = false;
     public int overlapPenaltyMultiplier = 1;
     public int connectionPenaltyMultiplier = 2;
     public int genomeLength = 10;
@@ -49,8 +50,11 @@ public class LevelGenerator : MonoBehaviour
     public float evaluationTime = 0.1f;
     public Population population = new Population();
     public Individual fittestIndividual = new Individual();
+    public Population fitIndividuals = new Population();
     public string time;
     public string timeMs;
+    public int runtimeInSeconds = 300;
+    [ReadOnly] public bool terminate = false;
     [ReadOnly] public bool initialised;
     public static Graph graph = new Graph();
     // Private properties
@@ -60,7 +64,7 @@ public class LevelGenerator : MonoBehaviour
     private static float uniformRate = 0.5f;
 
     private List<Vector3> trapPositions = new List<Vector3>();
-
+    private bool finished = false;
     // Use this for initialization
     void Start()
     {
@@ -68,39 +72,55 @@ public class LevelGenerator : MonoBehaviour
         GenerateRandomPopulation(populationSize);
 
         generation = 1;
-        fittest = int.MaxValue;
+        fittest = 0;//int.MaxValue;
         //elitism = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (fittest != 1) //if (currentIndividual != 1)
+        //Debug.Log(Time.time);
+        // Run for 1 minute
+        if(!displaying || Time.time <= runtimeInSeconds ^ terminate)//if (fittest != 1) //if (currentIndividual != 1)
         {
             timeMs = Time.time.ToString("F2");
             int minutes = Mathf.FloorToInt(Time.time / 60F);
             int seconds = Mathf.FloorToInt(Time.time - minutes * 60);
             time = string.Format("{0:0}:{1:00}", minutes, seconds);
-            DisplayPopulation();
-
+            
+            // Will spawn levels and evaluate them
+            DisplayPopulation(population);
+            
             //if (initialised)
             //{
             //    EvolvePopulation();
             //}
             if (initialised)
             {
-                Debug.Log("fitnesses: " + fittestIndividual.fitness + ", " + population.GetFittest().fitness);
+                //Debug.Log("fitnesses: " + fittestIndividual.fitness + ", " + population.GetFittest().fitness);
                 //population.Sort();
                 //population.Print();
-
                 generation++;
+                Debug.Log("Before: " + fittestIndividual.fitness + " - " + population.GetFittest().fitness + ", " + generation);
                 //System.out.println("Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness());
-                population = EvolvePopulation(population);
-
+                EvolvePopulation(population);
+                Debug.Log("After: " + fittestIndividual.fitness + " - " + population.GetFittest().fitness + ", " + generation);
                 currentIndividual = 0;
                 initialised = false;
 
             }
+        }
+        else if(!finished)
+        {
+            Individual final = Individual.FromJson(Application.dataPath + "/" + "gl" + genomeLength + "f" + fittest + ".json");
+
+            Debug.Log("Clearing and spawning fittest, it has a fitness of: " + fittestIndividual.fitness);
+            ClearScene();
+            //currentIndividual = 0;
+            // Show fittest individual
+            DisplayIndividual(final);
+            //DisplayIndividual(fittestIndividual);
+            finished = true;
         }
 
     }
@@ -116,9 +136,9 @@ public class LevelGenerator : MonoBehaviour
             // Add fittest that will not be changed
             //newPopulation.Add(new Individual(fittestIndividual));
             // Add fittest which could be potentially changed
-            //newPopulation.Add(new Individual(fittestIndividual));
+            newPopulation.Add(fittestIndividual.DeepCopy());
             //newPopulation.Add(fittestIndividual);
-            newPopulation.Add(pop.GetFittest());
+            //newPopulation.Add(pop.GetFittest());
             //newPopulation.Add(new Individual(population.GetFittest()));
 
         }
@@ -165,26 +185,27 @@ public class LevelGenerator : MonoBehaviour
         }
 
         // Diversity check
-        for (int i = elitismOffset; i < newPopulation.individuals.Count - 1; i++)
-        {
-            populationDiversity = newPopulation.individuals.Count;
-            // Compare current individual with next in population
-            if (newPopulation.individuals[i].Equals(newPopulation.individuals[i + 1]))
-            {
-                Debug.Log("Diversity mutation");
-                // Mutate one of them if they are the same
-                Mutate(newPopulation.individuals[i]);
+        //for (int i = elitismOffset; i < newPopulation.individuals.Count - 1; i++)
+        //{
+        //    populationDiversity = newPopulation.individuals.Count;
+        //    // Compare current individual with next in population
+        //    if (newPopulation.individuals[i].Equals(newPopulation.individuals[i + 1]))
+        //    {
+        //        Debug.Log("Diversity mutation");
+        //        // Mutate one of them if they are the same
+        //        Mutate(newPopulation.individuals[i]);
 
-                // Check again
-                if (newPopulation.individuals[i].Equals(newPopulation.individuals[i + 1]))
-                {
-                    populationDiversity--;
-                }
-            }
-        }
+        //        // Check again
+        //        if (newPopulation.individuals[i].Equals(newPopulation.individuals[i + 1]))
+        //        {
+        //            populationDiversity--;
+        //        }
+        //    }
+        //}
 
-        //newPopulation.individuals[0] = fittestIndividual;
+        newPopulation.individuals[0] = Individual.FromJson(Application.dataPath + "/" + "gl" + genomeLength + "f" + fittest + ".json");
 
+        pop = newPopulation;
         return newPopulation;
     }
 
@@ -268,9 +289,9 @@ public class LevelGenerator : MonoBehaviour
         population.Add(individual);
     }
     // Displays the population in Unity
-    void DisplayPopulation()
+    void DisplayPopulation(Population pop)
     {
-        if (!displaying && currentIndividual < population.individuals.Count)
+        if (!displaying && currentIndividual < pop.individuals.Count)
         {
             // Reset variables
             overlapPenalty = 0;
@@ -283,7 +304,7 @@ public class LevelGenerator : MonoBehaviour
             // Reset cooldown
             cooldown = 0;
             // Display the individual
-            DisplayIndividual(population.individuals[currentIndividual]);
+            DisplayIndividual(pop.individuals[currentIndividual]);
 
             displaying = true;
 
@@ -298,19 +319,38 @@ public class LevelGenerator : MonoBehaviour
                 // Display graph
                 //Graph.Print();
                 connectedComponents = graph.CalculateConnectivity();
+                // Check that the graph is at least a 2-vertex-connected graph
+                //pairVertexConnected = graph.IsKConnected(2);
+                int kConnectivity = graph.CalculateKConnectivity(2);
                 //graph.CalculateStrongConnectivity();
-                Debug.Log("Connected components: " + connectedComponents + ", strongly connected: " + graph.CalculateStrongConnectivity());
+                //Debug.Log("Connected components: " + connectedComponents + ", strongly connected: " + graph.CalculateStrongConnectivity());
                 GraphEditor.InitRects(genomeLength);
 
                 //}
                 // Calculate fitness for current individual
                 //population.individuals[currentIndividual].fitness = overlapPenalty + (genomeLength - connectedCount);
-                int maxConnections = CalculateMaxConnections(population.individuals[currentIndividual]);
+                //int maxConnections = CalculateMaxConnections(population.individuals[currentIndividual]);
 
                 //population.individuals[currentIndividual].fitness = overlapPenalty * overlapPenaltyMultiplier + (maxConnections - connectedCount) * connectionPenaltyMultiplier;
-                population.individuals[currentIndividual].fitness = connectedComponents;
-
-
+                pop.individuals[currentIndividual].fitness = (genomeLength - connectedComponents) + kConnectivity;// + connectedCount;
+                if (connectedComponents == 1)
+                {
+                    Debug.Log("Found a graph with 1 connected component.");
+                    fitness += genomeLength / 2;
+                    //terminate = true;
+                }
+                //if (pairVertexConnected)
+                //{
+                //    Debug.Log("Found a 2-vertex-connected graph.");
+                //    population.individuals[currentIndividual].fitness *=2;
+                //    
+                //}
+                if (kConnectivity == genomeLength && connectedComponents == 1)
+                {
+                    Debug.Log("Found a 2-vertex-connected graph that is completely connected.");
+                    //population.individuals[currentIndividual].fitness *=2;
+                    terminate = true;
+                }
                 //int cross = 0, t_junction = 0, hall = 0, corner = 0, room = 0;
                 //foreach (LevelPiece lp in population.individuals[currentIndividual].designElements)
                 //{
@@ -344,19 +384,22 @@ public class LevelGenerator : MonoBehaviour
                 //{
                 //    populationArea += Area(levelPiece);
                 //}
-                fitness = population.individuals[currentIndividual].fitness;
-                // Closest to 0 is fittest
-                if (fitness <= fittest)
+                fitness = pop.individuals[currentIndividual].fitness;
+                
+                if (fitness >= fittest)
                 {
                     fittest = fitness;
-                    overlap = overlapPenalty;
-                    connection = (maxConnections - connectedCount);
-                    fittestIndividual = new Individual(population.individuals[currentIndividual]);
-                    //                    LevelGeneratorEditor.load = true;
-                    //                    ScreenCapture.CaptureScreenshot("Assets/Resources/FittestLevel.png");
-                    //#if UNITY_EDITOR
-                    //                    AssetDatabase.Refresh();
-                    //#endif
+                    //overlap = overlapPenalty;
+                    //connection = (maxConnections - connectedCount);
+                    fittestIndividual = pop.individuals[currentIndividual].DeepCopy();
+                    //fitIndividuals.Add(new Individual(pop.individuals[currentIndividual]));
+                    Debug.Log("Updated fittest individual at generation: " + generation);
+                    fittestIndividual.ToJson();
+//                    LevelGeneratorEditor.load = true;
+//                    ScreenCapture.CaptureScreenshot("Assets/Resources/FittestLevel.png");
+//#if UNITY_EDITOR
+//                    AssetDatabase.Refresh();
+//#endif
                 }
                 //Debug.Log("I am individual number: " + currentIndividual + ", my OVERLAP penalty is: " + overlapPenalty +
                 //", my DISCONNECT penalty is: " + (populationSize - connectedCount));
@@ -455,7 +498,7 @@ public class LevelGenerator : MonoBehaviour
         for (int i = 0; i < tournamentSize; i++)
         {
             int randomId = Random.Range(0, pop.individuals.Count);
-            tournamentPopulation.Add(pop.individuals[randomId]);
+            tournamentPopulation.Add(new Individual(pop.individuals[randomId]));
         }
         // Get the fittest
         Individual fittest = tournamentPopulation.GetFittest();

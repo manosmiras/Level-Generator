@@ -37,5 +37,11 @@ public class LevelGeneratorEditor : Editor
             LevelGenerator levelGenScript =  levelGen.GetComponent<LevelGenerator>();
             levelGenScript.fittestIndividual.ToJson();
         }
+        if (GUILayout.Button("Terminate"))
+        {
+            GameObject levelGen = GameObject.FindGameObjectWithTag("LevelGenerator");
+            LevelGenerator levelGenScript = levelGen.GetComponent<LevelGenerator>();
+            levelGenScript.terminate = true;
+        }
     }
 }
