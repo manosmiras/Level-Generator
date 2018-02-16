@@ -94,7 +94,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
-  weighting: 0
+  type: 0
 --- !u!136 &136746662114744496
 CapsuleCollider:
   m_ObjectHideFlags: 1

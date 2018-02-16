@@ -27,6 +27,8 @@ public class LevelGenerator : MonoBehaviour
     public GameObject spikeTrap;
     public GameObject seekerFast;
     public GameObject seekerSafe;
+    public GameObject seekerDangerous;
+    public GameObject seekerSlow;
     public GameObject target;
     [ReadOnly] public int currentIndividual = 0;
     [ReadOnly] public int generation = 1;
@@ -787,7 +789,9 @@ public class LevelGenerator : MonoBehaviour
         Instantiate(target, furthest, new Quaternion());
         Instantiate(seekerFast, piecePositions[0], new Quaternion());
         Instantiate(seekerSafe, piecePositions[0], new Quaternion());
-    }
+        Instantiate(seekerDangerous, piecePositions[0], new Quaternion());
+        Instantiate(seekerSlow, piecePositions[0], new Quaternion());
+}
 
     List<GameObject> CollectLevelPieces()
     {

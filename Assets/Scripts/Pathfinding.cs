@@ -14,12 +14,12 @@ public class Pathfinding : MonoBehaviour {
         grid = GetComponent<Grid>();
     }
 
-    public void StartFindPath(Vector3 startPos, Vector3 targetPos, bool weighting)
+    public void StartFindPath(Vector3 startPos, Vector3 targetPos, Unit.UnitType type)
     {
-        StartCoroutine(FindPath(startPos, targetPos, weighting));
+        StartCoroutine(FindPath(startPos, targetPos, type));
     }
 
-    IEnumerator FindPath(Vector3 startPos, Vector3 targetPos, bool weighting)
+    IEnumerator FindPath(Vector3 startPos, Vector3 targetPos, Unit.UnitType type)
     {
         Stopwatch sw = new Stopwatch();
         sw.Start();
@@ -60,11 +60,24 @@ public class Pathfinding : MonoBehaviour {
                 {
                     if (!neighbour.walkable || closedSet.Contains(neighbour))
                         continue;
-
-                    int newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
-
-                    if(weighting)
-                        newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour) + neighbour.movementPenalty;
+                    int newMovementCostToNeighbour = 0;
+                    switch (type)
+                    {
+                        case Unit.UnitType.Fast:
+                            newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour);
+                            break;
+                        case Unit.UnitType.Slow:
+                            newMovementCostToNeighbour = currentNode.gCost - GetDistance(currentNode, neighbour);
+                            break;
+                        case Unit.UnitType.Safe:
+                            newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour) + neighbour.movementPenalty;
+                            break;
+                        case Unit.UnitType.Dangerous:
+                            newMovementCostToNeighbour = currentNode.gCost + GetDistance(currentNode, neighbour) - neighbour.movementPenalty;
+                            break;
+                        default:
+                            break;
+                    }
 
                     if (newMovementCostToNeighbour < neighbour.gCost || !openSet.Contains(neighbour))
                     {

@@ -5,16 +5,25 @@ using UnityEngine;
 
 public class Unit : MonoBehaviour {
 
+    public enum UnitType
+    {
+        Fast,
+        Slow,
+        Safe,
+        Dangerous
+    }
+
     public Transform target;
     float speed = 10;
     Vector3[] path;
     int targetIndex;
-    public bool weighting = false;
+    public UnitType type;
+
 
     private void Start()
     {
         target = GameObject.FindGameObjectWithTag("Target").transform;
-        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, weighting);
+        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, type);
     }
 
     public void OnPathFound(Vector3[] newPath, bool pathSuccesful)
@@ -56,10 +65,24 @@ public class Unit : MonoBehaviour {
         {
             for (int i = targetIndex; i < path.Length; i++)
             {
-                if(weighting)
-                    Gizmos.color = Color.green;
-                else
-                    Gizmos.color = Color.red;
+                switch (type)
+                {
+                    case UnitType.Fast:
+                        Gizmos.color = Color.blue;
+                        break;
+                    case UnitType.Slow:
+                        Gizmos.color = Color.yellow;
+                        break;
+                    case UnitType.Safe:
+                        Gizmos.color = Color.green;
+                        break;
+                    case UnitType.Dangerous:
+                        Gizmos.color = Color.red;
+                        break;
+                    default:
+                        break;
+                }
+                
                 Gizmos.DrawCube(path[i], Vector3.one);
 
                 if (i == targetIndex)
