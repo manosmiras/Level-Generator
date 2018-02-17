@@ -78,6 +78,18 @@ public class Graph
         }
         return kConnectivity;
     }
+    // Returns the number of children each node has
+    public int CalculateVariableKConnectivity()
+    {
+        int variableKConnectivity = 0;
+        foreach (GraphNode node in nodes)
+        {
+            // If k is larger than the amount of children in the node, 
+            // the graph contains a node that is less than k connected
+            variableKConnectivity += node.children.Count;
+        }
+        return variableKConnectivity;
+    }
 
     // https://www.geeksforgeeks.org/connected-components-in-an-undirected-graph/
     public void DFSUtil(int v, bool[] visited, ref string output)

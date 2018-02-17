@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
+[Serializable]
 public class Population
 {
     public List<Individual> individuals = new List<Individual>();
@@ -41,12 +42,12 @@ public class Population
         return fittest;
     }
 
-    public Population DeepCopy()
-    {
-        Population other = (Population)this.MemberwiseClone();
-        other.individuals = new List<Individual>(this.individuals);
-        return other;
-    }
+    //public Population DeepCopy()
+    //{
+    //    Population other = (Population)this.MemberwiseClone();
+    //    other.individuals = new List<Individual>(this.individuals);
+    //    return other;
+    //}
 
     public void Print()
     {

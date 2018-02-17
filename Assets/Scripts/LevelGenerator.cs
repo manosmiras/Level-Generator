@@ -3,6 +3,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 using UnityEditor;
 public class ReadOnlyAttribute : PropertyAttribute { }
@@ -28,16 +30,15 @@ public class LevelGenerator : MonoBehaviour
     public GameObject seekerFast;
     public GameObject seekerSafe;
     public GameObject seekerDangerous;
-    public GameObject seekerSlow;
+    //public GameObject seekerSlow;
     public GameObject target;
     [ReadOnly] public int currentIndividual = 0;
     [ReadOnly] public int generation = 1;
-    [ReadOnly] public int fittest;
-    [ReadOnly] public int fitness = 0;
+    [ReadOnly] public float fittest;
+    [ReadOnly] public float fitness = 0;
     [ReadOnly] public int overlap = 0;
     [ReadOnly] public int connection = 0;
     [ReadOnly] public int populationDiversity = 0;
-    [ReadOnly] public float populationArea = 0;
     [ReadOnly] public int connectedComponents = 0;
     [ReadOnly] public bool pairVertexConnected = false;
     public int overlapPenaltyMultiplier = 1;
@@ -52,7 +53,7 @@ public class LevelGenerator : MonoBehaviour
     public float evaluationTime = 0.1f;
     public Population population = new Population();
     public Individual fittestIndividual = new Individual();
-    public Population fitIndividuals = new Population();
+    public Population feasiblePopulation = new Population();
     public string time;
     public string timeMs;
     public int runtimeInSeconds = 300;
@@ -64,7 +65,7 @@ public class LevelGenerator : MonoBehaviour
     private bool displaying = false;
 
     private static float uniformRate = 0.5f;
-
+    
     private List<Vector3> trapPositions = new List<Vector3>();
     private bool finished = false;
     // Use this for initialization
@@ -74,8 +75,7 @@ public class LevelGenerator : MonoBehaviour
         GenerateRandomPopulation(populationSize);
 
         generation = 1;
-        fittest = 0;//int.MaxValue;
-        //elitism = true;
+        fittest = 0;
     }
 
     // Update is called once per frame
@@ -93,20 +93,15 @@ public class LevelGenerator : MonoBehaviour
             // Will spawn levels and evaluate them
             DisplayPopulation(population);
             
-            //if (initialised)
-            //{
-            //    EvolvePopulation();
-            //}
             if (initialised)
             {
-                //Debug.Log("fitnesses: " + fittestIndividual.fitness + ", " + population.GetFittest().fitness);
-                //population.Sort();
-                //population.Print();
+
                 generation++;
-                Debug.Log("Before: " + fittestIndividual.fitness + " - " + population.GetFittest().fitness + ", " + generation);
+                //Debug.Log("Before: " + fittestIndividual.fitness + " - " + population.GetFittest().fitness + ", " + generation);
                 //System.out.println("Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness());
-                EvolvePopulation(population);
-                Debug.Log("After: " + fittestIndividual.fitness + " - " + population.GetFittest().fitness + ", " + generation);
+
+                population = EvolvePopulation(population);
+                //Debug.Log("After: " + fittestIndividual.fitness + " - " + population.GetFittest().fitness + ", " + generation);
                 currentIndividual = 0;
                 initialised = false;
 
@@ -114,14 +109,14 @@ public class LevelGenerator : MonoBehaviour
         }
         else if(!finished)
         {
-            Individual final = Individual.FromJson(Application.dataPath + "/" + "gl" + genomeLength + "f" + fittest + ".json");
+            //Individual final = Individual.FromJson(Application.dataPath + "/Levels/" + "gl" + genomeLength + "f" + fittest + ".json");
 
             Debug.Log("Clearing and spawning fittest, it has a fitness of: " + fittestIndividual.fitness);
             ClearScene();
-            //currentIndividual = 0;
+
             // Show fittest individual
-            DisplayIndividual(final);
-            //DisplayIndividual(fittestIndividual);
+            //DisplayIndividual(final);
+            DisplayIndividual(fittestIndividual);
             finished = true;
         }
 
@@ -134,14 +129,10 @@ public class LevelGenerator : MonoBehaviour
         // Keep our best individual
         if (elitism)
         {
-
-            // Add fittest that will not be changed
-            //newPopulation.Add(new Individual(fittestIndividual));
-            // Add fittest which could be potentially changed
-            newPopulation.Add(fittestIndividual.DeepCopy());
-            //newPopulation.Add(fittestIndividual);
-            //newPopulation.Add(pop.GetFittest());
-            //newPopulation.Add(new Individual(population.GetFittest()));
+            // Add fittest to new population, will not be affected by crossover or mutation
+            newPopulation.Add(Utility.DeepClone(fittestIndividual));
+            // Add fittest to new population a second time, will be affected by mutation
+            newPopulation.Add(Utility.DeepClone(fittestIndividual));
 
         }
 
@@ -157,11 +148,16 @@ public class LevelGenerator : MonoBehaviour
 
         // Loop over the population size and create new individuals with
         // crossover
-        for (int i = elitismOffset; i < pop.individuals.Count; i++)
+        for (int i = elitismOffset + 1; i < pop.individuals.Count; i++)
         {
             Individual individual1 = TournamentSelection(pop);
             Individual individual2 = TournamentSelection(pop);
-            Individual newIndividual = UniformCrossover(individual1, individual2);
+            Individual newIndividual = new Individual();
+            // Perform uniform crossover every 5 generations, for the rest use single point crossover
+            if (generation % 5 == 0)
+                newIndividual = UniformCrossover(individual1, individual2);
+            else
+                newIndividual = SinglePointCrossover(individual1, individual2);
 
             newPopulation.Add(newIndividual);
         }
@@ -169,45 +165,21 @@ public class LevelGenerator : MonoBehaviour
         // Mutate population
         for (int i = elitismOffset; i < pop.individuals.Count; i++)
         {
-            //if (i == elitismOffset)
-            //{
-            //    Debug.Log("before mutation:\n");
-            //    newPopulation.individuals[i].Print();
-            //}
+            // Always mutate 
+            if (i == elitismOffset)
+            {
+                Mutate(newPopulation.individuals[i]);
+            }
             // mutationRate % chance of mutating
             if (Random.Range(0.0f, 1.0f) <= mutationRate)
             {
                 Mutate(newPopulation.individuals[i]);
             }
-            //if (i == elitismOffset)
-            //{
-            //    Debug.Log("after mutation:\n");
-            //    newPopulation.individuals[i].Print();
-            //}
         }
 
-        // Diversity check
-        //for (int i = elitismOffset; i < newPopulation.individuals.Count - 1; i++)
-        //{
-        //    populationDiversity = newPopulation.individuals.Count;
-        //    // Compare current individual with next in population
-        //    if (newPopulation.individuals[i].Equals(newPopulation.individuals[i + 1]))
-        //    {
-        //        Debug.Log("Diversity mutation");
-        //        // Mutate one of them if they are the same
-        //        Mutate(newPopulation.individuals[i]);
-
-        //        // Check again
-        //        if (newPopulation.individuals[i].Equals(newPopulation.individuals[i + 1]))
-        //        {
-        //            populationDiversity--;
-        //        }
-        //    }
-        //}
-
-        newPopulation.individuals[0] = Individual.FromJson(Application.dataPath + "/" + "gl" + genomeLength + "f" + fittest + ".json");
-
-        pop = newPopulation;
+        //newPopulation.individuals[0] = Individual.FromJson(Application.dataPath + "/" + "gl" + genomeLength + "f" + fittest + ".json");
+        //newPopulation.individuals[0] = Utility.DeepClone(fittestIndividual);
+        //pop = newPopulation;
         return newPopulation;
     }
 
@@ -228,59 +200,6 @@ public class LevelGenerator : MonoBehaviour
         individual.designElements.Clear();
         for (int i = 0; i < genomeLength; i++)
         {
-            //Vector2 position = new Vector2(Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier,
-            //                               Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier);
-
-            //Vector2 position = new Vector2(Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier,
-            //                               Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier);
-
-            //float xMax = Mathf.RoundToInt(Mathf.Sqrt(genomeLength));
-            //float yMax = Mathf.CeilToInt(genomeLength / xMax);
-            //Debug.Log("xMax is: " + (int)xMax + "(" + xMax + ")");
-            //Debug.Log("yMax is: " + (int)yMax + "(" + yMax + ")");
-
-            //Vector2 position = new Vector2(Random.Range(0, (int)xMax) * positionModifier,
-            //                   Random.Range(0, (int)yMax) * positionModifier);
-
-            //Vector2 position = new Vector2(i * positionModifier,
-            //                               i * positionModifier);
-
-            //float result = Mathf.Sqrt(genomeLength);
-            //bool isSquare = result % 1 == 0;
-
-            //if (!isSquare)
-            //{
-            //    if (genomeLength % 2 == 0)
-            //    {
-            //        position = new Vector2(Random.Range(0, (int)Mathf.Ceil(Mathf.Sqrt(genomeLength))) * positionModifier,
-            //                               Random.Range(0, (int)Mathf.Floor(Mathf.Sqrt(genomeLength))) * positionModifier);
-            //    }
-            //    else
-            //    {
-            //        position = new Vector2(Random.Range(0, (int)Mathf.Ceil((float)genomeLength / 2)) * positionModifier,
-            //                               Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier);
-
-            //    }
-            //}
-
-            //if (position.x < 0)
-            //{
-            //    position.x = -Mathf.Sqrt(Mathf.Abs(position.x));
-            //}
-            //else
-            //{
-            //    position.x = Mathf.Sqrt(position.x);
-            //}
-
-            //if (position.y < 0)
-            //{
-            //    position.y = -Mathf.Sqrt(Mathf.Abs(position.y));
-            //}
-            //else
-            //{
-            //    position.y = Mathf.Sqrt(position.y);
-            //}
-
             float rotation = Random.Range(0, 4);
             rotation *= 90f;
             int roomType = Random.Range(0, 7);
@@ -316,95 +235,44 @@ public class LevelGenerator : MonoBehaviour
             cooldown += Time.deltaTime;
             if (cooldown >= evaluationTime)
             {
-                //if (currentIndividual == 0)
-                //{
-                // Display graph
-                //Graph.Print();
+
                 connectedComponents = graph.CalculateConnectivity();
-                // Check that the graph is at least a 2-vertex-connected graph
-                //pairVertexConnected = graph.IsKConnected(2);
-                int kConnectivity = graph.CalculateKConnectivity(2);
-                //graph.CalculateStrongConnectivity();
-                //Debug.Log("Connected components: " + connectedComponents + ", strongly connected: " + graph.CalculateStrongConnectivity());
+                // Calculates the 2-vertex-connectivity of the graph
+                //int kConnectivity = graph.CalculateKConnectivity(2);
+                //float kConnectivity = graph.CalculateVariableKConnectivity();
+
                 GraphEditor.InitRects(genomeLength);
 
-                //}
-                // Calculate fitness for current individual
-                //population.individuals[currentIndividual].fitness = overlapPenalty + (genomeLength - connectedCount);
-                //int maxConnections = CalculateMaxConnections(population.individuals[currentIndividual]);
-
-                //population.individuals[currentIndividual].fitness = overlapPenalty * overlapPenaltyMultiplier + (maxConnections - connectedCount) * connectionPenaltyMultiplier;
-                pop.individuals[currentIndividual].fitness = (genomeLength - connectedComponents) + kConnectivity;// + connectedCount;
+                pop.individuals[currentIndividual].fitness = (genomeLength - connectedComponents);// + kConnectivity;
+                // Feasible
                 if (connectedComponents == 1)
                 {
                     Debug.Log("Found a graph with 1 connected component.");
-                    fitness += genomeLength / 2;
-                    //terminate = true;
+                    //fitness += genomeLength / 2;
+                    // Add to feasible population only if solution is different
+                    if (!feasiblePopulation.individuals.Contains(pop.individuals[currentIndividual]))
+                    {
+                        Individual feasibleIndividual = Utility.DeepClone(pop.individuals[currentIndividual]);
+                        feasiblePopulation.Add(feasibleIndividual);
+                        //feasibleIndividual.ToJson("feasible" + feasiblePopulation.individuals.Count);
+                    }
                 }
-                //if (pairVertexConnected)
-                //{
-                //    Debug.Log("Found a 2-vertex-connected graph.");
-                //    population.individuals[currentIndividual].fitness *=2;
-                //    
-                //}
-                if (kConnectivity == genomeLength && connectedComponents == 1)
-                {
-                    Debug.Log("Found a 2-vertex-connected graph that is completely connected.");
-                    //population.individuals[currentIndividual].fitness *=2;
-                    terminate = true;
-                }
-                //int cross = 0, t_junction = 0, hall = 0, corner = 0, room = 0;
-                //foreach (LevelPiece lp in population.individuals[currentIndividual].designElements)
-                //{
-                //    switch (lp.type)
-                //    {
-                //        case LevelPiece.Type.Cross:
-                //            cross++;
-                //            break;
-                //        case LevelPiece.Type.T_Junction:
-                //            t_junction++;
-                //            break;
-                //        case LevelPiece.Type.Hall:
-                //            hall++;
-                //            break;
-                //        case LevelPiece.Type.Corner:
-                //            corner++;
-                //            break;
-                //        case LevelPiece.Type.Room:
-                //            room++;
-                //            break;
-                //    }
-                //    if (cross >= genomeLength || t_junction >= genomeLength || hall >= genomeLength || corner >= genomeLength || room >= genomeLength)
-                //    {
-                //        population.individuals[currentIndividual].fitness += genomeLength;
-                //    }
-                //}
-                populationArea = 0;
-                //List<GameObject> levelPieces = CollectLevelPieces();
 
-                //foreach (GameObject levelPiece in levelPieces)
-                //{
-                //    populationArea += Area(levelPiece);
-                //}
                 fitness = pop.individuals[currentIndividual].fitness;
                 
-                if (fitness >= fittest)
+                if (fitness >= fittest)// && !pop.individuals[currentIndividual].Equals(fittestIndividual))
                 {
                     fittest = fitness;
-                    //overlap = overlapPenalty;
-                    //connection = (maxConnections - connectedCount);
-                    fittestIndividual = pop.individuals[currentIndividual].DeepCopy();
-                    //fitIndividuals.Add(new Individual(pop.individuals[currentIndividual]));
+
+                    fittestIndividual = Utility.DeepClone(pop.individuals[currentIndividual]);
                     Debug.Log("Updated fittest individual at generation: " + generation);
-                    fittestIndividual.ToJson();
+                    //fittestIndividual.ToJson();
 //                    LevelGeneratorEditor.load = true;
 //                    ScreenCapture.CaptureScreenshot("Assets/Resources/FittestLevel.png");
 //#if UNITY_EDITOR
 //                    AssetDatabase.Refresh();
 //#endif
                 }
-                //Debug.Log("I am individual number: " + currentIndividual + ", my OVERLAP penalty is: " + overlapPenalty +
-                //", my DISCONNECT penalty is: " + (populationSize - connectedCount));
 
                 currentIndividual++;
                 if (currentIndividual == populationSize)
@@ -500,7 +368,7 @@ public class LevelGenerator : MonoBehaviour
         for (int i = 0; i < tournamentSize; i++)
         {
             int randomId = Random.Range(0, pop.individuals.Count);
-            tournamentPopulation.Add(new Individual(pop.individuals[randomId]));
+            tournamentPopulation.Add(Utility.DeepClone(pop.individuals[randomId]));
         }
         // Get the fittest
         Individual fittest = tournamentPopulation.GetFittest();
@@ -516,11 +384,6 @@ public class LevelGenerator : MonoBehaviour
         {
 
             int mutationType = Random.Range(0, 2);
-            //Debug.Log("Mutation type: " + mutationType);
-            //if (mutationType == 0)
-            //{
-            //    MutatePosition(individual.designElements[i]);
-            //}
             if (mutationType == 0)
             {
                 MutateRotation(individual.designElements[i]);
@@ -535,45 +398,17 @@ public class LevelGenerator : MonoBehaviour
 
     void MutatePosition(DesignElement designElement)
     {
-        // Select a random position
-        //Vector2 position = new Vector2(Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier,
-        //                               Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier);
-        //Vector2 position = new Vector2(Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier,
-        //                               Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier);
-
         float xMax = Mathf.RoundToInt(Mathf.Sqrt(genomeLength));
         float yMax = Mathf.CeilToInt(genomeLength / xMax);
 
         Vector2 position = new Vector2(Random.Range(0, (int)xMax) * positionModifier,
                            Random.Range(0, (int)yMax) * positionModifier);
 
-        //float result = Mathf.Sqrt(genomeLength);
-        //bool isSquare = result % 1 == 0;
-
-        //if (!isSquare)
-        //{
-        //    if (genomeLength % 2 == 0)
-        //    {
-        //        position = new Vector2(Random.Range(0, (int)Mathf.Ceil(Mathf.Sqrt(genomeLength))) * positionModifier,
-        //                               Random.Range(0, (int)Mathf.Floor(Mathf.Sqrt(genomeLength))) * positionModifier);
-        //    }
-        //    else
-        //    {
-        //        position = new Vector2(Random.Range(0, (int)Mathf.Ceil((float)genomeLength / 2)) * positionModifier,
-        //                               Random.Range(0, (int)Mathf.Sqrt(genomeLength)) * positionModifier);
-
-        //    }
-        //}
-
         // Keep re-positioning until value is different
         while (position == designElement.position)
         {
-            //position = new Vector2(Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier,
-            //                                   Random.Range((int)-Mathf.Sqrt(genomeLength), (int)Mathf.Sqrt(genomeLength)) * positionModifier);
-
             position = new Vector2(Random.Range(0, (int)xMax) * positionModifier,
                                Random.Range(0, (int)yMax) * positionModifier);
-            //Debug.Log("gotta change position");
         }
         designElement.position = position;
     }
@@ -586,10 +421,8 @@ public class LevelGenerator : MonoBehaviour
         while (rotation * 90f == designElement.rotation)
         {
             rotation = Random.Range(0, 4);
-            //Debug.Log("gotta change rotation");
         }
         rotation *= 90f;
-        //Debug.Log(rotation);
         designElement.rotation = rotation;
     }
 
@@ -601,7 +434,6 @@ public class LevelGenerator : MonoBehaviour
         while ((LevelPiece.Type)roomType == levelPiece.type)
         {
             roomType = Random.Range(0, 7);
-            //Debug.Log("gotta change room type");
         }
         levelPiece.type = (LevelPiece.Type)roomType;
     }
@@ -636,8 +468,6 @@ public class LevelGenerator : MonoBehaviour
                             tempCross.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempCross.name, count));
-                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
-                            //tempCross.tag = "LevelPiece";
                             break;
                         case LevelPiece.Type.T_Junction:
                             GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
@@ -645,12 +475,6 @@ public class LevelGenerator : MonoBehaviour
                             tempT_Junction.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempT_Junction.name, count));
-
-                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
-                            //trapPositions.Add(new Vector3(tempT_Junction.transform.forward.x, tempT_Junction.transform.forward.y, tempT_Junction.transform.forward.z) + new Vector3(-1,0,0));
-                            //trapPositions.Add(tempT_Junction.transform.forward + new Vector3(2.5f, 0, 0));
-                            //trapPositions.Add(tempT_Junction.transform.forward - new Vector3(2.5f, 0, 0));
-                            //tempT_Junction.tag = "LevelPiece";
                             break;
                         case LevelPiece.Type.Hall:
                             GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
@@ -658,8 +482,6 @@ public class LevelGenerator : MonoBehaviour
                             tempHall.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempHall.name, count));
-                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
-                            //tempHall.tag = "LevelPiece";
                             break;
                         case LevelPiece.Type.Corner:
                             GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
@@ -667,8 +489,6 @@ public class LevelGenerator : MonoBehaviour
                             tempCorner.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempCorner.name, count));
-                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
-                            //tempCorner.tag = "LevelPiece";
                             break;
                         case LevelPiece.Type.Room1:
                             GameObject tempRoom1 = Instantiate(room1, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
@@ -676,8 +496,6 @@ public class LevelGenerator : MonoBehaviour
                             tempRoom1.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempRoom1.name, count));
-                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
-                            //tempRoom.tag = "LevelPiece";
                             break;
                         case LevelPiece.Type.Room2:
                             GameObject tempRoom2 = Instantiate(room2, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
@@ -685,8 +503,6 @@ public class LevelGenerator : MonoBehaviour
                             tempRoom2.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempRoom2.name, count));
-                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
-                            //tempRoom.tag = "LevelPiece";
                             break;
                         case LevelPiece.Type.Room3:
                             GameObject tempRoom3 = Instantiate(room3, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
@@ -694,8 +510,6 @@ public class LevelGenerator : MonoBehaviour
                             tempRoom3.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempRoom3.name, count));
-                            //trapPositions.Add(new Vector3(piece.position.x, -2.5f, piece.position.y));
-                            //tempRoom.tag = "LevelPiece";
                             break;
                     }
                 }
@@ -720,57 +534,6 @@ public class LevelGenerator : MonoBehaviour
             trapPositions.Remove(trapPositions[randPos]);
         }
 
-        //foreach (LevelPiece piece in individual.designElements)
-        //{
-
-        //    count++;
-        //    switch (piece.type)
-        //    {
-        //        case LevelPiece.Type.Cross:
-        //            GameObject tempCross = Instantiate(cross, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-        //            tempCross.transform.parent = gameObject.transform;
-        //            tempCross.name += count;
-        //            //tempCross.tag = "LevelPiece";
-        //            break;
-        //        case LevelPiece.Type.T_Junction:
-        //            GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-        //            tempT_Junction.transform.parent = gameObject.transform;
-        //            tempT_Junction.name += count;
-        //            //tempT_Junction.tag = "LevelPiece";
-        //            break;
-        //        //case LevelPiece.Type.Hall:
-        //        //    GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-        //        //    tempHall.transform.parent = gameObject.transform;
-        //        //    tempHall.name += count;
-        //        //    tempHall.tag = "LevelPiece";
-        //        //    break;
-        //        case LevelPiece.Type.Corner:
-        //            GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-        //            tempCorner.transform.parent = gameObject.transform;
-        //            tempCorner.name += count; //a
-        //            //tempCorner.tag = "LevelPiece";
-        //            break;
-        //        case LevelPiece.Type.Room1:
-        //            GameObject tempRoom1 = Instantiate(room1, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-        //            tempRoom1.transform.parent = gameObject.transform;
-        //            tempRoom1.name += count;
-        //            //tempRoom.tag = "LevelPiece";
-        //            break;
-        //        case LevelPiece.Type.Room2:
-        //            GameObject tempRoom2 = Instantiate(room2, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-        //            tempRoom2.transform.parent = gameObject.transform;
-        //            tempRoom2.name += count;
-        //            //tempRoom.tag = "LevelPiece";
-        //            break;
-        //        case LevelPiece.Type.Room3:
-        //            GameObject tempRoom3 = Instantiate(room3, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
-        //            tempRoom3.transform.parent = gameObject.transform;
-        //            tempRoom3.name += count;
-        //            //tempRoom.tag = "LevelPiece";
-        //            break;
-        //    }
-        //}
-        // TODO: Fix overlap and disconnected penalties detection to work, maybe make coroutine or async?
         generated = true;
         // Initialise pathfinding
         Instantiate(aStar, new Vector3(), new Quaternion());
@@ -790,7 +553,7 @@ public class LevelGenerator : MonoBehaviour
         Instantiate(seekerFast, piecePositions[0], new Quaternion());
         Instantiate(seekerSafe, piecePositions[0], new Quaternion());
         Instantiate(seekerDangerous, piecePositions[0], new Quaternion());
-        Instantiate(seekerSlow, piecePositions[0], new Quaternion());
+        //Instantiate(seekerSlow, piecePositions[0], new Quaternion());
 }
 
     List<GameObject> CollectLevelPieces()

@@ -11,7 +11,9 @@ public class Individual : IEquatable<Individual>
 {
 
     public List<DesignElement> designElements = new List<DesignElement>();
+    // fitness is used a form of measurement for the feasibility of 
     public int fitness;
+    public int objectiveFitness;
 
     public Individual()
     {
@@ -43,7 +45,6 @@ public class Individual : IEquatable<Individual>
         return other;
     }
 
-
     public void Print()
     {
         string output = "";
@@ -57,16 +58,24 @@ public class Individual : IEquatable<Individual>
 
     public void ToJson()
     {
-        //List<LevelPiece> levelPieces = new List<LevelPiece>();
-
-        //foreach (LevelPiece lp in designElements)
-        //{
-        //    levelPieces.Add(lp);
-        //}
         string json = JsonConvert.SerializeObject(this);
         
        
-        string path = Application.dataPath + "/" + "gl" + designElements.Count + "f" + fitness + ".json";
+        string path = Application.dataPath + "/Levels/" + "gl" + designElements.Count + "f" + fitness + ".json";
+        Debug.Log(path);
+        File.WriteAllText(path, json.ToString());
+#if UNITY_EDITOR
+        UnityEditor.AssetDatabase.Refresh();
+#endif
+
+    }
+
+    public void ToJson(string text)
+    {
+        string json = JsonConvert.SerializeObject(this);
+
+
+        string path = Application.dataPath + "/Levels/" + "gl" + designElements.Count + "f" + fitness + text + ".json";
         Debug.Log(path);
         File.WriteAllText(path, json.ToString());
 #if UNITY_EDITOR
@@ -87,19 +96,23 @@ public class Individual : IEquatable<Individual>
 
     public bool Equals(Individual other)
     {
-        int equalCount = 0;
-        for (int i = 0; i < designElements.Count; i++)
+        if (other.designElements.Count != 0)
         {
-            // Sum the number of same design elements
-            if (designElements[i].Equals(other.designElements[i]))
+            int equalCount = 0;
+            for (int i = 0; i < designElements.Count; i++)
             {
-                equalCount++;
+                // Sum the number of same design elements
+                if (designElements[i].Equals(other.designElements[i]))
+                {
+                    equalCount++;
+                }
             }
+            // Individuals are equal if all the design elements have the same values
+            if (equalCount == designElements.Count)
+                return true;
+            return false;
         }
-        // Individuals are equal if all the design elements have the same values
-        if (equalCount == designElements.Count)
-            return true;
+        // Other is not initialised properly - they are not equal
         return false;
-
     }
 }
