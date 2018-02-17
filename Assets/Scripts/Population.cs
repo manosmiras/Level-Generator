@@ -49,6 +49,11 @@ public class Population
     //    return other;
     //}
 
+    public int Size()
+    {
+        return this.individuals.Count;
+    }
+
     public void Print()
     {
         foreach (Individual individual in individuals)
