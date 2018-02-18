@@ -14,16 +14,17 @@ public class Individual : IEquatable<Individual>
     // fitness is used a form of measurement for the feasibility of 
     public int fitness;
     public int objectiveFitness;
-
+    public bool delete;
     public Individual()
     {
-
+        delete = false;
     }
 
     public Individual(Individual individual)
     {
         this.designElements = new List<DesignElement>(individual.designElements);
         this.fitness = individual.fitness;
+        this.delete = false;
     }
 
     public Individual(List<DesignElement> designElements)

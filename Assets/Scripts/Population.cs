@@ -42,6 +42,38 @@ public class Population
         return fittest;
     }
 
+    // Gets the least fit individual in the population
+    public Individual GetWeakest()
+    {
+        Individual weakest = individuals[0];
+        // Get the fittest
+        for (int i = 1; i < individuals.Count; i++)
+        {
+            if (individuals[i].fitness < weakest.fitness)
+            {
+                weakest = individuals[i];
+            }
+        }
+        return weakest;
+    }
+
+    public int GetWeakestIndex()
+    {
+        Individual weakest = individuals[0];
+        int index = 0;
+        // Get the fittest
+        for (int i = 1; i < individuals.Count; i++)
+        {
+            if (individuals[i].fitness < weakest.fitness)
+            {
+                weakest = individuals[i];
+                index = i;
+            }
+        }
+        return index;
+    }
+
+
     //public Population DeepCopy()
     //{
     //    Population other = (Population)this.MemberwiseClone();

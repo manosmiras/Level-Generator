@@ -319,12 +319,15 @@ MonoBehaviour:
   seekerSafe: {fileID: 1586609201474592, guid: 4479f3b191a26c14f8ff71a752440f25, type: 2}
   seekerDangerous: {fileID: 1586609201474592, guid: 911f76ba08933bb44916c9c92686ac88,
     type: 2}
+  technique: 1
   target: {fileID: 1917319722232294, guid: 73f1927d5520dae44968981643d75800, type: 2}
   currentInfeasibleIndividual: 0
   currentFeasibleIndividual: 0
   generation: 0
-  fittest: 0
-  fitness: 0
+  fittestInfeasible: 0
+  fittestFeasible: 0
+  fitnessInfeasible: 0
+  fitnessFeasible: 0
   overlap: 0
   connection: 0
   populationDiversity: 0
@@ -332,25 +335,31 @@ MonoBehaviour:
   pairVertexConnected: 0
   overlapPenaltyMultiplier: 1
   connectionPenaltyMultiplier: 1
-  genomeLength: 16
+  genomeLength: 36
   populationSize: 50
   positionModifier: 15
   mutationRate: 0.1
   elitism: 1
   tournamentSize: 3
-  evaluationTime: 0.125
+  evaluationTime: 0.15
   infeasiblePopulation:
     individuals: []
   feasiblePopulation:
     individuals: []
-  fittestIndividual:
+  infeasibleFittest:
     fitness: 0
     objectiveFitness: 0
+    delete: 0
+  feasibleFittest:
+    fitness: 0
+    objectiveFitness: 0
+    delete: 0
   time: 
   timeMs: 
   runtimeInSeconds: 300
   terminate: 0
-  initialised: 0
+  initialisedInfeasiblePop: 0
+  initialisedFeasiblePop: 0
 --- !u!4 &110116972
 Transform:
   m_ObjectHideFlags: 0
