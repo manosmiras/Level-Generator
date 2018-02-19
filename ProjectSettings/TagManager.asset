@@ -19,6 +19,7 @@ TagManager:
   - TrapPosition
   - Target
   - Seeker
+  - Ceiling
   layers:
   - Default
   - TransparentFX

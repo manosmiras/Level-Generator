@@ -51,7 +51,8 @@ public class LevelGenerator : MonoBehaviour
     [ReadOnly] public int populationDiversity = 0;
     [ReadOnly] public int connectedComponents = 0;
     [ReadOnly] public bool pairVertexConnected = false;
-    
+    public bool displayCeiling = true;
+    public bool spawnTraps = true;
     public int overlapPenaltyMultiplier = 1;
     public int connectionPenaltyMultiplier = 2;
     public int genomeLength = 10;
@@ -72,6 +73,7 @@ public class LevelGenerator : MonoBehaviour
     [ReadOnly] public bool terminate = false;
     [ReadOnly] public bool initialisedInfeasiblePop;
     [ReadOnly] public bool initialisedFeasiblePop;
+    public static int shortestPathCost = 0;
     public static Graph graph = new Graph();
     // Private properties
     private float cooldown = 0;
@@ -124,7 +126,7 @@ public class LevelGenerator : MonoBehaviour
             if (feasiblePopulation.Size() >= 1 && initialisedInfeasiblePop)
             {
                 
-                Debug.Log("Trying to display feasible pop");
+                //Debug.Log("Trying to display feasible pop");
                 
                 DisplayFeasiblePopulation(feasiblePopulation);
             }
@@ -239,8 +241,8 @@ public class LevelGenerator : MonoBehaviour
             Individual individual1 = TournamentSelection(pop);
             Individual individual2 = TournamentSelection(pop);
             Individual newIndividual = new Individual();
-            // Perform uniform crossover every 5 generations, for the rest use single point crossover
-            if (generation % 5 == 0)
+            // Perform uniform crossover every 3 generations, for the rest use single point crossover
+            if (generation % 3 == 0)
                 newIndividual = UniformCrossover(individual1, individual2);
             else
                 newIndividual = SinglePointCrossover(individual1, individual2);
@@ -404,20 +406,19 @@ public class LevelGenerator : MonoBehaviour
             
         }
         if (displaying && !(currentFeasibleIndividual >= pop.Size()))
-        {
-            Debug.Log("before cooldown");
+        {   
             cooldown += Time.deltaTime;
             if (cooldown >= evaluationTime)
             {
-                Debug.Log("went into cooldown");
                 connectedComponents = graph.CalculateConnectivity();
                 // Calculates the 2-vertex-connectivity of the graph
                 //int kConnectivity = graph.CalculateKConnectivity(2);
-                int kConnectivity = graph.CalculateVariableKConnectivity();
+                
 
                 GraphEditor.InitRects(genomeLength);
 
-                pop.individuals[currentFeasibleIndividual].fitness = (genomeLength - connectedComponents) + kConnectivity;
+                //pop.individuals[currentFeasibleIndividual].fitness = (genomeLength - connectedComponents) + kConnectivity;
+                pop.individuals[currentFeasibleIndividual].fitness = (genomeLength - connectedComponents) + shortestPathCost;
                 //pop.individuals[currentFeasibleIndividual].objectiveFitness = kConnectivity;
                 // Infeasible
                 if (connectedComponents != 1)
@@ -427,7 +428,7 @@ public class LevelGenerator : MonoBehaviour
                     //infeasiblePopulation.individuals[infeasiblePopulation.GetWeakestIndex()] = Utility.DeepClone(pop.individuals[currentFeasibleIndividual]);
                     infeasiblePopulation.Add(Utility.DeepClone(pop.individuals[currentFeasibleIndividual]));
                     pop.individuals[currentFeasibleIndividual].delete = true;
-                    Debug.Log("Adding from feasible to infeasible, size becomes: " + infeasiblePopulation.Size());
+                    //Debug.Log("Adding from feasible to infeasible, size becomes: " + infeasiblePopulation.Size());
                 }
 
                 fitnessFeasible = pop.individuals[currentFeasibleIndividual].fitness;
@@ -685,17 +686,21 @@ public class LevelGenerator : MonoBehaviour
             }
         }
         trapPositions = CollectPossibleTrapPositions();
+
         // TEST
-        for (int i = 0; i < genomeLength; i++)
+        if (spawnTraps)
         {
-            // Choose a position randomly
-            int randPos = Random.Range(0, trapPositions.Count);
-            // Spawn trap
-            GameObject tempSpikeTrap = Instantiate(spikeTrap, new Vector3(trapPositions[randPos].x, trapPositions[randPos].y - 2.5f, trapPositions[randPos].z), Quaternion.AngleAxis(0, Vector3.up)) as GameObject;
-            tempSpikeTrap.transform.parent = gameObject.transform;
-            tempSpikeTrap.name += i;
-            // Remove currently selected position
-            trapPositions.Remove(trapPositions[randPos]);
+            for (int i = 0; i < genomeLength; i++)
+            {
+                // Choose a position randomly
+                int randPos = Random.Range(0, trapPositions.Count);
+                // Spawn trap
+                GameObject tempSpikeTrap = Instantiate(spikeTrap, new Vector3(trapPositions[randPos].x, trapPositions[randPos].y - 2.5f, trapPositions[randPos].z), Quaternion.AngleAxis(0, Vector3.up)) as GameObject;
+                tempSpikeTrap.transform.parent = gameObject.transform;
+                tempSpikeTrap.name += i;
+                // Remove currently selected position
+                trapPositions.Remove(trapPositions[randPos]);
+            }
         }
 
         generated = true;
@@ -712,11 +717,11 @@ public class LevelGenerator : MonoBehaviour
                 distance = currentDistance;
             }
         }
-
+        HideCeiling(!displayCeiling);
         Instantiate(target, furthest, new Quaternion());
         Instantiate(seekerFast, piecePositions[0], new Quaternion());
-        Instantiate(seekerSafe, piecePositions[0], new Quaternion());
-        Instantiate(seekerDangerous, piecePositions[0], new Quaternion());
+        //Instantiate(seekerSafe, piecePositions[0], new Quaternion());
+        //Instantiate(seekerDangerous, piecePositions[0], new Quaternion());
         //Instantiate(seekerSlow, piecePositions[0], new Quaternion());
 }
 
@@ -761,6 +766,15 @@ public class LevelGenerator : MonoBehaviour
         }
 
         return positions;
+    }
+
+    void HideCeiling(bool hide)
+    {
+        GameObject[] ceilings = GameObject.FindGameObjectsWithTag("Ceiling");
+        foreach (GameObject ceiling in ceilings)
+        {
+            ceiling.SetActive(!hide);
+        }
     }
 
     void ClearScene()

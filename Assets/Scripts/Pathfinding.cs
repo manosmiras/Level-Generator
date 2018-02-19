@@ -40,7 +40,7 @@ public class Pathfinding : MonoBehaviour {
             Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
             HashSet<Node> closedSet = new HashSet<Node>();
             openSet.Add(startNode);
-
+            
             while (openSet.Count > 0)
             {
                 Node currentNode = openSet.RemoveFirst();
@@ -100,6 +100,9 @@ public class Pathfinding : MonoBehaviour {
         yield return null;
         if (pathSuccess)
         {
+            //UnityEngine.Debug.Log("total path cost: " + targetNode.gCost);
+            if(type == Unit.UnitType.Fast)
+                LevelGenerator.shortestPathCost = targetNode.gCost;
             waypoints = RetracePath(startNode, targetNode);
         }
         requestManager.FinishedProcessingPath(waypoints, pathSuccess);

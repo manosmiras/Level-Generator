@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43846697, g: 0.4865523, b: 0.5668253, a: 1}
+  m_IndirectSpecularColor: {r: 0.45122582, g: 0.5009495, b: 0.5735805, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -306,13 +306,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca9b430dc5178904c8d9101b5eb8b7c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cross: {fileID: 1853625859058062, guid: e9832bf12601a524eaedcc04f908a00a, type: 2}
-  t_junction: {fileID: 1686162298647768, guid: 2053da72bfe767b4fab7fb9f128459e6, type: 2}
-  hall: {fileID: 1531126560688648, guid: f2a5ce33044b86a499d805c56f2c3a70, type: 2}
-  corner: {fileID: 1025679030023330, guid: c9c2d954dfb8121429ebf388ff7c6b94, type: 2}
-  room1: {fileID: 1628928118763918, guid: 26b3e9888adaec5429af3bfa71bdaa14, type: 2}
-  room2: {fileID: 1009672517134532, guid: 692a1e212f2dc5f45a11d09c61c5f6d5, type: 2}
-  room3: {fileID: 1124444945981548, guid: 89cd62dffbfc507418de507eeee87855, type: 2}
+  cross: {fileID: 1853625859058062, guid: 5c69afc33ca8a064bb1cdba13928fc58, type: 2}
+  t_junction: {fileID: 1686162298647768, guid: abdaa1a7ebf7e5540ade04d1c6e58c43, type: 2}
+  hall: {fileID: 1531126560688648, guid: 6f547eb81e7421846ac5693a4b0101df, type: 2}
+  corner: {fileID: 1025679030023330, guid: 1bfcc7c54078a1f43b67fa2fd9ad1921, type: 2}
+  room1: {fileID: 1628928118763918, guid: 885495471b8eb8248ae361d22e819f8a, type: 2}
+  room2: {fileID: 1009672517134532, guid: 2cec5f0a69f023e42ace24dfe20748c4, type: 2}
+  room3: {fileID: 1124444945981548, guid: 1ce164c577ce25e41a843bc7c9f50b52, type: 2}
   aStar: {fileID: 1344125825484124, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
   spikeTrap: {fileID: 1769948916603860, guid: a57e1625f8d9ccb4f8a5ea380ed09e78, type: 2}
   seekerFast: {fileID: 1586609201474592, guid: e326f36da50842949920f146f9518104, type: 2}
@@ -333,15 +333,17 @@ MonoBehaviour:
   populationDiversity: 0
   connectedComponents: 0
   pairVertexConnected: 0
+  displayCeiling: 1
+  spawnTraps: 1
   overlapPenaltyMultiplier: 1
   connectionPenaltyMultiplier: 1
-  genomeLength: 36
+  genomeLength: 49
   populationSize: 50
   positionModifier: 15
-  mutationRate: 0.1
+  mutationRate: 0.05
   elitism: 1
   tournamentSize: 3
-  evaluationTime: 0.15
+  evaluationTime: 0.2
   infeasiblePopulation:
     individuals: []
   feasiblePopulation:
@@ -477,13 +479,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 164757232}
-  m_LocalRotation: {x: 0.58801836, y: -0.20533493, z: 0.157559, w: 0.7663205}
+  m_LocalRotation: {x: 0.16358829, y: -0.77580553, z: 0.2239248, w: 0.56676483}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 75, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 32.2, y: -107.7, z: 0}
 --- !u!1001 &210709059
 Prefab:
   m_ObjectHideFlags: 0
@@ -715,7 +717,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 291176145}
   m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: 0.5}
-  m_LocalPosition: {x: 0, y: 100, z: 0}
+  m_LocalPosition: {x: 0, y: 200, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
