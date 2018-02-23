@@ -16,6 +16,13 @@ public enum Technique
     NoveltySearchGA
 }
 
+public enum CrossoverType
+{
+    SinglePoint,
+    Uniform,
+    Hybrid
+}
+
 public class LevelGenerator : MonoBehaviour
 {
     // Public properties
@@ -50,6 +57,7 @@ public class LevelGenerator : MonoBehaviour
     public GameObject seekerSafe;
     public GameObject seekerDangerous;
     public Technique technique;
+    public CrossoverType crossoverType;
     //public GameObject seekerSlow;
     public GameObject target;
     [ReadOnly] public int currentInfeasibleIndividual = 0;
@@ -84,6 +92,7 @@ public class LevelGenerator : MonoBehaviour
     public string time;
     public string timeMs;
     public int runtimeInSeconds = 300;
+    public int maxGeneration = 20;
     public bool testing;
     [ReadOnly] public bool terminate = false;
     [ReadOnly] public bool initialisedInfeasiblePop;
@@ -203,7 +212,7 @@ public class LevelGenerator : MonoBehaviour
     public void SimpleGA()
     {
         
-        if (totalTime <= runtimeInSeconds ^ (terminate || currentTestRun >= testRuns))//if (fittest != 1) //if (currentIndividual != 1)
+        if (generation <= maxGeneration ^ (terminate || currentTestRun >= testRuns))//if (fittest != 1) //if (currentIndividual != 1)
         {
             totalTime += Time.deltaTime;
             timeMs = totalTime.ToString("F2");
@@ -329,11 +338,24 @@ public class LevelGenerator : MonoBehaviour
             Individual individual1 = TournamentSelection(pop);
             Individual individual2 = TournamentSelection(pop);
             Individual newIndividual = new Individual();
-            // Perform uniform crossover every 3 generations, for the rest use single point crossover
-            if (generation % 3 == 0)
-                newIndividual = UniformCrossover(individual1, individual2);
-            else
-                newIndividual = SinglePointCrossover(individual1, individual2);
+            switch (crossoverType)
+            {
+                case CrossoverType.SinglePoint:
+                    newIndividual = SinglePointCrossover(individual1, individual2);
+                    break;
+                case CrossoverType.Uniform:
+                    newIndividual = UniformCrossover(individual1, individual2);
+                    break;
+                case CrossoverType.Hybrid:
+                    // Perform uniform crossover every 3 generations, for the rest use single point crossover
+                    if (generation % 3 == 0)
+                        newIndividual = UniformCrossover(individual1, individual2);
+                    else
+                        newIndividual = SinglePointCrossover(individual1, individual2);
+                    break;
+                default:
+                    break;
+            }
 
             newPopulation.Add(newIndividual);
         }
