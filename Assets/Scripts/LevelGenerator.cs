@@ -103,7 +103,7 @@ public class LevelGenerator : MonoBehaviour
     private int feasibleIndividualCount;
     private int bestObjectiveFitness;
     private int currentTestRun;
-
+    private string output = "";
     // Use this for initialization
     void Start()
     {
@@ -202,9 +202,10 @@ public class LevelGenerator : MonoBehaviour
 
     public void SimpleGA()
     {
-        totalTime += Time.deltaTime;
+        
         if (totalTime <= runtimeInSeconds ^ (terminate || currentTestRun >= testRuns))//if (fittest != 1) //if (currentIndividual != 1)
         {
+            totalTime += Time.deltaTime;
             timeMs = totalTime.ToString("F2");
             int minutes = Mathf.FloorToInt(totalTime / 60F);
             int seconds = Mathf.FloorToInt(totalTime - minutes * 60);
@@ -233,6 +234,7 @@ public class LevelGenerator : MonoBehaviour
             if (testing && currentTestRun < testRuns)
             {
                 Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + infeasibleFittest.fitness);
+                output += feasibleIndividualCount + ", " + infeasibleFittest.fitness + "\n";
                 ClearScene();
                 infeasiblePopulation.individuals.Clear();
                 totalTime = 0;
@@ -248,6 +250,7 @@ public class LevelGenerator : MonoBehaviour
             }
             else
             {
+                Debug.Log(output);
                 Debug.Log("Clearing and spawning fittest, it has a fitness of: " + infeasiblePopulation.GetFittest());
                 ClearScene();
 
