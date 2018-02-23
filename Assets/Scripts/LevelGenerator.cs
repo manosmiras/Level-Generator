@@ -84,6 +84,7 @@ public class LevelGenerator : MonoBehaviour
     public string time;
     public string timeMs;
     public int runtimeInSeconds = 300;
+    public bool testing;
     [ReadOnly] public bool terminate = false;
     [ReadOnly] public bool initialisedInfeasiblePop;
     [ReadOnly] public bool initialisedFeasiblePop;
@@ -95,9 +96,14 @@ public class LevelGenerator : MonoBehaviour
     private bool displaying = false;
 
     private static float uniformRate = 0.5f;
-    
+    public int testRuns = 10;
     private List<Vector3> trapPositions = new List<Vector3>();
     private bool finished = false;
+    private float totalTime;
+    private int feasibleIndividualCount;
+    private int bestObjectiveFitness;
+    private int currentTestRun;
+
     // Use this for initialization
     void Start()
     {
@@ -131,7 +137,8 @@ public class LevelGenerator : MonoBehaviour
 
     public void FI2PopGA()
     {
-        if (Time.time <= runtimeInSeconds ^ terminate)//if (fittest != 1) //if (currentIndividual != 1)
+        totalTime += Time.deltaTime;
+        if (totalTime <= runtimeInSeconds ^ terminate)//if (fittest != 1) //if (currentIndividual != 1)
         {
             timeMs = Time.time.ToString("F2");
             int minutes = Mathf.FloorToInt(Time.time / 60F);
@@ -195,11 +202,12 @@ public class LevelGenerator : MonoBehaviour
 
     public void SimpleGA()
     {
-        if (Time.time <= runtimeInSeconds ^ terminate)//if (fittest != 1) //if (currentIndividual != 1)
+        totalTime += Time.deltaTime;
+        if (totalTime <= runtimeInSeconds ^ (terminate || currentTestRun >= testRuns))//if (fittest != 1) //if (currentIndividual != 1)
         {
-            timeMs = Time.time.ToString("F2");
-            int minutes = Mathf.FloorToInt(Time.time / 60F);
-            int seconds = Mathf.FloorToInt(Time.time - minutes * 60);
+            timeMs = totalTime.ToString("F2");
+            int minutes = Mathf.FloorToInt(totalTime / 60F);
+            int seconds = Mathf.FloorToInt(totalTime - minutes * 60);
             time = string.Format("{0:0}:{1:00}", minutes, seconds);
 
             // Will spawn infeasible levels and evaluate them
@@ -222,15 +230,33 @@ public class LevelGenerator : MonoBehaviour
         else if (!finished)
         {
             //Individual final = Individual.FromJson(Application.dataPath + "/Levels/" + "gl" + genomeLength + "f" + fittest + ".json");
+            if (testing && currentTestRun < testRuns)
+            {
+                Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + infeasibleFittest.fitness);
+                ClearScene();
+                infeasiblePopulation.individuals.Clear();
+                totalTime = 0;
+                currentInfeasibleIndividual = 0;
+                infeasibleFittest = new Individual();
+                feasibleFittest = new Individual();
+                feasiblePopulation.individuals.Clear();
+                currentFeasibleIndividual = 0;
+                initialisedInfeasiblePop = false;
+                currentTestRun++;
+                feasibleIndividualCount = 0;
+                Start();
+            }
+            else
+            {
+                Debug.Log("Clearing and spawning fittest, it has a fitness of: " + infeasiblePopulation.GetFittest());
+                ClearScene();
 
-            Debug.Log("Clearing and spawning fittest, it has a fitness of: " + infeasiblePopulation.GetFittest());
-            ClearScene();
-
-            // Show fittest individual
-            //DisplayIndividual(final);
-            DisplayIndividual(infeasiblePopulation.GetFittest());
-            Invoke("SpawnWallsOnDeadEnds", evaluationTime);
-            finished = true;
+                // Show fittest individual
+                //DisplayIndividual(final);
+                DisplayIndividual(infeasiblePopulation.GetFittest());
+                Invoke("SpawnWallsOnDeadEnds", evaluationTime);
+                finished = true;
+            }
         }
     }
 
@@ -435,11 +461,13 @@ public class LevelGenerator : MonoBehaviour
                 // Feasible
                 if (connectedComponents == 1)
                 {
-                    Debug.Log("Found a graph with 1 connected component.");
+                    
+                    //Debug.Log("Found a graph with 1 connected component.");
                     //fitness += genomeLength / 2;
                     // Add to feasible population only if solution is different
                     if (!feasiblePopulation.individuals.Contains(pop.individuals[currentInfeasibleIndividual]))
                     {
+                        feasibleIndividualCount++;
                         Individual feasibleIndividual = Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]);
                         feasiblePopulation.Add(feasibleIndividual);
                         pop.individuals[currentInfeasibleIndividual].delete = true;
@@ -843,23 +871,6 @@ public class LevelGenerator : MonoBehaviour
                 count++;
             }
         }
-        //trapPositions = CollectPossibleTrapPositions();
-
-        // TEST
-        //if (spawnTraps)
-        //{
-        //    for (int i = 0; i < genomeLength; i++)
-        //    {
-        //        // Choose a position randomly
-        //        int randPos = Random.Range(0, trapPositions.Count);
-        //        // Spawn trap
-        //        GameObject tempSpikeTrap = Instantiate(spikeTrap, new Vector3(trapPositions[randPos].x, trapPositions[randPos].y - 2.5f, trapPositions[randPos].z), Quaternion.AngleAxis(0, Vector3.up)) as GameObject;
-        //        tempSpikeTrap.transform.parent = gameObject.transform;
-        //        tempSpikeTrap.name += i;
-        //        // Remove currently selected position
-        //        trapPositions.Remove(trapPositions[randPos]);
-        //    }
-        //}
 
         generated = true;
         // Initialise pathfinding

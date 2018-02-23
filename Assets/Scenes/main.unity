@@ -329,7 +329,7 @@ MonoBehaviour:
   seekerSafe: {fileID: 1586609201474592, guid: 4479f3b191a26c14f8ff71a752440f25, type: 2}
   seekerDangerous: {fileID: 1586609201474592, guid: 911f76ba08933bb44916c9c92686ac88,
     type: 2}
-  technique: 1
+  technique: 0
   target: {fileID: 1917319722232294, guid: 73f1927d5520dae44968981643d75800, type: 2}
   currentInfeasibleIndividual: 0
   currentFeasibleIndividual: 0
@@ -370,11 +370,13 @@ MonoBehaviour:
     delete: 0
   time: 
   timeMs: 
-  runtimeInSeconds: 300
+  runtimeInSeconds: 10
+  testing: 0
   terminate: 0
   initialisedInfeasiblePop: 0
   initialisedFeasiblePop: 0
   cost: 0
+  testRuns: 3
 --- !u!4 &110116972
 Transform:
   m_ObjectHideFlags: 0
