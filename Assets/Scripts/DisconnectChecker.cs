@@ -5,6 +5,11 @@ using UnityEngine;
 public class DisconnectChecker : MonoBehaviour
 {
     List<string> otherCollisions = new List<string>();
+    public bool didCollide = false;
+    private void Start()
+    {
+        didCollide = false;
+    }
     void OnTriggerEnter(Collider other)
     {
         //// Checks for collisions of room entries
@@ -27,7 +32,7 @@ public class DisconnectChecker : MonoBehaviour
             string otherColliderName = other.transform.parent.name;
 
             // Checks for collisions of room entries
-            if (gameObject.name.Equals("Entry_Colliders") && other.name.Equals("Entry_Colliders") && !otherCollisions.Contains(otherColliderName))
+            if (gameObject.name.Contains("Entry_Colliders") && other.name.Contains("Entry_Colliders") && !otherCollisions.Contains(otherColliderName))
             {
                 //Debug.Log("name: " + other.name + ", go name " + transform.parent.name);
                 otherCollisions.Add(otherColliderName);
@@ -42,7 +47,9 @@ public class DisconnectChecker : MonoBehaviour
                 LevelGenerator.connectedCount++;
                 //TextMesh tm = gameObject.GetComponentInChildren<TextMesh>();
                 //tm.text = otherCollisions.Count.ToString();
+                didCollide = true;
             }
         }
+
     }
 }

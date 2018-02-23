@@ -23,7 +23,19 @@ public class Unit : MonoBehaviour {
     private void Start()
     {
         target = GameObject.FindGameObjectWithTag("Target").transform;
-        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, type);
+        if (target != null)
+            PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, type);
+    }
+
+    private void Update()
+    {
+        // If target not found yet
+        if (target == null)
+        {
+            // Retry
+            target = GameObject.FindGameObjectWithTag("Target").transform;
+            PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, type);
+        }
     }
 
     public void OnPathFound(Vector3[] newPath, bool pathSuccesful)

@@ -46,6 +46,25 @@ public class Individual : IEquatable<Individual>
         return other;
     }
 
+    public int GetDiversity(Individual other)
+    {
+        int diversity = 0;
+        for (int i = 0; i < designElements.Count; i++)
+        {
+            // Increase diversity if rotations for current piece are different
+            if (designElements[i].rotation != other.designElements[i].rotation)
+            {
+                diversity++;
+            }
+            // Increase diversity if current piece types are different
+            if (((LevelPiece)designElements[i]).type != ((LevelPiece)other.designElements[i]).type)
+            {
+                diversity++;
+            }
+        }
+        return diversity;
+    }
+
     public void Print()
     {
         string output = "";

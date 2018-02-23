@@ -9,13 +9,21 @@ public class LevelPiece : DesignElement
     public enum Type
     {
         Cross = 0,
-        T_Junction = 1,
-        Hall = 2,
-        Corner = 3,
-        Room1 = 4,
-        Room2 = 5,
-        Room3 = 6
-
+        T_Junction,
+        Hall,
+        Corner,
+        Room1,
+        Room2,
+        Room3,
+        Room4,
+        Cross_Trap,
+        T_Junction_Trap,
+        Hall_Trap,
+        Corner_Trap,
+        Room1_Trap,
+        Room2_Trap,
+        Room3_Trap,
+        Room4_Trap
     }
     [SerializeField]
     public Type type;
@@ -25,34 +33,6 @@ public class LevelPiece : DesignElement
         this.position = position;
         this.rotation = rotation;
         this.type = type;
-
-        //switch (type)
-        //{
-        //    // Issues with rotation?
-        //    case Type.Cross:
-        //        trapPositions.Add(new Vector2(position.x, position.y));
-        //        trapPositions.Add(new Vector2(position.x, position.y + 5));
-        //        trapPositions.Add(new Vector2(position.x, position.y - 5));
-        //        trapPositions.Add(new Vector2(position.x + 5, position.y));
-        //        trapPositions.Add(new Vector2(position.x - 5, position.y));
-        //        break;
-        //    case Type.T_Junction:
-        //        trapPositions.Add(new Vector2(position.x, position.y));
-        //        trapPositions.Add(new Vector2(position.x, position.y + 5));
-        //        trapPositions.Add(new Vector2(position.x + 5, position.y));
-        //        trapPositions.Add(new Vector2(position.x - 5, position.y));
-        //        break;
-        //    case Type.Hall:
-        //        trapPositions.Add(new Vector2(position.x, position.y));
-        //        trapPositions.Add(new Vector2(position.x, position.y + 5));
-        //        trapPositions.Add(new Vector2(position.x, position.y - 5));
-        //        break;
-        //    case Type.Corner:
-        //        trapPositions.Add(new Vector2(position.x, position.y));
-        //        trapPositions.Add(new Vector2(position.x, position.y + 5));
-        //        trapPositions.Add(new Vector2(position.x, position.y - 5));
-        //        break;
-        //}
     }
 
     public override bool Equals(DesignElement other)

@@ -69,7 +69,7 @@ MonoBehaviour:
   - terrainMask:
       serializedVersion: 2
       m_Bits: 2048
-    terrainPenalty: 10
+    terrainPenalty: 5
 --- !u!114 &114252764482651926
 MonoBehaviour:
   m_ObjectHideFlags: 1

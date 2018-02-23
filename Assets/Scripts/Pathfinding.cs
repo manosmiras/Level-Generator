@@ -101,7 +101,9 @@ public class Pathfinding : MonoBehaviour {
         if (pathSuccess)
         {
             //UnityEngine.Debug.Log("total path cost: " + targetNode.gCost);
-            if(type == Unit.UnitType.Fast)
+            //if(type == Unit.UnitType.Fast)
+            //    LevelGenerator.shortestPathCost = targetNode.gCost;
+            if (type == Unit.UnitType.Safe)
                 LevelGenerator.shortestPathCost = targetNode.gCost;
             waypoints = RetracePath(startNode, targetNode);
         }

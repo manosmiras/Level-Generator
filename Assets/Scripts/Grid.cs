@@ -145,17 +145,17 @@ public class Grid : MonoBehaviour
             foreach (Node node in grid)
             {
                 // White if walkable, red if unwalkable, green if entry
-                //Gizmos.color = node.walkable ? new Color(1,1,1,0.25f) : new Color(1, 0, 0, 0.25f);
-                //if (node.entry)
-                //{
-                //    Gizmos.color = new Color(0, 1, 0, 0.25f);
-                //}
-                //Gizmos.DrawCube(node.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
-                if (node.movementPenalty > 0)
+                Gizmos.color = node.walkable ? new Color(1, 1, 1, 0.25f) : new Color(1, 0, 0, 0.25f);
+                if (node.entry)
                 {
-                    Gizmos.color = new Color(1, 0, 0, 0.25f);
-                    Gizmos.DrawCube(node.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
+                    Gizmos.color = new Color(0, 1, 0, 0.25f);
                 }
+                Gizmos.DrawCube(node.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
+                //if (node.movementPenalty > 0)
+                //{
+                //    Gizmos.color = new Color(1, 0, 0, 0.25f);
+                //    Gizmos.DrawCube(node.worldPosition, Vector3.one * (nodeDiameter - 0.1f));
+                //}
             }
         }
     }
