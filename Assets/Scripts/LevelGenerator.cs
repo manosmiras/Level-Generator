@@ -147,7 +147,7 @@ public class LevelGenerator : MonoBehaviour
     public void FI2PopGA()
     {
         totalTime += Time.deltaTime;
-        if (totalTime <= runtimeInSeconds ^ terminate)//if (fittest != 1) //if (currentIndividual != 1)
+        if (generation <= maxGeneration ^ (terminate || currentTestRun >= testRuns))//if (fittest != 1) //if (currentIndividual != 1)
         {
             timeMs = Time.time.ToString("F2");
             int minutes = Mathf.FloorToInt(Time.time / 60F);
@@ -164,10 +164,6 @@ public class LevelGenerator : MonoBehaviour
                 
                 DisplayFeasiblePopulation(feasiblePopulation);
             }
-            //else
-            //{
-            //    initialisedFeasiblePop = true;
-            //}
             if (initialisedInfeasiblePop && (initialisedFeasiblePop || feasiblePopulation.Size() == 0))
             {
                 infeasiblePopulation.individuals.RemoveAll(x => x.delete == true);
@@ -189,23 +185,52 @@ public class LevelGenerator : MonoBehaviour
         }
         else if (!finished)
         {
-            //Individual final = Individual.FromJson(Application.dataPath + "/Levels/" + "gl" + genomeLength + "f" + fittest + ".json");
 
-            Debug.Log("Clearing and spawning fittest, it has a fitness of: " + infeasiblePopulation.GetFittest().fitness);
-            ClearScene();
+            if (testing && currentTestRun < testRuns)
+            {
+                Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + feasibleFittest.fitness);
+                output += feasibleIndividualCount + ", " + fittestFeasible + "\n";
+                currentTestRun++;
+                ClearScene();
+                if (currentTestRun <= testRuns - 1)
+                {
+                    infeasiblePopulation.individuals.Clear();
+                    feasiblePopulation.individuals.Clear();
+                    infeasibleFittest = new Individual();
+                    feasibleFittest = new Individual();
+                    Start();
+                }
+                totalTime = 0;
+                currentInfeasibleIndividual = 0;
+                currentFeasibleIndividual = 0;
+                feasibleIndividualCount = 0;
 
-            // Show fittest individual
-            //DisplayIndividual(final);
-            if (!(feasibleFittest.designElements.Count == 0))
-                DisplayIndividual(feasibleFittest);
+                initialisedInfeasiblePop = false;
+                initialisedFeasiblePop = false;
+                generation = 1;
+                fittestFeasible = 0;
+                fittestInfeasible = 0;
+            }
             else
-                DisplayIndividual(infeasiblePopulation.GetFittest());
-            //if (feasiblePopulation.Size() > 0)
-            //    DisplayIndividual(feasiblePopulation.GetFittest());
-            //else
-            //    DisplayIndividual(infeasiblePopulation.GetFittest());
-            Invoke("SpawnWallsOnDeadEnds", evaluationTime);
-            finished = true;
+            {
+                //Individual final = Individual.FromJson(Application.dataPath + "/Levels/" + "gl" + genomeLength + "f" + fittest + ".json");
+                ClearScene();
+
+                Debug.Log(output);
+                if (feasibleFittest.designElements.Count != 0)
+                {
+                    Debug.Log("Clearing and spawning fittest, it has a fitness of: " + feasibleFittest.fitness);
+                    DisplayIndividual(feasibleFittest);
+                }
+                else
+                {
+                    Debug.Log("Clearing and spawning fittest, it has a fitness of: " + infeasiblePopulation.GetFittest().fitness);
+                    DisplayIndividual(infeasiblePopulation.GetFittest());
+                }
+
+                Invoke("SpawnWallsOnDeadEnds", evaluationTime);
+                finished = true;
+            }
         }
     }
 
@@ -239,28 +264,37 @@ public class LevelGenerator : MonoBehaviour
         }
         else if (!finished)
         {
+
             //Individual final = Individual.FromJson(Application.dataPath + "/Levels/" + "gl" + genomeLength + "f" + fittest + ".json");
             if (testing && currentTestRun < testRuns)
             {
+                currentTestRun++;
                 Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + infeasibleFittest.fitness);
                 output += feasibleIndividualCount + ", " + infeasibleFittest.fitness + "\n";
                 ClearScene();
-                infeasiblePopulation.individuals.Clear();
+                if (currentTestRun <= testRuns - 1)
+                {
+                    infeasiblePopulation.individuals.Clear();
+                    feasiblePopulation.individuals.Clear();
+                    infeasibleFittest = new Individual();
+                    feasibleFittest = new Individual();
+                    Start();
+                }
                 totalTime = 0;
                 currentInfeasibleIndividual = 0;
-                infeasibleFittest = new Individual();
-                feasibleFittest = new Individual();
-                feasiblePopulation.individuals.Clear();
                 currentFeasibleIndividual = 0;
-                initialisedInfeasiblePop = false;
-                currentTestRun++;
                 feasibleIndividualCount = 0;
-                Start();
+
+                initialisedInfeasiblePop = false;
+                initialisedFeasiblePop = false;
+                generation = 1;
+                fittestFeasible = 0;
+                fittestInfeasible = 0;
             }
             else
             {
                 Debug.Log(output);
-                Debug.Log("Clearing and spawning fittest, it has a fitness of: " + infeasiblePopulation.GetFittest());
+                Debug.Log("Clearing and spawning fittest, it has a fitness of: " + infeasiblePopulation.GetFittest().fitness);
                 ClearScene();
 
                 // Show fittest individual
@@ -913,7 +947,7 @@ public class LevelGenerator : MonoBehaviour
         }
         HideCeiling(!displayCeiling);
         Instantiate(target, furthest, new Quaternion());
-        Instantiate(seekerFast, piecePositions[0], new Quaternion());
+        //Instantiate(seekerFast, piecePositions[0], new Quaternion());
         Instantiate(seekerSafe, piecePositions[0], new Quaternion());
         //Instantiate(seekerDangerous, piecePositions[0], new Quaternion());
         //Instantiate(seekerSlow, piecePositions[0], new Quaternion());
@@ -949,16 +983,16 @@ public class LevelGenerator : MonoBehaviour
         foreach (GameObject entryCollider in entryColliders)
         {
             DisconnectChecker dc = entryCollider.GetComponent<DisconnectChecker>();
-            Debug.Log(dc.didCollide);
+            //Debug.Log(dc.didCollide);
             if (!dc.didCollide)
             {
                 Transform[] children = entryCollider.GetComponentsInChildren<Transform>(true);
-                Debug.Log(children.Length);
+                //Debug.Log(children.Length);
                 foreach (Transform child in children)
                 {
                     if (child.name.Contains("Wall with Collider"))
                     {
-                        Debug.Log("Setting wall active");
+                        //Debug.Log("Setting wall active");
                         child.gameObject.SetActive(true);
                     }
                 }
