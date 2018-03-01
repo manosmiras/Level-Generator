@@ -12,12 +12,14 @@ public class Individual : IEquatable<Individual>
 
     public List<DesignElement> designElements = new List<DesignElement>();
     // fitness is used a form of measurement for the feasibility of 
-    public int fitness;
-    public int objectiveFitness;
+    [SerializeField]
+    public float fitness;
+    [SerializeField]
     public bool delete;
     public Individual()
     {
         delete = false;
+        fitness = 0;
     }
 
     public Individual(Individual individual)
@@ -30,6 +32,7 @@ public class Individual : IEquatable<Individual>
     public Individual(List<DesignElement> designElements)
     {
         this.designElements = designElements;
+        this.fitness = 0;
     }
     // Sort by x axis
     public void Sort()

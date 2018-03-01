@@ -67,17 +67,15 @@ public class LevelGenerator : MonoBehaviour
     [ReadOnly] public float fittestFeasible = 0;
     [ReadOnly] public float fitnessInfeasible = 0;
     [ReadOnly] public float fitnessFeasible = 0;
-    [ReadOnly] public int overlap = 0;
+
     [ReadOnly] public int connection = 0;
-    [ReadOnly] public int populationDiversity = 0;
+
     [ReadOnly] public int connectedComponents = 0;
-    [ReadOnly] public bool pairVertexConnected = false;
+
     public bool displayCeiling = true;
-    public bool spawnTraps = true;
-    public int overlapPenaltyMultiplier = 1;
-    public int connectionPenaltyMultiplier = 2;
+
     public int genomeLength = 10;
-    public int populationSize = 500;
+    public int populationSize = 50;
     public float positionModifier = 15f;
     [Range(0.0f, 1.0f)]
     public float mutationRate = 0.05f;
@@ -87,37 +85,41 @@ public class LevelGenerator : MonoBehaviour
     public Population infeasiblePopulation = new Population();
     public Population feasiblePopulation = new Population();
     public Population noveltyArchive = new Population();
+   
     public Individual infeasibleFittest = new Individual();
     public Individual feasibleFittest = new Individual();
+    
     public string time;
-    public string timeMs;
     public int runtimeInSeconds = 300;
     public int maxGeneration = 20;
     public bool testing;
     [ReadOnly] public bool terminate = false;
-    [ReadOnly] public bool initialisedInfeasiblePop;
-    [ReadOnly] public bool initialisedFeasiblePop;
+
     public static int shortestPathCost = 0;
-    public int cost = 0;
+    public float cost = 0;
     public static Graph graph = new Graph();
+    public int testRuns = 10;
     // Private properties
     private float cooldown = 0;
     private bool displaying = false;
-
     private static float uniformRate = 0.5f;
-    public int testRuns = 10;
     private List<Vector3> trapPositions = new List<Vector3>();
     private bool finished = false;
     private float totalTime;
     private int feasibleIndividualCount;
-    private int bestObjectiveFitness;
     private int currentTestRun;
     private string output = "";
+    private bool initialisedInfeasiblePop;
+    private bool initialisedFeasiblePop;
+    private int feasibleIndividualGeneration;
+    private int infeasibleIndividualGeneration;
     // Use this for initialization
     void Start()
     {
         initialisedInfeasiblePop = false;
         initialisedFeasiblePop = false;
+        infeasiblePopulation = new Population();
+        feasiblePopulation = new Population();
         GenerateRandomPopulation(populationSize);
 
         generation = 1;
@@ -147,9 +149,8 @@ public class LevelGenerator : MonoBehaviour
     public void FI2PopGA()
     {
         totalTime += Time.deltaTime;
-        if (generation <= maxGeneration ^ (terminate || currentTestRun >= testRuns))//if (fittest != 1) //if (currentIndividual != 1)
+        if (generation <= maxGeneration ^ (terminate || currentTestRun >= testRuns))
         {
-            timeMs = Time.time.ToString("F2");
             int minutes = Mathf.FloorToInt(Time.time / 60F);
             int seconds = Mathf.FloorToInt(Time.time - minutes * 60);
             time = string.Format("{0:0}:{1:00}", minutes, seconds);
@@ -159,9 +160,6 @@ public class LevelGenerator : MonoBehaviour
             // Will spawn feasible levels and evaluate them
             if (feasiblePopulation.Size() >= 1 && initialisedInfeasiblePop)
             {
-                
-                //Debug.Log("Trying to display feasible pop");
-                
                 DisplayFeasiblePopulation(feasiblePopulation);
             }
             if (initialisedInfeasiblePop && (initialisedFeasiblePop || feasiblePopulation.Size() == 0))
@@ -188,8 +186,8 @@ public class LevelGenerator : MonoBehaviour
 
             if (testing && currentTestRun < testRuns)
             {
-                Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + feasibleFittest.fitness);
-                output += feasibleIndividualCount + ", " + fittestFeasible + "\n";
+                Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + feasibleFittest.fitness + ", generated at generation #" + feasibleIndividualGeneration);
+                output += feasibleIndividualCount + ", " + fittestFeasible + ", " + feasibleIndividualGeneration + "\n";
                 currentTestRun++;
                 ClearScene();
                 if (currentTestRun <= testRuns - 1)
@@ -215,19 +213,20 @@ public class LevelGenerator : MonoBehaviour
             {
                 //Individual final = Individual.FromJson(Application.dataPath + "/Levels/" + "gl" + genomeLength + "f" + fittest + ".json");
                 ClearScene();
-
-                Debug.Log(output);
-                if (feasibleFittest.designElements.Count != 0)
+                if(feasibleIndividualCount > 0)
                 {
                     Debug.Log("Clearing and spawning fittest, it has a fitness of: " + feasibleFittest.fitness);
                     DisplayIndividual(feasibleFittest);
                 }
                 else
                 {
-                    Debug.Log("Clearing and spawning fittest, it has a fitness of: " + infeasiblePopulation.GetFittest().fitness);
-                    DisplayIndividual(infeasiblePopulation.GetFittest());
+                    Individual fittest = infeasiblePopulation.GetFittest();
+                    Debug.Log("No feasible individual was found, clearing and spawning fittest from infeasible population, it has a fitness of: " + fittest.fitness);
+                    DisplayIndividual(fittest);
                 }
-
+                if (testing)
+                    Debug.Log(output);
+                // Spawn dead end walls with a delay, so there is enough time for collision detection
                 Invoke("SpawnWallsOnDeadEnds", evaluationTime);
                 finished = true;
             }
@@ -240,7 +239,6 @@ public class LevelGenerator : MonoBehaviour
         if (generation <= maxGeneration ^ (terminate || currentTestRun >= testRuns))//if (fittest != 1) //if (currentIndividual != 1)
         {
             totalTime += Time.deltaTime;
-            timeMs = totalTime.ToString("F2");
             int minutes = Mathf.FloorToInt(totalTime / 60F);
             int seconds = Mathf.FloorToInt(totalTime - minutes * 60);
             time = string.Format("{0:0}:{1:00}", minutes, seconds);
@@ -252,11 +250,7 @@ public class LevelGenerator : MonoBehaviour
             {
 
                 generation++;
-                //Debug.Log("Before: " + fittestIndividual.fitness + " - " + population.GetFittest().fitness + ", " + generation);
-                //System.out.println("Generation: " + generationCount + " Fittest: " + myPop.getFittest().getFitness());
-
                 infeasiblePopulation = EvolvePopulation(infeasiblePopulation);
-                //Debug.Log("After: " + fittestIndividual.fitness + " - " + population.GetFittest().fitness + ", " + generation);
                 currentInfeasibleIndividual = 0;
                 initialisedInfeasiblePop = false;
 
@@ -269,8 +263,8 @@ public class LevelGenerator : MonoBehaviour
             if (testing && currentTestRun < testRuns)
             {
                 currentTestRun++;
-                Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + infeasibleFittest.fitness);
-                output += feasibleIndividualCount + ", " + infeasibleFittest.fitness + "\n";
+                Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + infeasibleFittest.fitness + ", generated at generation #" + infeasibleIndividualGeneration);
+                output += feasibleIndividualCount + ", " + infeasibleFittest.fitness + ", " + infeasibleIndividualGeneration + "\n";
                 ClearScene();
                 if (currentTestRun <= testRuns - 1)
                 {
@@ -293,13 +287,16 @@ public class LevelGenerator : MonoBehaviour
             }
             else
             {
-                Debug.Log(output);
+
                 Debug.Log("Clearing and spawning fittest, it has a fitness of: " + infeasiblePopulation.GetFittest().fitness);
+                if (testing)
+                    Debug.Log(output);
                 ClearScene();
 
                 // Show fittest individual
                 //DisplayIndividual(final);
                 DisplayIndividual(infeasiblePopulation.GetFittest());
+                // Spawn dead end walls with a delay, so there is enough time for collision detection
                 Invoke("SpawnWallsOnDeadEnds", evaluationTime);
                 finished = true;
             }
@@ -310,7 +307,6 @@ public class LevelGenerator : MonoBehaviour
     {
         if (Time.time <= runtimeInSeconds ^ terminate)
         {
-            timeMs = Time.time.ToString("F2");
             int minutes = Mathf.FloorToInt(Time.time / 60F);
             int seconds = Mathf.FloorToInt(Time.time - minutes * 60);
             time = string.Format("{0:0}:{1:00}", minutes, seconds);
@@ -349,9 +345,9 @@ public class LevelGenerator : MonoBehaviour
         if (elitism)
         {
             // Add fittest to new population, will not be affected by crossover or mutation
-            newPopulation.Add(Utility.DeepClone(infeasiblePopulation.GetFittest()));
+            newPopulation.Add(Utility.DeepClone(pop.GetFittest()));
             // Add fittest to new population a second time, will be affected by mutation
-            newPopulation.Add(Utility.DeepClone(infeasiblePopulation.GetFittest()));
+            newPopulation.Add(Utility.DeepClone(pop.GetFittest()));
 
         }
 
@@ -408,10 +404,6 @@ public class LevelGenerator : MonoBehaviour
                 Mutate(newPopulation.individuals[i]);
             }
         }
-
-        //newPopulation.individuals[0] = Individual.FromJson(Application.dataPath + "/" + "gl" + genomeLength + "f" + fittest + ".json");
-        //newPopulation.individuals[0] = Utility.DeepClone(fittestIndividual);
-        //pop = newPopulation;
         return newPopulation;
     }
 
@@ -462,27 +454,23 @@ public class LevelGenerator : MonoBehaviour
             displaying = true;
 
         }
-        if (displaying && !(currentInfeasibleIndividual >= pop.Size()))
+        if (displaying && currentInfeasibleIndividual < pop.Size())
         {
             cooldown += Time.deltaTime;
             if (cooldown >= evaluationTime)
             {
 
                 connectedComponents = graph.CalculateConnectivity();
-                // Calculates the 2-vertex-connectivity of the graph
-                //int kConnectivity = graph.CalculateKConnectivity(2);
-                //float kConnectivity = graph.CalculateVariableKConnectivity();
 
                 GraphEditor.InitRects(genomeLength);
 
                 switch (technique)
                 {
                     case Technique.SimpleGA:
-                        int kConnectivity = graph.CalculateVariableKConnectivity();
-                        pop.individuals[currentInfeasibleIndividual].fitness = (genomeLength - connectedComponents) + shortestPathCost / 10 + kConnectivity;
+                        pop.individuals[currentInfeasibleIndividual].fitness = CalculateCombinedFitness(); //(genomeLength - connectedComponents) + shortestPathCost / 10 + kConnectivity;
                         break;
                     case Technique.Fi2PopGA:
-                        pop.individuals[currentInfeasibleIndividual].fitness = (genomeLength - connectedComponents);
+                        pop.individuals[currentInfeasibleIndividual].fitness = CalculateConstraintFitness();
                         break;
                     case Technique.NoveltySearchGA:
                         int averageDiversity = 0;
@@ -517,23 +505,6 @@ public class LevelGenerator : MonoBehaviour
                         break;
                 }
 
-                // Feasible
-                if (connectedComponents == 1)
-                {
-                    
-                    //Debug.Log("Found a graph with 1 connected component.");
-                    //fitness += genomeLength / 2;
-                    // Add to feasible population only if solution is different
-                    if (!feasiblePopulation.individuals.Contains(pop.individuals[currentInfeasibleIndividual]))
-                    {
-                        feasibleIndividualCount++;
-                        Individual feasibleIndividual = Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]);
-                        feasiblePopulation.Add(feasibleIndividual);
-                        pop.individuals[currentInfeasibleIndividual].delete = true;
-                        //feasibleIndividual.ToJson("feasible" + feasiblePopulation.individuals.Count);
-                    }
-                }
-
                 fitnessInfeasible = pop.individuals[currentInfeasibleIndividual].fitness;
                 
                 if (fitnessInfeasible >= fittestInfeasible)// && !pop.individuals[currentIndividual].Equals(fittestIndividual))
@@ -542,16 +513,24 @@ public class LevelGenerator : MonoBehaviour
                     infeasibleFittest = Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]);
                     if (technique == Technique.NoveltySearchGA)
                     {
-                        int kConnectivity = graph.CalculateVariableKConnectivity();
-                        cost = shortestPathCost / 10 + kConnectivity;
+                        cost = CalculateObjectiveFitness();
                     }
-                    //Debug.Log("Updated fittest individual at generation: " + generation);
-                    //fittestIndividual.ToJson();
-                    //                    LevelGeneratorEditor.load = true;
-                    //                    ScreenCapture.CaptureScreenshot("Assets/Resources/FittestLevel.png");
-                    //#if UNITY_EDITOR
-                    //                    AssetDatabase.Refresh();
-                    //#endif
+                }
+
+                // Feasible
+                if (connectedComponents == 1)
+                {
+                    //Debug.Break();
+                    // Add to feasible population only if solution is different
+                    if (!feasiblePopulation.individuals.Contains(pop.individuals[currentInfeasibleIndividual]))
+                    {
+                      //Debug.Break();
+                      feasibleIndividualCount++;
+                      Individual feasibleIndividual = Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]);
+                      feasiblePopulation.Add(feasibleIndividual);
+                      infeasibleIndividualGeneration = generation;
+                      pop.individuals[currentInfeasibleIndividual].delete = true;
+                    }
                 }
 
                 currentInfeasibleIndividual++;
@@ -564,6 +543,7 @@ public class LevelGenerator : MonoBehaviour
         }
 
     }
+
 
     // Displays the feasible population in Unity
     void DisplayFeasiblePopulation(Population pop)
@@ -585,39 +565,43 @@ public class LevelGenerator : MonoBehaviour
             displaying = true;
             
         }
-        if (displaying && !(currentFeasibleIndividual >= pop.Size()))
+        if (displaying && currentFeasibleIndividual < pop.Size())
         {   
             cooldown += Time.deltaTime;
             if (cooldown >= evaluationTime)
             {
-                connectedComponents = graph.CalculateConnectivity();
+                
                 // Calculates the 2-vertex-connectivity of the graph
-                int kConnectivity = graph.CalculateVariableKConnectivity();
+                //int kConnectivity = graph.CalculateVariableKConnectivity();
                 
 
                 GraphEditor.InitRects(genomeLength);
+                connectedComponents = graph.CalculateConnectivity();
 
-                //pop.individuals[currentFeasibleIndividual].fitness = (genomeLength - connectedComponents) + kConnectivity;
-                pop.individuals[currentFeasibleIndividual].fitness = (genomeLength - connectedComponents) + shortestPathCost / 10 + kConnectivity;
-                //pop.individuals[currentFeasibleIndividual].objectiveFitness = kConnectivity;
+                pop.individuals[currentFeasibleIndividual].fitness = CalculateCombinedFitness();
+
                 // Infeasible
                 if (connectedComponents != 1)
                 {
-                    pop.individuals[currentFeasibleIndividual].fitness = (genomeLength - connectedComponents);
+                    // Since individual has now become infeasible, set it's fitness to the constraint fitness
+                    pop.individuals[currentFeasibleIndividual].fitness = CalculateConstraintFitness();
                     // Move to infeasible population
-                    //infeasiblePopulation.individuals[infeasiblePopulation.GetWeakestIndex()] = Utility.DeepClone(pop.individuals[currentFeasibleIndividual]);
                     infeasiblePopulation.Add(Utility.DeepClone(pop.individuals[currentFeasibleIndividual]));
+                    // Set to delete
                     pop.individuals[currentFeasibleIndividual].delete = true;
-                    //Debug.Log("Adding from feasible to infeasible, size becomes: " + infeasiblePopulation.Size());
                 }
-
-                fitnessFeasible = pop.individuals[currentFeasibleIndividual].fitness;
-
-                if (fitnessFeasible >= fittestFeasible)
+                else
                 {
-                    fittestFeasible = fitnessFeasible;
-                    feasibleFittest = Utility.DeepClone(pop.individuals[currentFeasibleIndividual]);
+                    fitnessFeasible = pop.individuals[currentFeasibleIndividual].fitness;
+
+                    if (fitnessFeasible >= fittestFeasible)
+                    {
+                        feasibleIndividualGeneration = generation;
+                        fittestFeasible = fitnessFeasible;
+                        feasibleFittest = Utility.DeepClone(pop.individuals[currentFeasibleIndividual]);
+                    }
                 }
+
 
                 currentFeasibleIndividual++;
                 if (currentFeasibleIndividual == feasiblePopulation.Size())
@@ -628,6 +612,57 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
+    }
+
+    public float CalculateCombinedFitness()
+    {
+        // Normalized path cost
+        float maxNodes = 144;
+        float minNodes = 0; //minNodes = 12;
+        float maxPathCost = (genomeLength - 1) * maxNodes;
+        float minPathCost = ((genomeLength / 2) - 1) * minNodes;
+        float normalizedShortestPathCost = (shortestPathCost - minPathCost) / (maxPathCost - minPathCost);
+        // Normalized connected components
+        float maxConnectedComponents = genomeLength - 1;
+        float minConnectedComponents = 0;
+        float connectedComponentsScore = genomeLength - connectedComponents;
+        float normalizedConnectedComponentsScore = (connectedComponentsScore - minConnectedComponents) / (maxConnectedComponents - minConnectedComponents);
+        // Normalized K-Vertex-Connectivity
+        int kConnectivity = graph.CalculateKConnectivity(2);//graph.CalculateVariableKConnectivity();
+        float minKVertexConnectivity = 0;
+        float maxKVertexConnectivity = genomeLength * 2;
+        float normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
+
+        return (normalizedShortestPathCost * 1.5f + normalizedConnectedComponentsScore * 0.5f + normalizedKVertexConnectivity * 1.5f) / 3;
+    }
+
+    public float CalculateConstraintFitness()
+    {
+        // Normalized connected components
+        float maxConnectedComponents = genomeLength - 1;
+        float minConnectedComponents = 0;
+        float connectedComponentsScore = genomeLength - connectedComponents;
+        float normalizedConnectedComponentsScore = (connectedComponentsScore - minConnectedComponents) / (maxConnectedComponents - minConnectedComponents);
+
+        return normalizedConnectedComponentsScore;
+    }
+
+    public float CalculateObjectiveFitness()
+    {
+        // Normalized path cost
+        float maxNodes = 144;
+        float minNodes = 0; //minNodes = 12;
+        float maxPathCost = (genomeLength - 1) * maxNodes;
+        float minPathCost = ((genomeLength / 2) - 1) * minNodes;
+        float normalizedShortestPathCost = (shortestPathCost - minPathCost) / (maxPathCost - minPathCost);
+
+        // Normalized K-Vertex-Connectivity
+        int kConnectivity = graph.CalculateKConnectivity(2);//graph.CalculateVariableKConnectivity();
+        float minKVertexConnectivity = 0;
+        float maxKVertexConnectivity = genomeLength * 2;
+        float normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
+
+        return (normalizedShortestPathCost * 0.5f + normalizedKVertexConnectivity * 1.5f) / 2;
     }
 
     Individual UniformCrossover(Individual individual1, Individual individual2)
@@ -933,7 +968,7 @@ public class LevelGenerator : MonoBehaviour
 
         generated = true;
         // Initialise pathfinding
-        Instantiate(aStar, new Vector3(), new Quaternion());
+        Instantiate(aStar, new Vector3(piecePositions[0].x - 7.5f, 0f, piecePositions[0].z - 7.5f), new Quaternion());
         float distance = 0;
         Vector3 furthest = new Vector3();
         for (int i = 0; i < piecePositions.Count; i++)
