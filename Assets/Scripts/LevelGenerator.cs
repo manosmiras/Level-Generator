@@ -190,6 +190,7 @@ public class LevelGenerator : MonoBehaviour
                 output += feasibleIndividualCount + ", " + fittestFeasible + ", " + feasibleIndividualGeneration + "\n";
                 currentTestRun++;
                 ClearScene();
+                FitnessVisualizerEditor.values.Clear();
                 if (currentTestRun <= testRuns - 1)
                 {
                     infeasiblePopulation.individuals.Clear();
@@ -213,6 +214,7 @@ public class LevelGenerator : MonoBehaviour
             {
                 //Individual final = Individual.FromJson(Application.dataPath + "/Levels/" + "gl" + genomeLength + "f" + fittest + ".json");
                 ClearScene();
+
                 if(feasibleIndividualCount > 0)
                 {
                     Debug.Log("Clearing and spawning fittest, it has a fitness of: " + feasibleFittest.fitness);
@@ -266,6 +268,7 @@ public class LevelGenerator : MonoBehaviour
                 Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + infeasibleFittest.fitness + ", generated at generation #" + infeasibleIndividualGeneration);
                 output += feasibleIndividualCount + ", " + infeasibleFittest.fitness + ", " + infeasibleIndividualGeneration + "\n";
                 ClearScene();
+                FitnessVisualizerEditor.values.Clear();
                 if (currentTestRun <= testRuns - 1)
                 {
                     infeasiblePopulation.individuals.Clear();
@@ -468,6 +471,7 @@ public class LevelGenerator : MonoBehaviour
                 {
                     case Technique.SimpleGA:
                         pop.individuals[currentInfeasibleIndividual].fitness = CalculateCombinedFitness(); //(genomeLength - connectedComponents) + shortestPathCost / 10 + kConnectivity;
+                        FitnessVisualizerEditor.values.Add(pop.individuals[currentInfeasibleIndividual].fitness);
                         break;
                     case Technique.Fi2PopGA:
                         pop.individuals[currentInfeasibleIndividual].fitness = CalculateConstraintFitness();
@@ -593,7 +597,7 @@ public class LevelGenerator : MonoBehaviour
                 else
                 {
                     fitnessFeasible = pop.individuals[currentFeasibleIndividual].fitness;
-
+                    FitnessVisualizerEditor.values.Add(fitnessFeasible);
                     if (fitnessFeasible >= fittestFeasible)
                     {
                         feasibleIndividualGeneration = generation;
