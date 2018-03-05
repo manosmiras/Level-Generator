@@ -49,7 +49,7 @@ public class Individual : IEquatable<Individual>
         return other;
     }
 
-    public int GetDiversity(Individual other)
+    public float GetDiversity(Individual other)
     {
         int diversity = 0;
         for (int i = 0; i < designElements.Count; i++)
@@ -65,7 +65,11 @@ public class Individual : IEquatable<Individual>
                 diversity++;
             }
         }
-        return diversity;
+        // Normalize diversity
+        float minDiversity = 0;
+        float maxDiversity = designElements.Count * 2;
+        float diversityNormalized = (diversity - minDiversity) / (maxDiversity - minDiversity);
+        return diversityNormalized;
     }
 
     public void Print()

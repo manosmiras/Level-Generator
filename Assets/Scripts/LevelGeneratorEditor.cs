@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using System.Collections.Generic;
 
 [CustomEditor(typeof(LevelGenerator))]
 [CanEditMultipleObjects]
@@ -7,9 +8,41 @@ public class LevelGeneratorEditor : Editor
 {
     public Texture2D image;
     public static bool load = false;
+    LevelGenerator levelGenerator;
+    //private static string[] dontInclude = new string[7];
+    List<string> dontInclude = new List<string>();
+
+    private void OnEnable()
+    {
+        GameObject levelGen = GameObject.FindGameObjectWithTag("LevelGenerator");
+        levelGenerator = levelGen.GetComponent<LevelGenerator>();
+    }
+
     public override void OnInspectorGUI()
     {
-        DrawDefaultInspector();
+        dontInclude = new List<string>();
+        if (levelGenerator.technique == Technique.NoveltySearchGA || levelGenerator.technique == Technique.FI2PopNsGA)
+        {
+            dontInclude.Add("terminate");
+        }
+        else
+        {
+            dontInclude.Add("minimalCriteria");
+            dontInclude.Add("deathPenalty");
+            dontInclude.Add("terminate");
+        }
+
+        if (!levelGenerator.testing)
+        {
+            dontInclude.Add("testName");
+            dontInclude.Add("testRuns");
+        }
+
+
+        DrawPropertiesExcluding(serializedObject, dontInclude.ToArray());
+        serializedObject.ApplyModifiedProperties();
+        
+        //DrawDefaultInspector();
 
         if (load)
         {
@@ -39,9 +72,7 @@ public class LevelGeneratorEditor : Editor
         //}
         if (GUILayout.Button("Terminate"))
         {
-            GameObject levelGen = GameObject.FindGameObjectWithTag("LevelGenerator");
-            LevelGenerator levelGenScript = levelGen.GetComponent<LevelGenerator>();
-            levelGenScript.terminate = true;
+            levelGenerator.terminate = true;
         }
     }
 }
