@@ -69,9 +69,9 @@ public class LevelGenerator : MonoBehaviour
     public bool testing;
     public string testName;
     public int testRuns = 10;
-    [ReadOnly] public int currentInfeasibleIndividual = 0;
-    [ReadOnly] public int currentFeasibleIndividual = 0;
-    [ReadOnly] public int currentIndividual = 0;
+    //[ReadOnly] public int currentInfeasibleIndividual = 0;
+    //[ReadOnly] public int currentFeasibleIndividual = 0;
+    //[ReadOnly] public int currentIndividual = 0;
     [ReadOnly] public int generation = 1;
 
     public string time;
@@ -106,18 +106,22 @@ public class LevelGenerator : MonoBehaviour
             case Technique.SimpleGA:
                 simpleGA.Run();
                 simpleGA.csvFileName = testName;
+                generation = simpleGA.generation;
                 break;
             case Technique.FI2PopGA:
                 fi2PopGA.Run();
                 fi2PopGA.csvFileName = testName;
+                generation = fi2PopGA.generation;
                 break;
             case Technique.NoveltySearchGA:
                 noveltySearchGA.Run();
                 noveltySearchGA.csvFileName = testName;
+                generation = noveltySearchGA.generation;
                 break;
             case Technique.FI2PopNsGA:
                 fi2PopNsGA.Run();
                 fi2PopNsGA.csvFileName = testName;
+                generation = fi2PopNsGA.generation;
                 break;
             default:
                 break;

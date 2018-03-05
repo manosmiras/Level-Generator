@@ -337,18 +337,15 @@ MonoBehaviour:
   elitism: 1
   mutationRate: 0.05
   displayCeiling: 0
-  genomeLength: 9
+  genomeLength: 25
   populationSize: 50
   tournamentSize: 3
   evaluationTime: 0.1
-  maxGeneration: 5
+  maxGeneration: 50
   positionModifier: 15
-  testing: 1
+  testing: 0
   testName: simplega-test
   testRuns: 3
-  currentInfeasibleIndividual: 0
-  currentFeasibleIndividual: 0
-  currentIndividual: 0
   generation: 0
   time: 
   terminate: 0
