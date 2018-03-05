@@ -69,6 +69,7 @@ public class Unit : MonoBehaviour {
             transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, speed * Time.deltaTime);
             yield return null;
         }
+        yield return null;
     }
 
     public void OnDrawGizmos()
