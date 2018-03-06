@@ -329,7 +329,7 @@ public class LevelGenerator : MonoBehaviour
 
     public void InvokeSpawnWallsOnDeadEnds(float evaluationTime)
     {
-        Invoke("SpawnWallsOnDeadEnds", evaluationTime);
+        Invoke("SpawnWallsOnDeadEnds", evaluationTime + Time.deltaTime);
     }
 
     // Spawn walls on dead ends
