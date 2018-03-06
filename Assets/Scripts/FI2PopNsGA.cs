@@ -190,7 +190,7 @@ public class FI2PopNsGA : GeneticAlgorithm
         if (displaying && currentInfeasibleIndividual < pop.Size())
         {
             cooldown += Time.deltaTime;
-            if (cooldown >= evaluationTime)
+            if (cooldown >= evaluationTime + Time.deltaTime)
             {
 
                 connectedComponents = LevelGenerator.graph.CalculateConnectivity();
@@ -270,7 +270,7 @@ public class FI2PopNsGA : GeneticAlgorithm
         if (displaying && currentFeasibleIndividual < pop.Size())
         {
             cooldown += Time.deltaTime;
-            if (cooldown >= evaluationTime)
+            if (cooldown >= evaluationTime + Time.deltaTime)
             {
                 GraphEditor.InitRects(genomeLength);
                 connectedComponents = LevelGenerator.graph.CalculateConnectivity();

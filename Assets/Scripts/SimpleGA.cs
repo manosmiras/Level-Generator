@@ -146,9 +146,8 @@ public class SimpleGA : GeneticAlgorithm
         if (displaying && currentIndividual < pop.Size())
         {
             cooldown += Time.deltaTime;
-            if (cooldown >= evaluationTime)
+            if (cooldown >= evaluationTime + Time.deltaTime)
             {
-
                 connectedComponents = LevelGenerator.graph.CalculateConnectivity();
 
                 GraphEditor.InitRects(genomeLength);
