@@ -72,14 +72,16 @@ public abstract class GeneticAlgorithm
     {
         Population newPopulation = new Population();
 
-        // Keep our best individual
+        // Keep our best individuals
         if (elitism)
         {
-            // Add fittest to new population, will not be affected by crossover or mutation
-            newPopulation.Add(Utility.DeepClone(pop.GetFittest()));
-            // Add fittest to new population a second time, will be affected by mutation
-            newPopulation.Add(Utility.DeepClone(pop.GetFittest()));
-
+            if (pop.Size() != 0)
+            {
+                // Add fittest to new population, will not be affected by crossover or mutation
+                newPopulation.Add(Utility.DeepClone(pop.GetFittest()));
+                // Add fittest to new population a second time, will be affected by mutation
+                newPopulation.Add(Utility.DeepClone(pop.GetFittest()));
+            }
         }
 
         int elitismOffset;

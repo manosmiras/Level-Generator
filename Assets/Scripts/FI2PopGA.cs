@@ -6,6 +6,10 @@ public class FI2PopGA : GeneticAlgorithm
 {
     public Population infeasiblePopulation = new Population();
     public Population feasiblePopulation = new Population();
+
+    // Used to keep track of all the feasible Individuals
+    public Population feasibleIndividuals = new Population();
+
     private bool initialisedInfeasiblePop;
     private bool initialisedFeasiblePop;
     private int feasibleIndividualGeneration;
@@ -204,7 +208,14 @@ public class FI2PopGA : GeneticAlgorithm
                     // Keep track of generation of first feasible individual
                     if (feasibleIndividualCount == 0)
                         firstFeasibleGeneration = generation;
-                    feasibleIndividualCount++;
+
+                    // Count unique feasible individuals, not all of them
+                    if (!feasibleIndividuals.individuals.Contains(pop.individuals[currentInfeasibleIndividual]))
+                    {
+                        feasibleIndividualCount++;
+                        feasibleIndividuals.Add(Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]));
+                    }
+
                     Individual feasibleIndividual = Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]);
                     feasiblePopulation.Add(feasibleIndividual);
                     pop.individuals[currentInfeasibleIndividual].delete = true;

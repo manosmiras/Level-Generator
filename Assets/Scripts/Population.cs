@@ -32,7 +32,7 @@ public class Population
     {
         Individual fittest = individuals[0];
         // Get the fittest
-        for (int i = 1; i < individuals.Count; i++)
+        for (int i = 0; i < individuals.Count; i++)
         {
             if (individuals[i].fitness > fittest.fitness)
             {

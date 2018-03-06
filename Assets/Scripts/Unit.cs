@@ -18,24 +18,24 @@ public class Unit : MonoBehaviour {
     Vector3[] path;
     int targetIndex;
     public UnitType type;
-
+    public bool followPath = false;
 
     private void Start()
     {
         target = GameObject.FindGameObjectWithTag("Target").transform;
-        if (target != null)
-            PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, type);
+        //if (target != null)
+        PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, type);
     }
 
     private void Update()
     {
         // If target not found yet
-        if (target == null)
-        {
-            // Retry
-            target = GameObject.FindGameObjectWithTag("Target").transform;
-            PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, type);
-        }
+        //if (target == null)
+        //{
+        //    // Retry
+        //    target = GameObject.FindGameObjectWithTag("Target").transform;
+        //    PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, type);
+        //}
     }
 
     public void OnPathFound(Vector3[] newPath, bool pathSuccesful)
@@ -43,8 +43,12 @@ public class Unit : MonoBehaviour {
         if (pathSuccesful)
         {
             path = newPath;
-            //StopCoroutine("FollowPath");
-            //StartCoroutine("FollowPath");
+            if (followPath)
+            {
+                StopCoroutine("FollowPath");
+                StartCoroutine("FollowPath");
+            }
+
         }
 
     }
@@ -69,7 +73,6 @@ public class Unit : MonoBehaviour {
             transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, speed * Time.deltaTime);
             yield return null;
         }
-        yield return null;
     }
 
     public void OnDrawGizmos()

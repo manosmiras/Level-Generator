@@ -6,6 +6,10 @@ public class NoveltySearchGA : GeneticAlgorithm
 {
     public Population population = new Population();
     public Population noveltyArchive = new Population();
+
+    // Used to keep track of all the feasible Individuals
+    public Population feasibleIndividuals = new Population();
+
     public int currentIndividual;
     public bool initialisedPopulation;
     public Individual fittestIndividualDiversity = new Individual();
@@ -230,7 +234,12 @@ public class NoveltySearchGA : GeneticAlgorithm
                     if (feasibleIndividualCount == 0)
                         firstFeasibleGeneration = generation;
 
-                    feasibleIndividualCount++;
+                    // Count unique feasible individuals, not all of them
+                    if (!feasibleIndividuals.individuals.Contains(pop.individuals[currentIndividual]))
+                    {
+                        feasibleIndividualCount++;
+                        feasibleIndividuals.Add(Utility.DeepClone(pop.individuals[currentIndividual]));
+                    }
 
                     fittestGeneration = generation;
                 }
