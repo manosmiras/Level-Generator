@@ -81,7 +81,9 @@ public class LevelGenerator : MonoBehaviour
     public static int shortestPathCost = 0;
 
     public static Graph graph = new Graph();
-
+    public int feasibleCount;
+    public int currentInfeasibleIndividual;
+    public int currentFeasibleIndividual;
     // Private properties
     private bool init = true;
     private SimpleGA simpleGA;
@@ -112,6 +114,9 @@ public class LevelGenerator : MonoBehaviour
                 fi2PopGA.Run();
                 fi2PopGA.csvFileName = testName;
                 generation = fi2PopGA.generation;
+                feasibleCount = fi2PopGA.feasiblePopulation.Size();
+                currentInfeasibleIndividual = fi2PopGA.currentInfeasibleIndividual;
+                currentFeasibleIndividual = fi2PopGA.currentFeasibleIndividual;
                 break;
             case Technique.NoveltySearchGA:
                 noveltySearchGA.Run();
@@ -329,7 +334,7 @@ public class LevelGenerator : MonoBehaviour
 
     public void InvokeSpawnWallsOnDeadEnds(float evaluationTime)
     {
-        Invoke("SpawnWallsOnDeadEnds", evaluationTime + Time.deltaTime);
+        Invoke("SpawnWallsOnDeadEnds", evaluationTime + Time.deltaTime + 2);
     }
 
     // Spawn walls on dead ends

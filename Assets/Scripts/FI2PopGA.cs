@@ -70,8 +70,22 @@ public class FI2PopGA : GeneticAlgorithm
             }
             if (initialisedInfeasiblePop && (initialisedFeasiblePop || feasiblePopulation.Size() == 0))
             {
-                infeasiblePopulation.individuals.RemoveAll(x => x.delete == true);
+                // Remove weakest individuals from infeasible population to maintain population size
+                while (infeasiblePopulation.Size() > populationSize)
+                {
+                    infeasiblePopulation.individuals.Remove(infeasiblePopulation.GetWeakest());
+                }
+
+                // Delete individuals in feasible population which became unfeasible from evolution
                 feasiblePopulation.individuals.RemoveAll(x => x.delete == true);
+
+                // Remove weakest individuals from feasible population to maintain population size
+                while (feasiblePopulation.Size() > populationSize)
+                {
+                    feasiblePopulation.individuals.Remove(feasiblePopulation.GetWeakest());
+                }
+                //infeasiblePopulation.individuals.RemoveAll(x => x.delete == true);
+
 
                 generation++;
                 // Evolve infeasible population
@@ -187,7 +201,7 @@ public class FI2PopGA : GeneticAlgorithm
                 GraphEditor.InitRects(genomeLength);
 
 
-                pop.individuals[currentInfeasibleIndividual].fitness = CalculateConstraintFitness();// (CalculateConstraintFitness() * 0.5f + CalculateKVertexConnectivtyFitness() * 1.5f) / 2;
+                pop.individuals[currentInfeasibleIndividual].fitness = CalculateConstraintFitness();
                 FitnessVisualizerEditor.values2.Add(pop.individuals[currentInfeasibleIndividual].fitness);
 
                 fitnessInfeasible = pop.individuals[currentInfeasibleIndividual].fitness;
@@ -218,7 +232,7 @@ public class FI2PopGA : GeneticAlgorithm
 
                     Individual feasibleIndividual = Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]);
                     feasiblePopulation.Add(feasibleIndividual);
-                    pop.individuals[currentInfeasibleIndividual].delete = true;
+                    //pop.individuals[currentInfeasibleIndividual].delete = true;
                     //}
                 }
 
@@ -268,7 +282,7 @@ public class FI2PopGA : GeneticAlgorithm
                 if (connectedComponents != 1)
                 {
                     // Since individual has now become infeasible, set it's fitness to the constraint fitness
-                    pop.individuals[currentFeasibleIndividual].fitness = CalculateConstraintFitness();//(CalculateConstraintFitness() * 0.5f + CalculateKVertexConnectivtyFitness() * 1.5f) / 2;
+                    pop.individuals[currentFeasibleIndividual].fitness = CalculateCombinedFitness();//(CalculateConstraintFitness() * 0.5f + CalculateKVertexConnectivtyFitness() * 1.5f) / 2;
                     // Move to infeasible population
                     infeasiblePopulation.Add(Utility.DeepClone(pop.individuals[currentFeasibleIndividual]));
                     // Set to delete
@@ -276,6 +290,13 @@ public class FI2PopGA : GeneticAlgorithm
                 }
                 else
                 {
+                    // Count unique feasible individuals, not all of them
+                    if (!feasibleIndividuals.individuals.Contains(pop.individuals[currentFeasibleIndividual]))
+                    {
+                        feasibleIndividualCount++;
+                        feasibleIndividuals.Add(Utility.DeepClone(pop.individuals[currentFeasibleIndividual]));
+                    }
+
                     fitnessFeasible = pop.individuals[currentFeasibleIndividual].fitness;
                     FitnessVisualizerEditor.values.Add(fitnessFeasible);
                     if (fitnessFeasible >= fittestFeasible)

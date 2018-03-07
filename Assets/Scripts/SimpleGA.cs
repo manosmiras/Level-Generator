@@ -69,16 +69,18 @@ public class SimpleGA : GeneticAlgorithm
             if (testing && currentTestRun < testRuns)
             {
                 currentTestRun++;
-                Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + fittestIndividual.fitness + ", generated at generation #" + fittestGeneration);
+                Debug.Log("Current run produced " + feasibleIndividualCount + " feasible individuals, with a best fitness of " + fittestIndividual.fitness + ", generated at generation #" + fittestGeneration + " cc:" + connectedComponents);
                 output += feasibleIndividualCount + ", " + fittestIndividual.fitness + ", " + fittestGeneration + "\n";
+
+
 
                 // Append title to csv
                 if (csv.Length == 0)
                 {
-                    AddDataToResults(string.Format("{0},{1},{2},{3}", "Number of Feasible individuals", "Fittest Individual Fitness", "Generation of Fittest Individual", "Generation of First Feasible Individual"));
+                    AddDataToResults(string.Format("{0},{1},{2},{3},{4}", "Number of Feasible individuals", "Fittest Individual Fitness", "Generation of Fittest Individual", "Generation of First Feasible Individual", "Connected Components"));
                 }
                 // Append new line to csv
-                AddDataToResults(string.Format("{0},{1},{2},{3}", feasibleIndividualCount, fittestIndividual.fitness, fittestGeneration, firstFeasibleGeneration));
+                AddDataToResults(string.Format("{0},{1},{2},{3},{4}", feasibleIndividualCount, fittestIndividual.fitness, fittestGeneration, firstFeasibleGeneration, connectedComponents));
 
                 levelGenerator.ClearScene();
 

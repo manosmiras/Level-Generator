@@ -340,15 +340,18 @@ MonoBehaviour:
   genomeLength: 25
   populationSize: 50
   tournamentSize: 3
-  evaluationTime: 0.1
-  maxGeneration: 10
+  evaluationTime: 0.0001
+  maxGeneration: 20
   positionModifier: 15
   testing: 1
-  testName: simplega-test
-  testRuns: 50
+  testName: fi2pop-ga-mutation-testing-5-percent-updated
+  testRuns: 30
   generation: 0
   time: 
   terminate: 0
+  feasibleCount: 0
+  currentInfeasibleIndividual: 0
+  currentFeasibleIndividual: 0
 --- !u!4 &110116972
 Transform:
   m_ObjectHideFlags: 0
