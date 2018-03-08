@@ -62,7 +62,9 @@ public class FI2PopGA : GeneticAlgorithm
             time = string.Format("{0:0}:{1:00}", minutes, seconds);
 
             // Will spawn infeasible levels and evaluate them
-            DisplayInfeasiblePopulation(infeasiblePopulation);
+            if(!initialisedInfeasiblePop)
+                DisplayInfeasiblePopulation(infeasiblePopulation);
+
             // Will spawn feasible levels and evaluate them
             if (feasiblePopulation.Size() >= 1 && initialisedInfeasiblePop)
             {
@@ -73,20 +75,12 @@ public class FI2PopGA : GeneticAlgorithm
                 // Remove weakest individuals from infeasible population to maintain population size
                 while (infeasiblePopulation.Size() > populationSize)
                 {
-                    infeasiblePopulation.individuals.Remove(infeasiblePopulation.GetWeakest());
+                    infeasiblePopulation.individuals.RemoveAt(infeasiblePopulation.GetWeakestIndex());
                 }
 
-                // Delete individuals in feasible population which became unfeasible from evolution
+                // Delete individuals in feasible population which became infeasible from evolution
                 feasiblePopulation.individuals.RemoveAll(x => x.delete == true);
-
-                // Remove weakest individuals from feasible population to maintain population size
-                while (feasiblePopulation.Size() > populationSize)
-                {
-                    feasiblePopulation.individuals.Remove(feasiblePopulation.GetWeakest());
-                }
-                //infeasiblePopulation.individuals.RemoveAll(x => x.delete == true);
-
-
+                
                 generation++;
                 // Evolve infeasible population
                 infeasiblePopulation = EvolvePopulation(infeasiblePopulation);
@@ -193,7 +187,7 @@ public class FI2PopGA : GeneticAlgorithm
         if (displaying && currentInfeasibleIndividual < pop.Size())
         {
             cooldown += Time.deltaTime;
-            if (cooldown >= evaluationTime + Time.deltaTime)
+            if (cooldown > evaluationTime + Time.deltaTime)
             {
 
                 connectedComponents = LevelGenerator.graph.CalculateConnectivity();
@@ -229,9 +223,22 @@ public class FI2PopGA : GeneticAlgorithm
                         feasibleIndividualCount++;
                         feasibleIndividuals.Add(Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]));
                     }
-
+                    // Create a copy with the new feasible individual
                     Individual feasibleIndividual = Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]);
-                    feasiblePopulation.Add(feasibleIndividual);
+
+                    // Simply add to feasible population
+                    if (feasiblePopulation.Size() < populationSize)
+                    {
+                        feasiblePopulation.Add(feasibleIndividual);
+                    }
+                    // Replace weakest feasible individual with new feasible individual
+                    else
+                    {
+                        // todo figure this out
+                        if (feasiblePopulation.GetWeakest().fitness > CalculateCombinedFitness())
+                            feasiblePopulation.individuals[feasiblePopulation.GetWeakestIndex()] = feasibleIndividual;
+                    }
+
                     //pop.individuals[currentInfeasibleIndividual].delete = true;
                     //}
                 }
@@ -256,7 +263,6 @@ public class FI2PopGA : GeneticAlgorithm
         {
             // Reset variables
             LevelGenerator.connectedCount = 0;
-
             LevelGenerator.connected.Clear();
             // Clear scene before spawning level
             levelGenerator.ClearScene();
@@ -271,7 +277,7 @@ public class FI2PopGA : GeneticAlgorithm
         if (displaying && currentFeasibleIndividual < pop.Size())
         {
             cooldown += Time.deltaTime;
-            if (cooldown >= evaluationTime + Time.deltaTime)
+            if (cooldown > evaluationTime + Time.deltaTime)
             {
                 GraphEditor.InitRects(genomeLength);
                 connectedComponents = LevelGenerator.graph.CalculateConnectivity();
@@ -282,7 +288,7 @@ public class FI2PopGA : GeneticAlgorithm
                 if (connectedComponents != 1)
                 {
                     // Since individual has now become infeasible, set it's fitness to the constraint fitness
-                    pop.individuals[currentFeasibleIndividual].fitness = CalculateCombinedFitness();//(CalculateConstraintFitness() * 0.5f + CalculateKVertexConnectivtyFitness() * 1.5f) / 2;
+                    pop.individuals[currentFeasibleIndividual].fitness = CalculateConstraintFitness();//(CalculateConstraintFitness() * 0.5f + CalculateKVertexConnectivtyFitness() * 1.5f) / 2;
                     // Move to infeasible population
                     infeasiblePopulation.Add(Utility.DeepClone(pop.individuals[currentFeasibleIndividual]));
                     // Set to delete
