@@ -106,7 +106,7 @@ public class SimpleGA : GeneticAlgorithm
             else
             {
 
-                Debug.Log("Clearing and spawning fittest, it has a fitness of: " + population.GetFittest().fitness);
+                Debug.Log("Clearing and spawning fittest, it has a fitness of: " + fittestIndividual.fitness);
                 if (testing)
                 {
                     OutputTestResults();
@@ -117,7 +117,7 @@ public class SimpleGA : GeneticAlgorithm
 
                 // Show fittest individual
                 //DisplayIndividual(final);
-                levelGenerator.DisplayIndividual(population.GetFittest());
+                levelGenerator.DisplayIndividual(fittestIndividual);
                 // Spawn dead end walls with a delay, so there is enough time for collision detection
                 levelGenerator.InvokeSpawnWallsOnDeadEnds(evaluationTime);
                 finished = true;
@@ -160,10 +160,11 @@ public class SimpleGA : GeneticAlgorithm
 
                 fitness = pop.individuals[currentIndividual].fitness;
 
-                if (fitness >= fittest)// && !pop.individuals[currentIndividual].Equals(fittestIndividual))
+                if (fitness > fittest)
                 {
                     fittest = fitness;
                     fittestIndividual = Utility.DeepClone(pop.individuals[currentIndividual]);
+                    Debug.Log("Path: " + CalculatePathFitness() + ", constraint: " + CalculateConstraintFitness() + ", kVertex: " + CalculateKVertexConnectivityFitness() + ", total: " + CalculateCombinedFitness());
                 }
 
                 // Feasible

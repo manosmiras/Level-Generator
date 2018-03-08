@@ -160,6 +160,9 @@ public abstract class GeneticAlgorithm
             float rotation = Random.Range(0, 4);
             rotation *= 90f;
             int roomType = Random.Range(0, 16);
+            // No traps allowed on start and end of level
+            if(i == 0 || i == genomeLength - 1)
+                roomType = Random.Range(0, 8);
             LevelPiece piece = new LevelPiece(Vector2.zero, rotation, (LevelPiece.Type)roomType);
             individual.designElements.Add(piece);
 
@@ -272,7 +275,7 @@ public abstract class GeneticAlgorithm
             }
             else if (mutationType == 1)
             {
-                MutateLevelPiece((LevelPiece)individual.designElements[i]);
+                MutateLevelPiece((LevelPiece)individual.designElements[i], i);
             }
 
         }
@@ -291,15 +294,19 @@ public abstract class GeneticAlgorithm
         designElement.rotation = rotation;
     }
 
-    void MutateLevelPiece(LevelPiece levelPiece)
+    void MutateLevelPiece(LevelPiece levelPiece, int i)
     {
         // Select random room type
-        int roomType = Random.Range(0, 8);
-        // Keep chaning piece until it's different
+        int roomType = Random.Range(0, 16);
+        // Keep changing piece until it's different
         while ((LevelPiece.Type)roomType == levelPiece.type)
         {
             roomType = Random.Range(0, 16);
         }
+        // No traps allowed on start and end of level
+        if (i == 0 || i == genomeLength - 1)
+            roomType = Random.Range(0, 8);
+
         levelPiece.type = (LevelPiece.Type)roomType;
     }
 
@@ -321,11 +328,10 @@ public abstract class GeneticAlgorithm
         float minKVertexConnectivity = 0;
         float maxKVertexConnectivity = genomeLength * 2;
         float normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
-
-        return (normalizedShortestPathCost * 1.5f + normalizedConnectedComponentsScore * 0.5f + normalizedKVertexConnectivity * 1.5f) / 3;
+        return (normalizedShortestPathCost * 1.0f + normalizedConnectedComponentsScore * 1.0f + normalizedKVertexConnectivity * 1.0f) / 3;
     }
 
-    public float CalculateKVertexConnectivtyFitness()
+    public float CalculateKVertexConnectivityFitness()
     {
         // Normalized K-Vertex-Connectivity
         int kConnectivity = LevelGenerator.graph.CalculateKConnectivity(2);//graph.CalculateVariableKConnectivity();
@@ -347,6 +353,18 @@ public abstract class GeneticAlgorithm
         return normalizedConnectedComponentsScore;
     }
 
+    public float CalculatePathFitness()
+    {
+        // Normalized path cost
+        float maxNodes = 144;
+        float minNodes = 0; //minNodes = 12;
+        float maxPathCost = (genomeLength - 1) * maxNodes;
+        float minPathCost = ((genomeLength / 2) - 1) * minNodes;
+        float normalizedShortestPathCost = (LevelGenerator.shortestPathCost - minPathCost) / (maxPathCost - minPathCost);
+
+        return normalizedShortestPathCost;
+    }
+
     public float CalculateObjectiveFitness()
     {
         // Normalized path cost
@@ -362,7 +380,7 @@ public abstract class GeneticAlgorithm
         float maxKVertexConnectivity = genomeLength * 2;
         float normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
 
-        return (normalizedShortestPathCost * 0.5f + normalizedKVertexConnectivity * 1.5f) / 2;
+        return (normalizedShortestPathCost * 1.0f + normalizedKVertexConnectivity * 1.0f) / 2;
     }
 
     public void AddDataToResults(string data)

@@ -131,7 +131,7 @@ public class LevelGenerator : MonoBehaviour
             default:
                 break;
         }
-        
+
     }
 
     public void DisplayIndividual(Individual individual)
@@ -148,10 +148,8 @@ public class LevelGenerator : MonoBehaviour
         {
             for (int y = 0; y < (int)yMax; y++)
             {
-                //Debug.Log(new Vector2(x, y));
                 if (count < genomeLength)
                 {
-
                     LevelPiece piece = (LevelPiece)individual.designElements[count];
                     piece.position.x = (x * positionModifier) - (xMax * positionModifier) / 2;
                     piece.position.y = (y * positionModifier) - (yMax * positionModifier) / 2;
@@ -284,18 +282,13 @@ public class LevelGenerator : MonoBehaviour
 
         generated = true;
         // Initialise pathfinding
-        Instantiate(aStar, new Vector3(piecePositions[0].x - 7.5f, 0f, piecePositions[0].z - 7.5f), new Quaternion());
-        float distance = 0;
+        Grid grid = aStar.GetComponentInChildren<Grid>();
+        grid.gridWorldSize.x = xMax * (10 + (10 * grid.nodeRadius));
+        grid.gridWorldSize.y = yMax * (10 + (10 * grid.nodeRadius));
+        Instantiate(aStar, new Vector3(-7.5f, 0, -7.5f), new Quaternion());
         Vector3 furthest = new Vector3();
-        for (int i = 0; i < piecePositions.Count; i++)
-        {
-            float currentDistance = ManhattanDistance(piecePositions[0], piecePositions[i]);
-            if (currentDistance > distance)
-            {
-                furthest = piecePositions[i];
-                distance = currentDistance;
-            }
-        }
+        furthest = piecePositions[genomeLength - 1];
+
         HideCeiling(!displayCeiling);
         if (init)
         {
@@ -334,7 +327,7 @@ public class LevelGenerator : MonoBehaviour
 
     public void InvokeSpawnWallsOnDeadEnds(float evaluationTime)
     {
-        Invoke("SpawnWallsOnDeadEnds", evaluationTime + Time.deltaTime + 2);
+        Invoke("SpawnWallsOnDeadEnds", evaluationTime + Time.deltaTime);
     }
 
     // Spawn walls on dead ends
@@ -345,6 +338,7 @@ public class LevelGenerator : MonoBehaviour
         {
             DisconnectChecker dc = entryCollider.GetComponent<DisconnectChecker>();
             //Debug.Log(dc.didCollide);
+
             if (!dc.didCollide)
             {
                 Transform[] children = entryCollider.GetComponentsInChildren<Transform>(true);
@@ -431,10 +425,4 @@ public class LevelGenerator : MonoBehaviour
 
         return maxConnections;
     }
-
-    public float ManhattanDistance(Vector3 a, Vector3 b)
-    {
-        return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y) + Mathf.Abs(a.z - b.z);
-    }
-
 }

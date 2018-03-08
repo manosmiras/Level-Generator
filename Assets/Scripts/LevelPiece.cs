@@ -8,7 +8,7 @@ public class LevelPiece : DesignElement
     [SerializeField]
     public enum Type
     {
-        Cross = 0,
+        Cross,
         T_Junction,
         Hall,
         Corner,

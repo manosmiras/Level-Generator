@@ -70,7 +70,8 @@ public class FI2PopNsGA : GeneticAlgorithm
             time = string.Format("{0:0}:{1:00}", minutes, seconds);
 
             // Will spawn infeasible levels and evaluate them
-            DisplayInfeasiblePopulation(infeasiblePopulation);
+            if (!initialisedInfeasiblePop)
+                DisplayInfeasiblePopulation(infeasiblePopulation);
             // Will spawn feasible levels and evaluate them
             if (feasiblePopulation.Size() >= 1 && initialisedInfeasiblePop)
             {
@@ -78,7 +79,13 @@ public class FI2PopNsGA : GeneticAlgorithm
             }
             if (initialisedInfeasiblePop && (initialisedFeasiblePop || feasiblePopulation.Size() == 0))
             {
-                infeasiblePopulation.individuals.RemoveAll(x => x.delete == true);
+                // Remove weakest individuals from infeasible population to maintain population size
+                while (infeasiblePopulation.Size() > populationSize)
+                {
+                    infeasiblePopulation.individuals.RemoveAt(infeasiblePopulation.GetWeakestIndex());
+                }
+
+                // Delete individuals in feasible population which became infeasible from evolution
                 feasiblePopulation.individuals.RemoveAll(x => x.delete == true);
 
                 generation++;
@@ -212,11 +219,6 @@ public class FI2PopNsGA : GeneticAlgorithm
                 // Feasible
                 if (connectedComponents == 1)
                 {
-
-                    // Add to feasible population only if solution is different
-                    //if (!feasiblePopulation.individuals.Contains(pop.individuals[currentInfeasibleIndividual]))
-                    //{
-
                     // Keep track of generation of first feasible individual
                     if (feasibleIndividualCount == 0)
                         firstFeasibleGeneration = generation;
@@ -228,11 +230,21 @@ public class FI2PopNsGA : GeneticAlgorithm
                         feasibleIndividuals.Add(Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]));
                     }
 
+                    // Create a copy with the new feasible individual
                     Individual feasibleIndividual = Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]);
-                    feasiblePopulation.Add(feasibleIndividual);
-                    pop.individuals[currentInfeasibleIndividual].delete = true;
 
-                    //}
+                    if (feasiblePopulation.Size() < populationSize)
+                    {
+                        // Simply add to feasible population
+                        feasiblePopulation.Add(feasibleIndividual);
+                    }
+                    else
+                    {
+                        // Replace weakest feasible individual with new feasible individual
+                        if (feasiblePopulation.GetWeakest().fitness > CalculateCombinedFitness())
+                            feasiblePopulation.individuals[feasiblePopulation.GetWeakestIndex()] = feasibleIndividual;
+                    }
+
                 }
 
                 currentInfeasibleIndividual++;
@@ -341,7 +353,7 @@ public class FI2PopNsGA : GeneticAlgorithm
                     FitnessVisualizerEditor.values3.Add(fitnessFeasible);
                     float actualFitness = CalculateCombinedFitness();
                     FitnessVisualizerEditor.values.Add(actualFitness);
-                    if (fitnessFeasible >= fittestFeasible)
+                    if (fitnessFeasible > fittestFeasible)
                     {
                         feasibleIndividualGeneration = generation;
                         fittestFeasible = fitnessFeasible;

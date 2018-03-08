@@ -323,28 +323,28 @@ MonoBehaviour:
   room2Trap: {fileID: 1009672517134532, guid: 04788f57c8234bd418063f97cd584741, type: 2}
   room3Trap: {fileID: 1124444945981548, guid: e82f134081491d247becf43996ada622, type: 2}
   room4Trap: {fileID: 1201466669339096, guid: 7afb542891bac1d4d848d1953168afa5, type: 2}
-  aStar: {fileID: 1948285662353128, guid: 1635ac3bf09bfa84cb5dc7dfdf3a65c7, type: 2}
+  aStar: {fileID: 1344125825484124, guid: 92d353825fbf26745bb16dcf4cae8961, type: 2}
   spikeTrap: {fileID: 1769948916603860, guid: a57e1625f8d9ccb4f8a5ea380ed09e78, type: 2}
   seekerFast: {fileID: 1586609201474592, guid: e326f36da50842949920f146f9518104, type: 2}
   seekerSafe: {fileID: 1586609201474592, guid: 4479f3b191a26c14f8ff71a752440f25, type: 2}
   seekerDangerous: {fileID: 1586609201474592, guid: 911f76ba08933bb44916c9c92686ac88,
     type: 2}
   target: {fileID: 1917319722232294, guid: 73f1927d5520dae44968981643d75800, type: 2}
-  technique: 1
+  technique: 0
   minimalCriteria: 1
   deathPenalty: 0
   crossoverType: 2
   elitism: 1
   mutationRate: 0.05
   displayCeiling: 0
-  genomeLength: 25
+  genomeLength: 16
   populationSize: 50
   tournamentSize: 3
   evaluationTime: 0.0001
-  maxGeneration: 20
+  maxGeneration: 2
   positionModifier: 15
-  testing: 1
-  testName: fi2pop-ga-mutation-testing-5-percent-updated
+  testing: 0
+  testName: custom-test
   testRuns: 30
   generation: 0
   time: 
@@ -363,7 +363,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 16
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &120061221
 Prefab:
@@ -617,7 +617,7 @@ Transform:
   - {fileID: 80143808}
   - {fileID: 1021399977}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &283187102 stripped
 Transform:
@@ -1393,7 +1393,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4854817237870758, guid: 2c03bc402f061b24c9248ed3076a0834, type: 2}
       propertyPath: m_RootOrder
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4854817237870758, guid: 2c03bc402f061b24c9248ed3076a0834, type: 2}
       propertyPath: m_LocalScale.x
@@ -1751,7 +1751,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
       propertyPath: m_RootOrder
-      value: 16
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 2}
       propertyPath: m_IsActive

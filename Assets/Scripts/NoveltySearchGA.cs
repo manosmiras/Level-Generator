@@ -216,7 +216,7 @@ public class NoveltySearchGA : GeneticAlgorithm
 
                 fitness = actualFitness;
 
-                if (fitness >= fittest)// && !pop.individuals[currentIndividual].Equals(fittestIndividual))
+                if (fitness > fittest)
                 {
                     fittest = fitness;
                     // Keep a copy of the fittest individual, fitness based on diversity score

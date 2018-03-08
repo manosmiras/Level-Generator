@@ -209,10 +209,6 @@ public class FI2PopGA : GeneticAlgorithm
                 // Feasible
                 if (connectedComponents == 1)
                 {
-                    // Add to feasible population only if solution is different
-                    //if (!feasiblePopulation.individuals.Contains(pop.individuals[currentInfeasibleIndividual]))
-                    //{
-
                     // Keep track of generation of first feasible individual
                     if (feasibleIndividualCount == 0)
                         firstFeasibleGeneration = generation;
@@ -226,21 +222,17 @@ public class FI2PopGA : GeneticAlgorithm
                     // Create a copy with the new feasible individual
                     Individual feasibleIndividual = Utility.DeepClone(pop.individuals[currentInfeasibleIndividual]);
 
-                    // Simply add to feasible population
                     if (feasiblePopulation.Size() < populationSize)
                     {
+                        // Simply add to feasible population
                         feasiblePopulation.Add(feasibleIndividual);
                     }
-                    // Replace weakest feasible individual with new feasible individual
                     else
                     {
-                        // todo figure this out
+                        // Replace weakest feasible individual with new feasible individual
                         if (feasiblePopulation.GetWeakest().fitness > CalculateCombinedFitness())
                             feasiblePopulation.individuals[feasiblePopulation.GetWeakestIndex()] = feasibleIndividual;
                     }
-
-                    //pop.individuals[currentInfeasibleIndividual].delete = true;
-                    //}
                 }
 
                 currentInfeasibleIndividual++;
@@ -305,8 +297,9 @@ public class FI2PopGA : GeneticAlgorithm
 
                     fitnessFeasible = pop.individuals[currentFeasibleIndividual].fitness;
                     FitnessVisualizerEditor.values.Add(fitnessFeasible);
-                    if (fitnessFeasible >= fittestFeasible)
+                    if (fitnessFeasible > fittestFeasible)
                     {
+                        Debug.Log("Path: " + CalculatePathFitness() + ", constraint: " + CalculateConstraintFitness() + ", kVertex: " + CalculateKVertexConnectivityFitness() + ", total: " + CalculateCombinedFitness());
                         feasibleIndividualGeneration = generation;
                         fittestFeasible = fitnessFeasible;
                         feasibleFittest = Utility.DeepClone(pop.individuals[currentFeasibleIndividual]);
