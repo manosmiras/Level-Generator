@@ -299,7 +299,7 @@ public class FI2PopGA : GeneticAlgorithm
                     FitnessVisualizerEditor.values.Add(fitnessFeasible);
                     if (fitnessFeasible > fittestFeasible)
                     {
-                        Debug.Log("Path: " + CalculatePathFitness() + ", constraint: " + CalculateConstraintFitness() + ", kVertex: " + CalculateKVertexConnectivityFitness() + ", total: " + CalculateCombinedFitness());
+                        //Debug.Log("Path: " + CalculatePathFitness() + ", constraint: " + CalculateConstraintFitness() + ", kVertex: " + CalculateKVertexConnectivityFitness() + ", total: " + CalculateCombinedFitness());
                         feasibleIndividualGeneration = generation;
                         fittestFeasible = fitnessFeasible;
                         feasibleFittest = Utility.DeepClone(pop.individuals[currentFeasibleIndividual]);

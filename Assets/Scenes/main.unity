@@ -333,19 +333,19 @@ MonoBehaviour:
   technique: 0
   minimalCriteria: 1
   deathPenalty: 0
-  crossoverType: 2
+  crossoverType: 0
   elitism: 1
-  mutationRate: 0.05
+  mutationRate: 0.15
   displayCeiling: 0
-  genomeLength: 16
+  genomeLength: 36
   populationSize: 50
   tournamentSize: 3
   evaluationTime: 0.0001
-  maxGeneration: 2
+  maxGeneration: 15
   positionModifier: 15
-  testing: 0
-  testName: custom-test
-  testRuns: 30
+  testing: 1
+  testName: simple-ga-mutation-single-point-10-mutation-gl-36-20-samples-15-max-gen
+  testRuns: 20
   generation: 0
   time: 
   terminate: 0
