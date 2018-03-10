@@ -164,7 +164,8 @@ public class SimpleGA : GeneticAlgorithm
                 {
                     fittest = fitness;
                     fittestIndividual = Utility.DeepClone(pop.individuals[currentIndividual]);
-                    Debug.Log("Path: " + CalculatePathFitness() + ", constraint: " + CalculateConstraintFitness() + ", kVertex: " + CalculateKVertexConnectivityFitness() + ", total: " + CalculateCombinedFitness());
+                    fittestGeneration = generation;
+                    //Debug.Log("Path: " + CalculatePathFitness() + ", constraint: " + CalculateConstraintFitness() + ", kVertex: " + CalculateKVertexConnectivityFitness() + ", total: " + CalculateCombinedFitness());
                 }
 
                 // Feasible
@@ -182,7 +183,6 @@ public class SimpleGA : GeneticAlgorithm
                         feasibleIndividuals.Add(Utility.DeepClone(pop.individuals[currentIndividual]));
                     }
 
-                    fittestGeneration = generation;
                 }
 
                 currentIndividual++;

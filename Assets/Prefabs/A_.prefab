@@ -53,7 +53,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78b509aef37533f40ab83f1c5cb2ff1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayGridGizmos: 1
+  displayGridGizmos: 0
   unwalkableMask:
     serializedVersion: 2
     m_Bits: 256
@@ -63,7 +63,7 @@ MonoBehaviour:
   entryMask:
     serializedVersion: 2
     m_Bits: 1024
-  gridWorldSize: {x: 48.75, y: 48.75}
+  gridWorldSize: {x: 81.25, y: 81.25}
   nodeRadius: 0.625
   walkableRegions:
   - terrainMask:
