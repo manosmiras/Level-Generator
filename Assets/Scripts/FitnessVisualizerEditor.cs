@@ -10,7 +10,6 @@ public class FitnessVisualizerEditor : EditorWindow
     public static List<float> values3 = new List<float>();
     public static Technique technique;
     private float distance = 20;
-    private Vector2 fittestPos = new Vector2();
 
     [MenuItem("Window/Fitness Visualizer Editor Window")]
     static void Init()
@@ -120,8 +119,8 @@ public class FitnessVisualizerEditor : EditorWindow
 
         if (values3.Count > 1)
         {
-            if (values.Count * distance >= position.width)
-                values.RemoveAt(0);
+            if (values3.Count * distance >= position.width)
+                values3.RemoveAt(0);
 
             for (int i = 0; i < values3.Count - 1; i++)
             {
