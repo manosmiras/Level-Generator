@@ -72,11 +72,13 @@ public class LevelGenerator : MonoBehaviour
     //[ReadOnly] public int currentInfeasibleIndividual = 0;
     //[ReadOnly] public int currentFeasibleIndividual = 0;
     //[ReadOnly] public int currentIndividual = 0;
-    [ReadOnly] public int generation = 1;
+    [ReadOnly]
+    public int generation = 1;
 
     public string time;
 
-    [ReadOnly] public bool terminate = false;
+    [ReadOnly]
+    public bool terminate = false;
 
     public static int shortestPathCost = 0;
 
@@ -158,56 +160,64 @@ public class LevelGenerator : MonoBehaviour
                     {
                         // Rooms
                         case LevelPiece.Type.Cross:
-                            GameObject tempCross = Instantiate(cross, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempCross = Instantiate(cross, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempCross.transform.parent = gameObject.transform;
                             tempCross.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempCross.name, count));
                             break;
                         case LevelPiece.Type.T_Junction:
-                            GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempT_Junction = Instantiate(t_junction, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempT_Junction.transform.parent = gameObject.transform;
                             tempT_Junction.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempT_Junction.name, count));
                             break;
                         case LevelPiece.Type.Hall:
-                            GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempHall = Instantiate(hall, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempHall.transform.parent = gameObject.transform;
                             tempHall.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempHall.name, count));
                             break;
                         case LevelPiece.Type.Corner:
-                            GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempCorner = Instantiate(corner, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempCorner.transform.parent = gameObject.transform;
                             tempCorner.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempCorner.name, count));
                             break;
                         case LevelPiece.Type.Room1:
-                            GameObject tempRoom1 = Instantiate(room1, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempRoom1 = Instantiate(room1, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom1.transform.parent = gameObject.transform;
                             tempRoom1.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempRoom1.name, count));
                             break;
                         case LevelPiece.Type.Room2:
-                            GameObject tempRoom2 = Instantiate(room2, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempRoom2 = Instantiate(room2, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom2.transform.parent = gameObject.transform;
                             tempRoom2.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempRoom2.name, count));
                             break;
                         case LevelPiece.Type.Room3:
-                            GameObject tempRoom3 = Instantiate(room3, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempRoom3 = Instantiate(room3, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom3.transform.parent = gameObject.transform;
                             tempRoom3.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempRoom3.name, count));
                             break;
                         case LevelPiece.Type.Room4:
-                            GameObject tempRoom4 = Instantiate(room4, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempRoom4 = Instantiate(room4, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom4.transform.parent = gameObject.transform;
                             tempRoom4.name += count;
                             // Add a new node to graph
@@ -215,56 +225,64 @@ public class LevelGenerator : MonoBehaviour
                             break;
                         // Trap rooms
                         case LevelPiece.Type.Cross_Trap:
-                            GameObject tempCrossTrap = Instantiate(crossTrap, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempCrossTrap = Instantiate(crossTrap, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempCrossTrap.transform.parent = gameObject.transform;
                             tempCrossTrap.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempCrossTrap.name, count));
                             break;
                         case LevelPiece.Type.T_Junction_Trap:
-                            GameObject tempT_JunctionTrap = Instantiate(t_junctionTrap, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempT_JunctionTrap = Instantiate(t_junctionTrap, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempT_JunctionTrap.transform.parent = gameObject.transform;
                             tempT_JunctionTrap.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempT_JunctionTrap.name, count));
                             break;
                         case LevelPiece.Type.Hall_Trap:
-                            GameObject tempHallTrap = Instantiate(hallTrap, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempHallTrap = Instantiate(hallTrap, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempHallTrap.transform.parent = gameObject.transform;
                             tempHallTrap.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempHallTrap.name, count));
                             break;
                         case LevelPiece.Type.Corner_Trap:
-                            GameObject tempCornerTrap = Instantiate(cornerTrap, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempCornerTrap = Instantiate(cornerTrap, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempCornerTrap.transform.parent = gameObject.transform;
                             tempCornerTrap.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempCornerTrap.name, count));
                             break;
                         case LevelPiece.Type.Room1_Trap:
-                            GameObject tempRoom1Trap = Instantiate(room1Trap, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempRoom1Trap = Instantiate(room1Trap, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom1Trap.transform.parent = gameObject.transform;
                             tempRoom1Trap.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempRoom1Trap.name, count));
                             break;
                         case LevelPiece.Type.Room2_Trap:
-                            GameObject tempRoom2Trap = Instantiate(room2Trap, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempRoom2Trap = Instantiate(room2Trap, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom2Trap.transform.parent = gameObject.transform;
                             tempRoom2Trap.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempRoom2Trap.name, count));
                             break;
                         case LevelPiece.Type.Room3_Trap:
-                            GameObject tempRoom3Trap = Instantiate(room3Trap, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempRoom3Trap = Instantiate(room3Trap, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom3Trap.transform.parent = gameObject.transform;
                             tempRoom3Trap.name += count;
                             // Add a new node to graph
                             graph.nodes.Add(new GraphNode(tempRoom3Trap.name, count));
                             break;
                         case LevelPiece.Type.Room4_Trap:
-                            GameObject tempRoom4Trap = Instantiate(room4Trap, new Vector3(piece.position.x, 0, piece.position.y), Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
+                            GameObject tempRoom4Trap = Instantiate(room4Trap, new Vector3(piece.position.x, 0, piece.position.y),
+                                Quaternion.AngleAxis(piece.rotation, Vector3.up)) as GameObject;
                             tempRoom4Trap.transform.parent = gameObject.transform;
                             tempRoom4Trap.name += count;
                             // Add a new node to graph
