@@ -72,6 +72,44 @@ public class Individual : IEquatable<Individual>
         return diversityNormalized;
     }
 
+    public float GetLinearity()
+    {
+        int[] ints = new int[designElements.Count];
+        int count = 0;
+        foreach (LevelPiece levelPiece in designElements)
+        {
+
+            int num = (int)levelPiece.type;
+            ints[count] = num;
+            //ints.Add(num);
+            count++;
+        }
+        var query = ints.GroupBy(r => r)
+        .Select(grp => new
+        {
+            Value = grp.Key,
+            Count = grp.Count()
+        });
+        float min = 15 / designElements.Count;
+        float max = 0;
+        float maxVal = 0;
+        foreach (var item in query)
+        {
+            if (item.Count > max)
+            {
+                max = item.Count;
+                maxVal = item.Value;
+            }
+            //Debug.Log("Value: " + item.Value + ", Count: " + item.Count);
+        }
+        float linearity = 0;
+        if (max > min)
+            linearity = max / designElements.Count;
+        return linearity;
+        //Debug.Log("Max is: " + maxVal + " with " + max);
+        //Debug.Log("Linearity: " + linearity);
+    }
+
     public void Print()
     {
         string output = "";

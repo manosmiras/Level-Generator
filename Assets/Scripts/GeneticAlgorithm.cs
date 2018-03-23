@@ -342,6 +342,17 @@ public abstract class GeneticAlgorithm
         return normalizedKVertexConnectivity;
     }
 
+    public float CalculateVariableVertexConnectivityFitness()
+    {
+        // Normalized K-Vertex-Connectivity
+        int kConnectivity = LevelGenerator.graph.CalculateVariableKConnectivity();
+        float minKVertexConnectivity = 0;
+        float maxKVertexConnectivity = genomeLength * 4;
+        float normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
+
+        return normalizedKVertexConnectivity;
+    }
+
     public float CalculateConstraintFitness()
     {
         // Normalized connected components
