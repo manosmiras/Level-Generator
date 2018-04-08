@@ -21,15 +21,21 @@ public class LevelGeneratorEditor : Editor
     public override void OnInspectorGUI()
     {
         dontInclude = new List<string>();
-        if (levelGenerator.technique == Technique.NoveltySearchGA || levelGenerator.technique == Technique.FI2PopNsGA)
-        {
-            dontInclude.Add("terminate");
-        }
-        else
+        dontInclude.Add("terminate");
+        if (levelGenerator.technique != Technique.NoveltySearchGA)
         {
             dontInclude.Add("minimalCriteria");
             dontInclude.Add("deathPenalty");
-            dontInclude.Add("terminate");
+        }
+
+        if (levelGenerator.technique == Technique.NoveltySearchGA || levelGenerator.technique == Technique.SimpleGA)
+        {
+            dontInclude.Add("currentFeasibleIndividual");
+            dontInclude.Add("currentInfeasibleIndividual");
+        }
+        else
+        {
+            dontInclude.Add("currentIndividual");
         }
 
         if (!levelGenerator.testing)

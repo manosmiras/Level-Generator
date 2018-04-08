@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Simple Genetic Algorithm (SGA)
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -14,9 +16,9 @@ public class SimpleGA : GeneticAlgorithm
     public float fittest = 0;
     public float fitness = 0;
     // expressive range
-    public float variableVertexConnectivity;
-    public float linearity;
-    public float minCost;
+    //public float variableVertexConnectivity;
+    //public float linearity;
+    //public float minCost;
     public SimpleGA(int populationSize, int genomeLength, float mutationRate, bool elitism, CrossoverType crossoverType, int tournamentSize, float evaluationTime, bool testing,
          int testRuns, int maxGeneration, LevelGenerator levelGenerator)
     {
@@ -80,20 +82,20 @@ public class SimpleGA : GeneticAlgorithm
                 // Append title to csv
                 if (csv.Length == 0)
                 {
-                    //AddDataToResults(string.Format("{0},{1},{2},{3},{4}", "Number of Feasible individuals", "Fittest Individual Fitness", "Generation of Fittest Individual", "Generation of First Feasible Individual", "Connected Components"));
-                    AddDataToResults(string.Format("{0},{1},{2}", "Linearity", "Explorability", "Challenge"));
+                    AddDataToResults(string.Format("{0},{1},{2},{3},{4}", "Number of Feasible individuals", "Fittest Individual Fitness", "Generation of Fittest Individual", "Generation of First Feasible Individual", "Connected Components"));
+                    //AddDataToResults(string.Format("{0},{1},{2}", "Linearity", "Explorability", "Challenge"));
                 }
                 // Append new line to csv
-                //AddDataToResults(string.Format("{0},{1},{2},{3},{4}", feasibleIndividualCount, fittestIndividual.fitness, fittestGeneration, firstFeasibleGeneration, connectedComponents));
-                AddDataToResults(string.Format("{0},{1},{2}", linearity, variableVertexConnectivity, minCost));
+                AddDataToResults(string.Format("{0},{1},{2},{3},{4}", feasibleIndividualCount, fittestIndividual.fitness, fittestGeneration, firstFeasibleGeneration, connectedComponents));
+                //AddDataToResults(string.Format("{0},{1},{2}", linearity, variableVertexConnectivity, minCost));
                 levelGenerator.ClearScene();
 
                 if (currentTestRun <= testRuns - 1)
                 {
                     population.individuals.Clear();
-                    linearity = 0;
-                    minCost = 0;
-                    variableVertexConnectivity = 0;
+                    //linearity = 0;
+                    //minCost = 0;
+                    //variableVertexConnectivity = 0;
                     fittestIndividual = new Individual();
                     FitnessVisualizerEditor.values.Clear();
                     Initialise();
@@ -173,11 +175,9 @@ public class SimpleGA : GeneticAlgorithm
                     fittestIndividual = Utility.DeepClone(pop.individuals[currentIndividual]);
                     fittestGeneration = generation;
                     // expressive range
-                    minCost = CalculatePathFitness();
-                    variableVertexConnectivity = CalculateVariableVertexConnectivityFitness();
-                    linearity = fittestIndividual.GetLinearity();
-                    //Debug.Log("Linearity: " + linearity + ", VariableKvc: " + variableVertexConnectivity + ", Cost: " + minCost);
-                    //Debug.Log("Path: " + CalculatePathFitness() + ", constraint: " + CalculateConstraintFitness() + ", kVertex: " + CalculateKVertexConnectivityFitness() + ", total: " + CalculateCombinedFitness());
+                    //minCost = CalculatePathFitness();
+                    //variableVertexConnectivity = CalculateVariableVertexConnectivityFitness();
+                    //linearity = fittestIndividual.GetLinearity();
                 }
 
                 // Feasible

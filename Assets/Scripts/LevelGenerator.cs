@@ -1,4 +1,5 @@
-﻿// LevelGenerator.cs
+﻿// Level Generator, handles the initialization of selected genetic algorithm, 
+// and spawns level pieces for evaluation
 
 using System.Collections;
 using System.Collections.Generic;
@@ -83,9 +84,10 @@ public class LevelGenerator : MonoBehaviour
     public static int shortestPathCost = 0;
 
     public static Graph graph = new Graph();
-    public int feasibleCount;
-    public int currentInfeasibleIndividual;
-    public int currentFeasibleIndividual;
+    [ReadOnly]public int feasibleCount;
+    [ReadOnly]public int currentInfeasibleIndividual;
+    [ReadOnly]public int currentFeasibleIndividual;
+    [ReadOnly]public int currentIndividual;
     // Private properties
     private bool init = true;
     private SimpleGA simpleGA;
@@ -111,6 +113,9 @@ public class LevelGenerator : MonoBehaviour
                 simpleGA.Run();
                 simpleGA.csvFileName = testName;
                 generation = simpleGA.generation;
+                currentIndividual = simpleGA.currentIndividual;
+                time = simpleGA.time;
+                simpleGA.terminate = terminate;
                 break;
             case Technique.FI2PopGA:
                 fi2PopGA.Run();
@@ -119,16 +124,25 @@ public class LevelGenerator : MonoBehaviour
                 feasibleCount = fi2PopGA.feasiblePopulation.Size();
                 currentInfeasibleIndividual = fi2PopGA.currentInfeasibleIndividual;
                 currentFeasibleIndividual = fi2PopGA.currentFeasibleIndividual;
+                time = fi2PopGA.time;
+                fi2PopGA.terminate = terminate;
                 break;
             case Technique.NoveltySearchGA:
                 noveltySearchGA.Run();
                 noveltySearchGA.csvFileName = testName;
                 generation = noveltySearchGA.generation;
+                currentIndividual = noveltySearchGA.currentIndividual;
+                time = noveltySearchGA.time;
+                noveltySearchGA.terminate = terminate;
                 break;
             case Technique.FI2PopNsGA:
                 fi2PopNsGA.Run();
                 fi2PopNsGA.csvFileName = testName;
                 generation = fi2PopNsGA.generation;
+                currentInfeasibleIndividual = fi2PopNsGA.currentInfeasibleIndividual;
+                currentFeasibleIndividual = fi2PopNsGA.currentFeasibleIndividual;
+                time = fi2PopNsGA.time;
+                fi2PopNsGA.terminate = true;
                 break;
             default:
                 break;
@@ -402,45 +416,5 @@ public class LevelGenerator : MonoBehaviour
         {
             DestroyImmediate(seeker, true);
         }
-    }
-
-    public float Area(GameObject gameObject)
-    {
-        //Transform transform = gameObject.transform.Find(gameObject.name.Substring(0, gameObject.name.Length - 8));
-        //Debug.Log("looking for: " + gameObject.name.Substring(0, gameObject.name.Length - 8));
-        MeshFilter[] meshFilters = transform.gameObject.GetComponentsInChildren<MeshFilter>();
-
-        Vector3 result = Vector3.zero;
-        foreach (MeshFilter mf in meshFilters)
-        {
-            Mesh mesh = mf.mesh;
-            Vector3[] vertices = mesh.vertices;
-
-
-            for (int p = vertices.Length - 1, q = 0; q < vertices.Length; p = q++)
-            {
-                result += Vector3.Cross(vertices[q], vertices[p]);
-            }
-            result *= 0.5f;
-
-        }
-        Debug.Log("Area of " + gameObject.tag + ": " + result.magnitude);
-        return result.magnitude;
-    }
-
-    public int CalculateMaxConnections(Individual individual)
-    {
-        GameObject[] corners = GameObject.FindGameObjectsWithTag("Corner");
-        GameObject[] crosses = GameObject.FindGameObjectsWithTag("Cross");
-        GameObject[] halls = GameObject.FindGameObjectsWithTag("Hall");
-        GameObject[] t_junctions = GameObject.FindGameObjectsWithTag("T_Junction");
-        GameObject[] rooms1 = GameObject.FindGameObjectsWithTag("Room1");
-        GameObject[] rooms2 = GameObject.FindGameObjectsWithTag("Room2");
-        GameObject[] rooms3 = GameObject.FindGameObjectsWithTag("Room3");
-
-        int maxConnections = corners.Length * 2 + crosses.Length * 4 + halls.Length * 2 +
-            t_junctions.Length * 3 + rooms1.Length + rooms2.Length * 2 + rooms3.Length * 3;
-
-        return maxConnections;
     }
 }

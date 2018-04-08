@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Feasible Infeasible Novelty Search (FINS)
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

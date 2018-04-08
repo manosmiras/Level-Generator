@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Novelty Search (NS) and Minimal Criteria Novelty Search (MCNS)
+
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
