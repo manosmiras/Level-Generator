@@ -10,7 +10,7 @@ public class DesignElementConverter : JsonConverter
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
-        JObject jo = JObject.Load(reader);
+        var jo = JObject.Load(reader);
         if (jo["FooBarBuzz"].Value<string>() == "A")
             return jo.ToObject<LevelPiece>(serializer);
 
@@ -20,10 +20,7 @@ public class DesignElementConverter : JsonConverter
         return null;
     }
 
-    public override bool CanWrite
-    {
-        get { return false; }
-    }
+    public override bool CanWrite => false;
 
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
     {

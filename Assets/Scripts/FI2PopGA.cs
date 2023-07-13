@@ -59,9 +59,9 @@ public class FI2PopGA : GeneticAlgorithm
         totalTime += Time.deltaTime;
         if (generation <= maxGeneration ^ (terminate || currentTestRun >= testRuns))
         {
-            int minutes = Mathf.FloorToInt(Time.time / 60F);
-            int seconds = Mathf.FloorToInt(Time.time - minutes * 60);
-            time = string.Format("{0:0}:{1:00}", minutes, seconds);
+            var minutes = Mathf.FloorToInt(Time.time / 60F);
+            var seconds = Mathf.FloorToInt(Time.time - minutes * 60);
+            time = $"{minutes:0}:{seconds:00}";
 
             // Will spawn infeasible levels and evaluate them
             if(!initialisedInfeasiblePop)
@@ -140,7 +140,6 @@ public class FI2PopGA : GeneticAlgorithm
             }
             else
             {
-                //Individual final = Individual.FromJson(Application.dataPath + "/Levels/" + "gl" + genomeLength + "f" + fittest + ".json");
                 levelGenerator.ClearScene();
 
                 if (feasibleIndividualCount > 0)
@@ -150,7 +149,7 @@ public class FI2PopGA : GeneticAlgorithm
                 }
                 else
                 {
-                    Individual fittest = infeasiblePopulation.GetFittest();
+                    var fittest = infeasiblePopulation.GetFittest();
                     Debug.Log("No feasible individual was found, clearing and spawning fittest from infeasible population, it has a fitness of: " + fittest.fitness);
                     levelGenerator.DisplayIndividual(fittest);
                 }
@@ -301,7 +300,6 @@ public class FI2PopGA : GeneticAlgorithm
                     FitnessVisualizerEditor.values.Add(fitnessFeasible);
                     if (fitnessFeasible > fittestFeasible)
                     {
-                        //Debug.Log("Path: " + CalculatePathFitness() + ", constraint: " + CalculateConstraintFitness() + ", kVertex: " + CalculateKVertexConnectivityFitness() + ", total: " + CalculateCombinedFitness());
                         feasibleIndividualGeneration = generation;
                         fittestFeasible = fitnessFeasible;
                         feasibleFittest = Utility.DeepClone(pop.individuals[currentFeasibleIndividual]);

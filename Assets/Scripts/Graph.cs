@@ -5,8 +5,7 @@ using UnityEngine;
 public class Graph
 {
     public List<GraphNode> nodes = new List<GraphNode>();
-
-
+    
     public void Print()
     {
         foreach (GraphNode node in nodes)
@@ -18,6 +17,7 @@ public class Graph
             }
         }
     }
+    
     public GraphNode Get(string name)
     {
         foreach (GraphNode node in nodes)

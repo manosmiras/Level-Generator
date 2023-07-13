@@ -294,7 +294,7 @@ public class FI2PopNsGA : GeneticAlgorithm
                 float averageDiversity = 0;
                 int divisor = 0;
                 // Compare current individual to neighbours in the population
-                for (int neighbour = 0; neighbour < 2; neighbour++)
+                for (var neighbour = 0; neighbour < 2; neighbour++)
                 {
                     if (currentFeasibleIndividual < pop.Size() - 1)
                     {
@@ -311,7 +311,7 @@ public class FI2PopNsGA : GeneticAlgorithm
                     }
                 }
                 // Compare current individual with novelty archive
-                for (int i = 0; i < noveltyArchive.Size(); i++)
+                for (var i = 0; i < noveltyArchive.Size(); i++)
                 {
                     averageDiversity += pop.individuals[currentFeasibleIndividual].GetDiversity(noveltyArchive.individuals[i]);
                     divisor++;
@@ -353,7 +353,7 @@ public class FI2PopNsGA : GeneticAlgorithm
                 {
                     fitnessFeasible = pop.individuals[currentFeasibleIndividual].fitness;
                     FitnessVisualizerEditor.values3.Add(fitnessFeasible);
-                    float actualFitness = CalculateCombinedFitness();
+                    var actualFitness = CalculateCombinedFitness();
                     FitnessVisualizerEditor.values.Add(actualFitness);
                     if (fitnessFeasible > fittestFeasible)
                     {

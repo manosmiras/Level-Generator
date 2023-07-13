@@ -24,15 +24,15 @@ public class Individual : IEquatable<Individual>
 
     public Individual(Individual individual)
     {
-        this.designElements = new List<DesignElement>(individual.designElements);
-        this.fitness = individual.fitness;
-        this.delete = false;
+        designElements = new List<DesignElement>(individual.designElements);
+        fitness = individual.fitness;
+        delete = false;
     }
 
     public Individual(List<DesignElement> designElements)
     {
         this.designElements = designElements;
-        this.fitness = 0;
+        fitness = 0;
     }
     // Sort by x axis
     public void Sort()
@@ -43,16 +43,16 @@ public class Individual : IEquatable<Individual>
 
     public Individual DeepCopy()
     {
-        Individual other = (Individual)this.MemberwiseClone();
+        var other = (Individual)MemberwiseClone();
         other.designElements = new List<DesignElement>(this.designElements);
-        other.fitness = this.fitness;
+        other.fitness = fitness;
         return other;
     }
 
     public float GetDiversity(Individual other)
     {
-        int diversity = 0;
-        for (int i = 0; i < designElements.Count; i++)
+        var diversity = 0;
+        for (var i = 0; i < designElements.Count; i++)
         {
             // Increase diversity if rotations for current piece are different
             if (designElements[i].rotation != other.designElements[i].rotation)
@@ -66,20 +66,20 @@ public class Individual : IEquatable<Individual>
             }
         }
         // Normalize diversity
-        float minDiversity = 0;
-        float maxDiversity = designElements.Count * 2;
-        float diversityNormalized = (diversity - minDiversity) / (maxDiversity - minDiversity);
+        var minDiversity = 0;
+        var maxDiversity = designElements.Count * 2;
+        var diversityNormalized = (diversity - minDiversity) / (maxDiversity - minDiversity);
         return diversityNormalized;
     }
 
     public float GetLinearity()
     {
-        int[] ints = new int[designElements.Count];
-        int count = 0;
+        var ints = new int[designElements.Count];
+        var count = 0;
         foreach (LevelPiece levelPiece in designElements)
         {
 
-            int num = (int)levelPiece.type;
+            var num = (int)levelPiece.type;
             ints[count] = num;
             //ints.Add(num);
             count++;
@@ -100,14 +100,11 @@ public class Individual : IEquatable<Individual>
                 max = item.Count;
                 maxVal = item.Value;
             }
-            //Debug.Log("Value: " + item.Value + ", Count: " + item.Count);
         }
         float linearity = 0;
         if (max > min)
             linearity = max / designElements.Count;
         return linearity;
-        //Debug.Log("Max is: " + maxVal + " with " + max);
-        //Debug.Log("Linearity: " + linearity);
     }
 
     public void Print()
@@ -123,12 +120,10 @@ public class Individual : IEquatable<Individual>
 
     public void ToJson()
     {
-        string json = JsonConvert.SerializeObject(this);
-        
-       
-        string path = Application.dataPath + "/Levels/" + "gl" + designElements.Count + "f" + fitness + ".json";
+        var json = JsonConvert.SerializeObject(this);
+        var path = Application.dataPath + "/Levels/" + "gl" + designElements.Count + "f" + fitness + ".json";
         Debug.Log(path);
-        File.WriteAllText(path, json.ToString());
+        File.WriteAllText(path, json);
 #if UNITY_EDITOR
         UnityEditor.AssetDatabase.Refresh();
 #endif
@@ -137,12 +132,10 @@ public class Individual : IEquatable<Individual>
 
     public void ToJson(string text)
     {
-        string json = JsonConvert.SerializeObject(this);
-
-
-        string path = Application.dataPath + "/Levels/" + "gl" + designElements.Count + "f" + fitness + text + ".json";
+        var json = JsonConvert.SerializeObject(this);
+        var path = Application.dataPath + "/Levels/" + "gl" + designElements.Count + "f" + fitness + text + ".json";
         Debug.Log(path);
-        File.WriteAllText(path, json.ToString());
+        File.WriteAllText(path, json);
 #if UNITY_EDITOR
         UnityEditor.AssetDatabase.Refresh();
 #endif
@@ -151,10 +144,10 @@ public class Individual : IEquatable<Individual>
 
     public static Individual FromJson(string path)
     {
-        string json = File.ReadAllText(path);
+        var json = File.ReadAllText(path);
         JsonConverter[] converters = { new LevelPieceConverter() };
 
-        Individual individual = JsonConvert.DeserializeObject<Individual>(json, new JsonSerializerSettings() { Converters = converters });
+        var individual = JsonConvert.DeserializeObject<Individual>(json, new JsonSerializerSettings() { Converters = converters });
         
         return individual;
     }

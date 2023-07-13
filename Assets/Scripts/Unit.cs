@@ -14,11 +14,12 @@ public class Unit : MonoBehaviour {
     }
 
     public Transform target;
-    float speed = 10;
-    Vector3[] path;
-    int targetIndex;
     public UnitType type;
-    public bool followPath = false;
+    public bool followPath;
+    
+    private float _speed = 10;
+    private Vector3[] _path;
+    private int _targetIndex;
 
     private void Start()
     {
@@ -42,7 +43,7 @@ public class Unit : MonoBehaviour {
     {
         if (pathSuccesful)
         {
-            path = newPath;
+            _path = newPath;
             if (followPath)
             {
                 StopCoroutine("FollowPath");
@@ -54,32 +55,32 @@ public class Unit : MonoBehaviour {
     }
     IEnumerator FollowPath()
     {
-        Vector3 currentWaypoint = path[0];
+        Vector3 currentWaypoint = _path[0];
 
         while (true)
         {
             if (transform.position == currentWaypoint)
             {
-                targetIndex++;
-                if (targetIndex >= path.Length)
+                _targetIndex++;
+                if (_targetIndex >= _path.Length)
                 {
-                    targetIndex = 0;
-                    path = new Vector3[0];
+                    _targetIndex = 0;
+                    _path = new Vector3[0];
                     yield break;
                 }
-                currentWaypoint = path[targetIndex];
+                currentWaypoint = _path[_targetIndex];
             }
 
-            transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, speed * Time.deltaTime);
+            transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, _speed * Time.deltaTime);
             yield return null;
         }
     }
 
     public void OnDrawGizmos()
     {
-        if (path != null)
+        if (_path != null)
         {
-            for (int i = targetIndex; i < path.Length; i++)
+            for (var i = _targetIndex; i < _path.Length; i++)
             {
                 switch (type)
                 {
@@ -99,15 +100,15 @@ public class Unit : MonoBehaviour {
                         break;
                 }
                 
-                Gizmos.DrawCube(path[i], Vector3.one);
+                Gizmos.DrawCube(_path[i], Vector3.one);
 
-                if (i == targetIndex)
+                if (i == _targetIndex)
                 {
-                    Gizmos.DrawLine(transform.position, path[i]);
+                    Gizmos.DrawLine(transform.position, _path[i]);
                 }
                 else
                 {
-                    Gizmos.DrawLine(path[i - 1], path[i]);
+                    Gizmos.DrawLine(_path[i - 1], _path[i]);
                 }
             }
         }

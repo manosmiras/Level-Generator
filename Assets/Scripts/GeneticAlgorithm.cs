@@ -70,9 +70,9 @@ public abstract class GeneticAlgorithm
     protected StringBuilder csv = new StringBuilder();
     public string csvFileName;
 
-    public Population EvolvePopulation(Population pop)
+    protected Population EvolvePopulation(Population pop)
     {
-        Population newPopulation = new Population();
+        var newPopulation = new Population();
 
         // Keep our best individuals
         if (elitism)
@@ -98,11 +98,11 @@ public abstract class GeneticAlgorithm
 
         // Loop over the population size and create new individuals with
         // crossover
-        for (int i = elitismOffset + 1; i < pop.Size(); i++)
+        var individual2 = TournamentSelection(pop);
+        for (var i = elitismOffset + 1; i < pop.Size(); i++)
         {
-            Individual individual1 = TournamentSelection(pop);
-            Individual individual2 = TournamentSelection(pop);
-            Individual newIndividual = new Individual();
+            var individual1 = TournamentSelection(pop);
+            var newIndividual = new Individual();
             switch (crossoverType)
             {
                 case CrossoverType.SinglePoint:
@@ -126,7 +126,7 @@ public abstract class GeneticAlgorithm
         }
 
         // Mutate population
-        for (int i = elitismOffset; i < pop.Size(); i++)
+        for (var i = elitismOffset; i < pop.Size(); i++)
         {
             // Always mutate 
             if (i == elitismOffset)
@@ -143,29 +143,29 @@ public abstract class GeneticAlgorithm
     }
 
     // Generates a random population
-    public void GenerateRandomPopulation(int size, Population pop)
+    protected void GenerateRandomPopulation(int size, Population pop)
     {
-        for (int i = 0; i < size; i++)
+        for (var i = 0; i < size; i++)
         {
             GenerateRandomIndividual(pop);
         }
     }
     // Generates a random individual
-    public void GenerateRandomIndividual(Population pop)
+    private void GenerateRandomIndividual(Population pop)
     {
-        Individual individual = new Individual();
+        var individual = new Individual();
 
         // Clear
         individual.designElements.Clear();
-        for (int i = 0; i < genomeLength; i++)
+        for (var i = 0; i < genomeLength; i++)
         {
             float rotation = Random.Range(0, 4);
             rotation *= 90f;
-            int roomType = Random.Range(0, 16);
+            var roomType = Random.Range(0, 16);
             // No traps allowed on start and end of level
             if(i == 0 || i == genomeLength - 1)
                 roomType = Random.Range(0, 8);
-            LevelPiece piece = new LevelPiece(Vector2.zero, rotation, (LevelPiece.Type)roomType);
+            var piece = new LevelPiece(Vector2.zero, rotation, (LevelPiece.Type)roomType);
             individual.designElements.Add(piece);
 
         }
@@ -174,13 +174,13 @@ public abstract class GeneticAlgorithm
 
     Individual UniformCrossover(Individual individual1, Individual individual2)
     {
-        Individual offspring = new Individual();
+        var offspring = new Individual();
         // Loop through all design elements
         for (int i = 0; i < individual1.designElements.Count; i++)
         {
             if (individual1.fitness > individual2.fitness)
             {
-                float rand = Random.Range(0.0f, 1.0f);
+                var rand = Random.Range(0.0f, 1.0f);
                 // 60% chance to copy design element from individual 1
                 if (rand <= uniformRate)
                 {
@@ -194,7 +194,7 @@ public abstract class GeneticAlgorithm
             }
             else
             {
-                float rand = Random.Range(0.0f, 1.0f);
+                var rand = Random.Range(0.0f, 1.0f);
                 // 60% chance to copy design element from individual 2
                 if (rand <= uniformRate)
                 {
@@ -212,11 +212,11 @@ public abstract class GeneticAlgorithm
 
     Individual SinglePointCrossover(Individual individual1, Individual individual2)
     {
-        Individual offspring = new Individual();
-        int point = genomeLength / 2;
-        float rand = Random.Range(0.0f, 1.0f);
+        var offspring = new Individual();
+        var point = genomeLength / 2;
+        var rand = Random.Range(0.0f, 1.0f);
         // Loop through all design elements
-        for (int i = 0; i < individual1.designElements.Count; i++)
+        for (var i = 0; i < individual1.designElements.Count; i++)
         {
             if (rand <= 0.5)
             {
@@ -246,31 +246,31 @@ public abstract class GeneticAlgorithm
         return offspring;
     }
 
-    Individual TournamentSelection(Population pop)
+    private Individual TournamentSelection(Population pop)
     {
         // Create a tournament population
-        Population tournamentPopulation = new Population();
+        var tournamentPopulation = new Population();
 
         // For each place in the tournament get a random individual
-        for (int i = 0; i < tournamentSize; i++)
+        for (var i = 0; i < tournamentSize; i++)
         {
-            int randomId = Random.Range(0, pop.Size());
+            var randomId = Random.Range(0, pop.Size());
             tournamentPopulation.Add(Utility.DeepClone(pop.individuals[randomId]));
         }
         // Get the fittest
-        Individual fittest = tournamentPopulation.GetFittest();
+        var fittest = tournamentPopulation.GetFittest();
 
         return fittest;
     }
 
     // Mutate an individual
-    void Mutate(Individual individual)
+    private void Mutate(Individual individual)
     {
         // Loop through genes
-        for (int i = 0; i < individual.designElements.Count; i++)
+        for (var i = 0; i < individual.designElements.Count; i++)
         {
 
-            int mutationType = Random.Range(0, 2);
+            var mutationType = Random.Range(0, 2);
             if (mutationType == 0)
             {
                 MutateRotation(individual.designElements[i]);
@@ -283,7 +283,7 @@ public abstract class GeneticAlgorithm
         }
     }
 
-    void MutateRotation(DesignElement designElement)
+    private void MutateRotation(DesignElement designElement)
     {
         // Select a random rotation between 0, 90, 180, 270 degrees
         float rotation = Random.Range(0, 4);
@@ -299,7 +299,7 @@ public abstract class GeneticAlgorithm
     void MutateLevelPiece(LevelPiece levelPiece, int i)
     {
         // Select random room type
-        int roomType = Random.Range(0, 16);
+        var roomType = Random.Range(0, 16);
         // Keep changing piece until it's different
         while ((LevelPiece.Type)roomType == levelPiece.type)
         {
@@ -312,34 +312,22 @@ public abstract class GeneticAlgorithm
         levelPiece.type = (LevelPiece.Type)roomType;
     }
 
-    public float CalculateCombinedFitness()
+    protected float CalculateCombinedFitness()
     {
         // Normalized path cost
-        float maxNodes = 144;
-        float minNodes = 0; //minNodes = 12;
-        float maxPathCost = (genomeLength - 1) * maxNodes;
-        float minPathCost = ((genomeLength / 2) - 1) * minNodes;
-        float normalizedShortestPathCost = (LevelGenerator.shortestPathCost - minPathCost) / (maxPathCost - minPathCost);
-        // Normalized connected components
-        float maxConnectedComponents = genomeLength - 1;
-        float minConnectedComponents = 0;
-        float connectedComponentsScore = genomeLength - connectedComponents;
-        float normalizedConnectedComponentsScore = (connectedComponentsScore - minConnectedComponents) / (maxConnectedComponents - minConnectedComponents);
-        // Normalized K-Vertex-Connectivity
-        int kConnectivity = LevelGenerator.graph.CalculateKConnectivity(2);//graph.CalculateVariableKConnectivity();
-        float minKVertexConnectivity = 0;
-        float maxKVertexConnectivity = genomeLength * 2;
-        float normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
+        var normalizedShortestPathCost = CalculatePathFitness();
+        var normalizedConnectedComponentsScore = CalculateConstraintFitness();
+        var normalizedKVertexConnectivity = CalculateKVertexConnectivityFitness();
         return (normalizedShortestPathCost * 1.0f + normalizedConnectedComponentsScore * 1.0f + normalizedKVertexConnectivity * 1.0f) / 3;
     }
 
-    public float CalculateKVertexConnectivityFitness()
+    private float CalculateKVertexConnectivityFitness()
     {
         // Normalized K-Vertex-Connectivity
-        int kConnectivity = LevelGenerator.graph.CalculateKConnectivity(2);//graph.CalculateVariableKConnectivity();
-        float minKVertexConnectivity = 0;
-        float maxKVertexConnectivity = genomeLength * 2;
-        float normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
+        var kConnectivity = LevelGenerator.graph.CalculateKConnectivity(2);//graph.CalculateVariableKConnectivity();
+        var minKVertexConnectivity = 0;
+        var maxKVertexConnectivity = genomeLength * 2;
+        var normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
 
         return normalizedKVertexConnectivity;
     }
@@ -347,33 +335,33 @@ public abstract class GeneticAlgorithm
     public float CalculateVariableVertexConnectivityFitness()
     {
         // Normalized K-Vertex-Connectivity
-        int kConnectivity = LevelGenerator.graph.CalculateVariableKConnectivity();
-        float minKVertexConnectivity = 0;
-        float maxKVertexConnectivity = genomeLength * 4;
-        float normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
+        var kConnectivity = LevelGenerator.graph.CalculateVariableKConnectivity();
+        var minKVertexConnectivity = 0;
+        var maxKVertexConnectivity = genomeLength * 4;
+        var normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
 
         return normalizedKVertexConnectivity;
     }
 
-    public float CalculateConstraintFitness()
+    protected float CalculateConstraintFitness()
     {
         // Normalized connected components
-        float maxConnectedComponents = genomeLength - 1;
-        float minConnectedComponents = 0;
-        float connectedComponentsScore = genomeLength - connectedComponents;
-        float normalizedConnectedComponentsScore = (connectedComponentsScore - minConnectedComponents) / (maxConnectedComponents - minConnectedComponents);
+        var maxConnectedComponents = genomeLength - 1;
+        var minConnectedComponents = 0;
+        var connectedComponentsScore = genomeLength - connectedComponents;
+        var normalizedConnectedComponentsScore = (connectedComponentsScore - minConnectedComponents) / (maxConnectedComponents - minConnectedComponents);
 
         return normalizedConnectedComponentsScore;
     }
 
-    public float CalculatePathFitness()
+    private float CalculatePathFitness()
     {
         // Normalized path cost
-        float maxNodes = 144;
-        float minNodes = 0; //minNodes = 12;
-        float maxPathCost = (genomeLength - 1) * maxNodes;
-        float minPathCost = ((genomeLength / 2) - 1) * minNodes;
-        float normalizedShortestPathCost = (LevelGenerator.shortestPathCost - minPathCost) / (maxPathCost - minPathCost);
+        var maxNodes = 144;
+        var minNodes = 0; //minNodes = 12;
+        var maxPathCost = (genomeLength - 1) * maxNodes;
+        var minPathCost = ((genomeLength / 2) - 1) * minNodes;
+        var normalizedShortestPathCost = (LevelGenerator.shortestPathCost - minPathCost) / (maxPathCost - minPathCost);
 
         return normalizedShortestPathCost;
     }
@@ -381,27 +369,27 @@ public abstract class GeneticAlgorithm
     public float CalculateObjectiveFitness()
     {
         // Normalized path cost
-        float maxNodes = 144;
-        float minNodes = 0; //minNodes = 12;
-        float maxPathCost = (genomeLength - 1) * maxNodes;
-        float minPathCost = ((genomeLength / 2) - 1) * minNodes;
-        float normalizedShortestPathCost = (LevelGenerator.shortestPathCost - minPathCost) / (maxPathCost - minPathCost);
+        var maxNodes = 144;
+        var minNodes = 0; //minNodes = 12;
+        var maxPathCost = (genomeLength - 1) * maxNodes;
+        var minPathCost = ((genomeLength / 2) - 1) * minNodes;
+        var normalizedShortestPathCost = (LevelGenerator.shortestPathCost - minPathCost) / (maxPathCost - minPathCost);
 
         // Normalized K-Vertex-Connectivity
-        int kConnectivity = LevelGenerator.graph.CalculateKConnectivity(2);//graph.CalculateVariableKConnectivity();
-        float minKVertexConnectivity = 0;
-        float maxKVertexConnectivity = genomeLength * 2;
-        float normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
+        var kConnectivity = LevelGenerator.graph.CalculateKConnectivity(2);//graph.CalculateVariableKConnectivity();
+        var minKVertexConnectivity = 0;
+        var maxKVertexConnectivity = genomeLength * 2;
+        var normalizedKVertexConnectivity = (kConnectivity - minKVertexConnectivity) / (maxKVertexConnectivity - minKVertexConnectivity);
 
         return (normalizedShortestPathCost * 1.0f + normalizedKVertexConnectivity * 1.0f) / 2;
     }
 
-    public void AddDataToResults(string data)
+    protected void AddDataToResults(string data)
     {
         csv.AppendLine(data);
     }
 
-    public void OutputTestResults()
+    protected void OutputTestResults()
     {
         File.WriteAllText(Application.dataPath + "/Experiments/" + csvFileName + ".csv", csv.ToString());
     }

@@ -3,28 +3,27 @@ using System.Collections.Generic;
 using UnityEditor;
 public class GraphEditor : EditorWindow
 {
-    //Rect windowRect = new Rect(100 + 100, 100, 50, 50);
-    //Rect windowRect2 = new Rect(100, 100, 50, 50);
-    static List<Rect> rects = new List<Rect>();
-    static bool connect = false;
+    private static List<Rect> _rects = new();
+    private static bool _connect;
+    
     [MenuItem("Window/Graph Editor Window")]
-    static void Init()
+    private static void Init()
     {
-        EditorWindow.GetWindow(typeof(GraphEditor));
+        GetWindow(typeof(GraphEditor));
     }
 
     private void OnGUI()
     {
-        if (connect)
+        if (_connect)
         {
             DrawConnections();
         }
 
         BeginWindows();
 
-        for (int i = 0; i < rects.Count; i++)
+        for (var i = 0; i < _rects.Count; i++)
         {
-            rects[i] = GUI.Window(i, rects[i], WindowFunction, i.ToString());
+            _rects[i] = GUI.Window(i, _rects[i], WindowFunction, i.ToString());
         }
 
         EndWindows();
@@ -34,7 +33,7 @@ public class GraphEditor : EditorWindow
     public static void InitRects(int size)
     {
         
-        rects = new List<Rect>();
+        _rects = new List<Rect>();
         //for (int i = 0; i < size; i++)
         //{
         //    Rect rect = new Rect(10 + i * 100, 100, 50, 50);
@@ -43,15 +42,15 @@ public class GraphEditor : EditorWindow
         float xMax = Mathf.RoundToInt(Mathf.Sqrt(size));
         float yMax = Mathf.CeilToInt(size / xMax);
 
-        int count = 0;
-        for (int x = 0; x < (int)xMax; x++)
+        var count = 0;
+        for (var x = 0; x < (int)xMax; x++)
         {
-            for (int y = 0; y < (int)yMax; y++)
+            for (var y = 0; y < (int)yMax; y++)
             {
                 if (count < size)
                 {
-                    Rect rect = new Rect(10 + y * 100, 10 + x * 100, 50, 50);
-                    rects.Add(rect);
+                    var rect = new Rect(10 + y * 100, 10 + x * 100, 50, 50);
+                    _rects.Add(rect);
                 }
                 else
                 {
@@ -60,22 +59,22 @@ public class GraphEditor : EditorWindow
                 count++;
             }
         }
-        connect = true;
+        _connect = true;
     }
 
-    public static void DrawConnections()
+    private static void DrawConnections()
     {
-        foreach (GraphNode parent in LevelGenerator.graph.nodes)
+        foreach (var parent in LevelGenerator.graph.nodes)
         {
-            foreach (GraphNode child in parent.children)
+            foreach (var child in parent.children)
             {
-                DrawConnection(rects[parent.id], rects[child.id]);
+                DrawConnection(_rects[parent.id], _rects[child.id]);
             }
         }
         
     }
 
-    public static void DrawConnection(Rect windowRect, Rect windowRect2)
+    private static void DrawConnection(Rect windowRect, Rect windowRect2)
     {
         Handles.BeginGUI();
         //Handles.DrawBezier(windowRect.center, windowRect2.center, new Vector2(windowRect.xMax + 50f, windowRect.center.y), new Vector2(windowRect2.xMin - 50f, windowRect2.center.y), Color.black, null, 3f);
@@ -84,7 +83,7 @@ public class GraphEditor : EditorWindow
         Handles.EndGUI();
     }
 
-    void WindowFunction(int windowID)
+    private void WindowFunction(int windowID)
     {
         GUI.DragWindow();
     }

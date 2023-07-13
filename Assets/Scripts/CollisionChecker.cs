@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CollisionChecker : MonoBehaviour
 {
-    void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
         
         // Checks for overlapping rooms/halls
@@ -14,17 +14,16 @@ public class CollisionChecker : MonoBehaviour
             if (!LevelGenerator.overlapping.Contains(transform.parent.name))
             {
                 // Get colliders
-                Collider[] colliders = GetComponents<Collider>();
+                var colliders = GetComponents<Collider>();
                 
                 // Check all colliders
-                for (int i = 0; i < colliders.Length; i++)
+                for (var i = 0; i < colliders.Length; i++)
                 {
                     // Check for intersection
                     if (colliders[i].bounds.Intersects(other.bounds))
                     {
                         LevelGenerator.overlapping.Add(transform.parent.name);
                         LevelGenerator.overlapPenalty++;
-                        //Debug.Log("Collision detected between " + transform.parent.name + " " + other.GetComponent<Transform>().parent.name);
                     }
                 }
             }

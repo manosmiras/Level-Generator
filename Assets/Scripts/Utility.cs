@@ -11,8 +11,8 @@ public class Utility {
         using (var ms = new MemoryStream())
         {
             var formatter = new BinaryFormatter();
-            SurrogateSelector surrogateSelector = new SurrogateSelector();
-            Vector2SerializationSurrogate vector2SS = new Vector2SerializationSurrogate();
+            var surrogateSelector = new SurrogateSelector();
+            var vector2SS = new Vector2SerializationSurrogate();
 
             surrogateSelector.AddSurrogate(typeof(Vector2), new StreamingContext(StreamingContextStates.All), vector2SS);
             formatter.SurrogateSelector = surrogateSelector;
