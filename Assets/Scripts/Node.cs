@@ -15,33 +15,23 @@ public class Node : IHeapItem<Node> {
     public int gCost;
     public int hCost;
 
-    int heapIndex;
-
-    public Node(bool _walkable, bool _entry, Vector3 _worldPos, int _gridX, int _gridY, int _penalty)
+    public Node(bool walkable, bool entry, Vector3 worldPosition, int gridX, int gridY, int movementPenalty)
     {
-        walkable = _walkable;
-        entry = _entry;
-        worldPosition = _worldPos;
-        gridX = _gridX;
-        gridY = _gridY;
-        movementPenalty = _penalty;
+        this.walkable = walkable;
+        this.entry = entry;
+        this.worldPosition = worldPosition;
+        this.gridX = gridX;
+        this.gridY = gridY;
+        this.movementPenalty = movementPenalty;
     }
 
-    public int fCost
-    {
-        get { return gCost + hCost; }
-        set { }
-    }
+    private int FCost => gCost + hCost;
 
-    public int HeapIndex
-    {
-        get { return heapIndex; }
-        set { heapIndex = value; }
-    }
+    public int HeapIndex { get; set; }
 
     public int CompareTo(Node nodeToCompare)
     {
-        int compare = fCost.CompareTo(nodeToCompare.fCost);
+        var compare = FCost.CompareTo(nodeToCompare.FCost);
         if (compare == 0)
             compare = hCost.CompareTo(nodeToCompare.hCost);
         return -compare;

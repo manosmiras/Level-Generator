@@ -37,9 +37,8 @@ public class LevelPiece : DesignElement
 
     public override bool Equals(DesignElement other)
     {
-        LevelPiece otherLP = (LevelPiece)other;
-        return (//position == otherLP.position
-            rotation == otherLP.rotation
+        var otherLP = (LevelPiece)other;
+        return (rotation == otherLP.rotation
             && type == otherLP.type);
     }
 }

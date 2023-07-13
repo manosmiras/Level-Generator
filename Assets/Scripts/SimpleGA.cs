@@ -15,10 +15,7 @@ public class SimpleGA : GeneticAlgorithm
     private int fittestGeneration;
     public float fittest = 0;
     public float fitness = 0;
-    // expressive range
-    //public float variableVertexConnectivity;
-    //public float linearity;
-    //public float minCost;
+    
     public SimpleGA(int populationSize, int genomeLength, float mutationRate, bool elitism, CrossoverType crossoverType, int tournamentSize, float evaluationTime, bool testing,
          int testRuns, int maxGeneration, LevelGenerator levelGenerator)
     {
@@ -83,19 +80,14 @@ public class SimpleGA : GeneticAlgorithm
                 if (csv.Length == 0)
                 {
                     AddDataToResults(string.Format("{0},{1},{2},{3},{4}", "Number of Feasible individuals", "Fittest Individual Fitness", "Generation of Fittest Individual", "Generation of First Feasible Individual", "Connected Components"));
-                    //AddDataToResults(string.Format("{0},{1},{2}", "Linearity", "Explorability", "Challenge"));
                 }
                 // Append new line to csv
                 AddDataToResults(string.Format("{0},{1},{2},{3},{4}", feasibleIndividualCount, fittestIndividual.fitness, fittestGeneration, firstFeasibleGeneration, connectedComponents));
-                //AddDataToResults(string.Format("{0},{1},{2}", linearity, variableVertexConnectivity, minCost));
                 levelGenerator.ClearScene();
 
                 if (currentTestRun <= testRuns - 1)
                 {
                     population.individuals.Clear();
-                    //linearity = 0;
-                    //minCost = 0;
-                    //variableVertexConnectivity = 0;
                     fittestIndividual = new Individual();
                     FitnessVisualizerEditor.values.Clear();
                     Initialise();
@@ -113,7 +105,6 @@ public class SimpleGA : GeneticAlgorithm
             }
             else
             {
-
                 Debug.Log("Clearing and spawning fittest, it has a fitness of: " + fittestIndividual.fitness);
                 if (testing)
                 {
@@ -122,9 +113,6 @@ public class SimpleGA : GeneticAlgorithm
                 }
 
                 levelGenerator.ClearScene();
-
-                // Show fittest individual
-                //DisplayIndividual(final);
                 levelGenerator.DisplayIndividual(fittestIndividual);
                 // Spawn dead end walls with a delay, so there is enough time for collision detection
                 levelGenerator.InvokeSpawnWallsOnDeadEnds(evaluationTime);
@@ -133,7 +121,7 @@ public class SimpleGA : GeneticAlgorithm
         }
     }
 
-    void DisplayPopulation(Population pop)
+    private void DisplayPopulation(Population pop)
     {
         if (!displaying && currentIndividual < pop.Size())
         {
@@ -174,10 +162,6 @@ public class SimpleGA : GeneticAlgorithm
                     fittest = fitness;
                     fittestIndividual = Utility.DeepClone(pop.individuals[currentIndividual]);
                     fittestGeneration = generation;
-                    // expressive range
-                    //minCost = CalculatePathFitness();
-                    //variableVertexConnectivity = CalculateVariableVertexConnectivityFitness();
-                    //linearity = fittestIndividual.GetLinearity();
                 }
 
                 // Feasible
@@ -205,7 +189,5 @@ public class SimpleGA : GeneticAlgorithm
                 displaying = false;
             }
         }
-
     }
-
 }

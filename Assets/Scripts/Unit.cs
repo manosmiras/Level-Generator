@@ -24,22 +24,10 @@ public class Unit : MonoBehaviour {
     private void Start()
     {
         target = GameObject.FindGameObjectWithTag("Target").transform;
-        //if (target != null)
         PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, type);
     }
 
-    private void Update()
-    {
-        // If target not found yet
-        //if (target == null)
-        //{
-        //    // Retry
-        //    target = GameObject.FindGameObjectWithTag("Target").transform;
-        //    PathRequestManager.RequestPath(transform.position, target.position, OnPathFound, type);
-        //}
-    }
-
-    public void OnPathFound(Vector3[] newPath, bool pathSuccesful)
+    private void OnPathFound(Vector3[] newPath, bool pathSuccesful)
     {
         if (pathSuccesful)
         {
@@ -53,9 +41,10 @@ public class Unit : MonoBehaviour {
         }
 
     }
-    IEnumerator FollowPath()
+
+    private IEnumerator FollowPath()
     {
-        Vector3 currentWaypoint = _path[0];
+        var currentWaypoint = _path[0];
 
         while (true)
         {
@@ -65,7 +54,7 @@ public class Unit : MonoBehaviour {
                 if (_targetIndex >= _path.Length)
                 {
                     _targetIndex = 0;
-                    _path = new Vector3[0];
+                    _path = Array.Empty<Vector3>();
                     yield break;
                 }
                 currentWaypoint = _path[_targetIndex];

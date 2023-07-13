@@ -98,7 +98,7 @@ public class FI2PopNsGA : GeneticAlgorithm
                 // Evolve feasible population, if it exists
                 if (initialisedFeasiblePop)
                 {
-                    noveltyArchive.Add(Utility.DeepClone(feasiblePopulation.GetFittest()));
+                    noveltyArchive.Add(Utility.DeepClone(feasiblePopulation.GetFittestIndividual()));
                     feasiblePopulation = EvolvePopulation(feasiblePopulation);
                     currentFeasibleIndividual = 0;
                     initialisedFeasiblePop = false;
@@ -160,7 +160,7 @@ public class FI2PopNsGA : GeneticAlgorithm
                 }
                 else
                 {
-                    Individual fittest = infeasiblePopulation.GetFittest();
+                    Individual fittest = infeasiblePopulation.GetFittestIndividual();
                     Debug.Log("No feasible individual was found, clearing and spawning fittest from infeasible population, it has a fitness of: " + fittest.fitness);
                     levelGenerator.DisplayIndividual(fittest);
                 }
@@ -243,7 +243,7 @@ public class FI2PopNsGA : GeneticAlgorithm
                     else
                     {
                         // Replace weakest feasible individual with new feasible individual
-                        if (feasiblePopulation.GetWeakest().fitness > CalculateCombinedFitness())
+                        if (feasiblePopulation.GetWeakestIndividual().fitness > CalculateCombinedFitness())
                             feasiblePopulation.individuals[feasiblePopulation.GetWeakestIndex()] = feasibleIndividual;
                     }
 

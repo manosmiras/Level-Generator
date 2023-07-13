@@ -78,16 +78,16 @@ public class Grid : MonoBehaviour
 
     public List<Node> GetNeighbours(Node node)
     {
-        List<Node> neighbours = new List<Node>();
+        var neighbours = new List<Node>();
 
-        for (int x = -1; x <= 1; x++)
+        for (var x = -1; x <= 1; x++)
         {
-            for (int y = -1; y <= 1; y++)
+            for (var y = -1; y <= 1; y++)
             {
                 if (x == 0 && y == 0)
                     continue;
-                int checkX = node.gridX + x;
-                int checkY = node.gridY + y;
+                var checkX = node.gridX + x;
+                var checkY = node.gridY + y;
 
                 if (checkX >= 0 && checkX < _gridSizeX && checkY >= 0 && checkY >= 0 && checkY < _gridSizeY)
                 {

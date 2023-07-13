@@ -20,19 +20,18 @@ public class Population
     // Copy constructor
     public Population(Population pop)
     {
-        this.individuals = new List<Individual>(pop.individuals);
+        individuals = new List<Individual>(pop.individuals);
     }
-    // Public constructor with argument
+    
     public Population(List<Individual> individuals)
     {
         this.individuals = new List<Individual>(individuals);
     }
-    // Gets fittest individual in the population
-    public Individual GetFittest()
+    
+    public Individual GetFittestIndividual()
     {
-        Individual fittest = individuals[0];
-        // Get the fittest
-        for (int i = 0; i < individuals.Count; i++)
+        var fittest = individuals[0];
+        for (var i = 0; i < individuals.Count; i++)
         {
             if (individuals[i].fitness > fittest.fitness)
             {
@@ -42,12 +41,10 @@ public class Population
         return fittest;
     }
 
-    // Gets the least fit individual in the population
-    public Individual GetWeakest()
+    public Individual GetWeakestIndividual()
     {
-        Individual weakest = individuals[0];
-        // Get the fittest
-        for (int i = 1; i < individuals.Count; i++)
+        var weakest = individuals[0];
+        for (var i = 1; i < individuals.Count; i++)
         {
             if (individuals[i].fitness < weakest.fitness)
             {
@@ -59,10 +56,10 @@ public class Population
 
     public int GetWeakestIndex()
     {
-        Individual weakest = individuals[0];
-        int index = 0;
+        var weakest = individuals[0];
+        var index = 0;
         // Get the fittest
-        for (int i = 1; i < individuals.Count; i++)
+        for (var i = 1; i < individuals.Count; i++)
         {
             if (individuals[i].fitness < weakest.fitness)
             {
@@ -73,29 +70,21 @@ public class Population
         return index;
     }
 
-
-    //public Population DeepCopy()
-    //{
-    //    Population other = (Population)this.MemberwiseClone();
-    //    other.individuals = new List<Individual>(this.individuals);
-    //    return other;
-    //}
-
     public int Size()
     {
-        return this.individuals.Count;
+        return individuals.Count;
     }
 
     public void Print()
     {
-        foreach (Individual individual in individuals)
+        foreach (var individual in individuals)
         {
             individual.Print();
         }
     }
     public void Sort()
     {
-        foreach (Individual individual in individuals)
+        foreach (var individual in individuals)
         {
             individual.Sort();
         }

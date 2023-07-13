@@ -109,8 +109,8 @@ public class Individual : IEquatable<Individual>
 
     public void Print()
     {
-        string output = "";
-        foreach (DesignElement de in designElements)
+        var output = "";
+        foreach (var de in designElements)
         {
             output += "Position:" + de.position + ", Rotation: " + de.rotation + "\n";
 
@@ -156,8 +156,8 @@ public class Individual : IEquatable<Individual>
     {
         if (other.designElements.Count != 0)
         {
-            int equalCount = 0;
-            for (int i = 0; i < designElements.Count; i++)
+            var equalCount = 0;
+            for (var i = 0; i < designElements.Count; i++)
             {
                 // Sum the number of same design elements
                 if (designElements[i].Equals(other.designElements[i]))

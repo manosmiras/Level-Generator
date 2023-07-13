@@ -80,9 +80,9 @@ public abstract class GeneticAlgorithm
             if (pop.Size() != 0)
             {
                 // Add fittest to new population, will not be affected by crossover or mutation
-                newPopulation.Add(Utility.DeepClone(pop.GetFittest()));
+                newPopulation.Add(Utility.DeepClone(pop.GetFittestIndividual()));
                 // Add fittest to new population a second time, will be affected by mutation
-                newPopulation.Add(Utility.DeepClone(pop.GetFittest()));
+                newPopulation.Add(Utility.DeepClone(pop.GetFittestIndividual()));
             }
         }
 
@@ -258,7 +258,7 @@ public abstract class GeneticAlgorithm
             tournamentPopulation.Add(Utility.DeepClone(pop.individuals[randomId]));
         }
         // Get the fittest
-        var fittest = tournamentPopulation.GetFittest();
+        var fittest = tournamentPopulation.GetFittestIndividual();
 
         return fittest;
     }

@@ -63,7 +63,7 @@ public class NoveltySearchGA : GeneticAlgorithm
 
             if (initialisedPopulation)
             {
-                noveltyArchive.Add(Utility.DeepClone(population.GetFittest()));
+                noveltyArchive.Add(Utility.DeepClone(population.GetFittestIndividual()));
                 generation++;
                 population = EvolvePopulation(population);
                 currentIndividual = 0;
