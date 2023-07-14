@@ -85,8 +85,6 @@ public class Unit : MonoBehaviour {
                     case UnitType.Dangerous:
                         Gizmos.color = Color.red;
                         break;
-                    default:
-                        break;
                 }
                 
                 Gizmos.DrawCube(_path[i], Vector3.one);

@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 public class Individual : IEquatable<Individual>
 {
 
-    public List<DesignElement> designElements = new List<DesignElement>();
+    public List<LevelPiece> levelPieces = new();
     // fitness is used a form of measurement for the feasibility of 
     [SerializeField]
     public float fitness;
@@ -24,27 +24,27 @@ public class Individual : IEquatable<Individual>
 
     public Individual(Individual individual)
     {
-        designElements = new List<DesignElement>(individual.designElements);
+        levelPieces = new List<LevelPiece>(individual.levelPieces);
         fitness = individual.fitness;
         delete = false;
     }
 
-    public Individual(List<DesignElement> designElements)
+    public Individual(List<LevelPiece> levelPieces)
     {
-        this.designElements = designElements;
+        this.levelPieces = levelPieces;
         fitness = 0;
     }
     // Sort by x axis
     public void Sort()
     {
-        designElements = designElements.OrderBy(t => t.position.y).ThenBy(t => t.position.x).ToList();
+        levelPieces = levelPieces.OrderBy(t => t.position.y).ThenBy(t => t.position.x).ToList();
     }
 
 
     public Individual DeepCopy()
     {
         var other = (Individual)MemberwiseClone();
-        other.designElements = new List<DesignElement>(this.designElements);
+        other.levelPieces = new List<LevelPiece>(levelPieces);
         other.fitness = fitness;
         return other;
     }
@@ -52,31 +52,31 @@ public class Individual : IEquatable<Individual>
     public float GetDiversity(Individual other)
     {
         var diversity = 0;
-        for (var i = 0; i < designElements.Count; i++)
+        for (var i = 0; i < levelPieces.Count; i++)
         {
             // Increase diversity if rotations for current piece are different
-            if (designElements[i].rotation != other.designElements[i].rotation)
+            if (levelPieces[i].rotation != other.levelPieces[i].rotation)
             {
                 diversity++;
             }
             // Increase diversity if current piece types are different
-            if (((LevelPiece)designElements[i]).type != ((LevelPiece)other.designElements[i]).type)
+            if (((LevelPiece)levelPieces[i]).type != ((LevelPiece)other.levelPieces[i]).type)
             {
                 diversity++;
             }
         }
         // Normalize diversity
         var minDiversity = 0;
-        var maxDiversity = designElements.Count * 2;
+        var maxDiversity = levelPieces.Count * 2;
         var diversityNormalized = (diversity - minDiversity) / (maxDiversity - minDiversity);
         return diversityNormalized;
     }
 
     public float GetLinearity()
     {
-        var ints = new int[designElements.Count];
+        var ints = new int[levelPieces.Count];
         var count = 0;
-        foreach (LevelPiece levelPiece in designElements)
+        foreach (LevelPiece levelPiece in levelPieces)
         {
 
             var num = (int)levelPiece.type;
@@ -90,7 +90,7 @@ public class Individual : IEquatable<Individual>
             Value = grp.Key,
             Count = grp.Count()
         });
-        float min = 15 / designElements.Count;
+        float min = 15 / levelPieces.Count;
         float max = 0;
         float maxVal = 0;
         foreach (var item in query)
@@ -103,14 +103,14 @@ public class Individual : IEquatable<Individual>
         }
         float linearity = 0;
         if (max > min)
-            linearity = max / designElements.Count;
+            linearity = max / levelPieces.Count;
         return linearity;
     }
 
     public void Print()
     {
         var output = "";
-        foreach (var de in designElements)
+        foreach (var de in levelPieces)
         {
             output += "Position:" + de.position + ", Rotation: " + de.rotation + "\n";
 
@@ -121,7 +121,7 @@ public class Individual : IEquatable<Individual>
     public void ToJson()
     {
         var json = JsonConvert.SerializeObject(this);
-        var path = Application.dataPath + "/Levels/" + "gl" + designElements.Count + "f" + fitness + ".json";
+        var path = Application.dataPath + "/Levels/" + "gl" + levelPieces.Count + "f" + fitness + ".json";
         Debug.Log(path);
         File.WriteAllText(path, json);
 #if UNITY_EDITOR
@@ -133,7 +133,7 @@ public class Individual : IEquatable<Individual>
     public void ToJson(string text)
     {
         var json = JsonConvert.SerializeObject(this);
-        var path = Application.dataPath + "/Levels/" + "gl" + designElements.Count + "f" + fitness + text + ".json";
+        var path = Application.dataPath + "/Levels/" + "gl" + levelPieces.Count + "f" + fitness + text + ".json";
         Debug.Log(path);
         File.WriteAllText(path, json);
 #if UNITY_EDITOR
@@ -154,19 +154,19 @@ public class Individual : IEquatable<Individual>
 
     public bool Equals(Individual other)
     {
-        if (other.designElements.Count != 0)
+        if (other.levelPieces.Count != 0)
         {
             var equalCount = 0;
-            for (var i = 0; i < designElements.Count; i++)
+            for (var i = 0; i < levelPieces.Count; i++)
             {
                 // Sum the number of same design elements
-                if (designElements[i].Equals(other.designElements[i]))
+                if (levelPieces[i].Equals(other.levelPieces[i]))
                 {
                     equalCount++;
                 }
             }
             // Individuals are equal if all the design elements have the same values
-            if (equalCount == designElements.Count)
+            if (equalCount == levelPieces.Count)
                 return true;
             return false;
         }

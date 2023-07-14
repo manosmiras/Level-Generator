@@ -47,9 +47,9 @@ public class SimpleGA : GeneticAlgorithm
         if (generation <= maxGeneration ^ (terminate || currentTestRun >= testRuns))
         {
             totalTime += Time.deltaTime;
-            int minutes = Mathf.FloorToInt(totalTime / 60F);
-            int seconds = Mathf.FloorToInt(totalTime - minutes * 60);
-            time = string.Format("{0:0}:{1:00}", minutes, seconds);
+            var minutes = Mathf.FloorToInt(totalTime / 60F);
+            var seconds = Mathf.FloorToInt(totalTime - minutes * 60);
+            time = $"{minutes:0}:{seconds:00}";
 
             // Will spawn infeasible levels and evaluate them
             DisplayPopulation(population);
@@ -94,13 +94,9 @@ public class SimpleGA : GeneticAlgorithm
                 }
                 totalTime = 0;
                 currentIndividual = 0;
-
                 feasibleIndividualCount = 0;
-
                 initialisedPopulation = false;
-
                 generation = 1;
-
                 fittest = 0;
             }
             else

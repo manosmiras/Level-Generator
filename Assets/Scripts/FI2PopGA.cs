@@ -1,7 +1,4 @@
 ﻿// Feasible Infeasible Two Population Genetic Algorithm (FI-2Pop GA)
-
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FI2PopGA : GeneticAlgorithm

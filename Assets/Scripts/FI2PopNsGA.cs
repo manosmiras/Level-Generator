@@ -1,7 +1,5 @@
 ﻿// Feasible Infeasible Novelty Search (FINS)
 
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FI2PopNsGA : GeneticAlgorithm

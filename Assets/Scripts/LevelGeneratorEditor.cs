@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class LevelGeneratorEditor : Editor
 {
     public Texture2D image;
-    public static bool load = false;
+    public static bool load;
 
     private LevelGenerator _levelGenerator;
     private List<string> _dontInclude = new();

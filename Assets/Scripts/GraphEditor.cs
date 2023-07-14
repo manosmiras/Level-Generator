@@ -34,11 +34,6 @@ public class GraphEditor : EditorWindow
     {
         
         _rects = new List<Rect>();
-        //for (int i = 0; i < size; i++)
-        //{
-        //    Rect rect = new Rect(10 + i * 100, 100, 50, 50);
-        //    rects.Add(rect);
-        //}
         float xMax = Mathf.RoundToInt(Mathf.Sqrt(size));
         float yMax = Mathf.CeilToInt(size / xMax);
 
@@ -77,7 +72,6 @@ public class GraphEditor : EditorWindow
     private static void DrawConnection(Rect windowRect, Rect windowRect2)
     {
         Handles.BeginGUI();
-        //Handles.DrawBezier(windowRect.center, windowRect2.center, new Vector2(windowRect.xMax + 50f, windowRect.center.y), new Vector2(windowRect2.xMin - 50f, windowRect2.center.y), Color.black, null, 3f);
         Handles.color = Color.black;
         Handles.DrawLine(windowRect.center, windowRect2.center);
         Handles.EndGUI();

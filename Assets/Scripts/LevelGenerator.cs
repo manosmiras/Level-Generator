@@ -152,7 +152,7 @@ public class LevelGenerator : MonoBehaviour
 
     public void DisplayIndividual(Individual individual)
     {
-        int genomeLength = individual.designElements.Count;
+        int genomeLength = individual.levelPieces.Count;
         int count = 0;
         float xMax = Mathf.RoundToInt(Mathf.Sqrt(genomeLength));
         float yMax = Mathf.CeilToInt(genomeLength / xMax);
@@ -166,7 +166,7 @@ public class LevelGenerator : MonoBehaviour
             {
                 if (count < genomeLength)
                 {
-                    LevelPiece piece = (LevelPiece)individual.designElements[count];
+                    var piece = individual.levelPieces[count];
                     piece.position.x = (x * positionModifier) - (xMax * positionModifier) / 2;
                     piece.position.y = (y * positionModifier) - (yMax * positionModifier) / 2;
                     piecePositions.Add(new Vector3(piece.position.x, 0, piece.position.y));

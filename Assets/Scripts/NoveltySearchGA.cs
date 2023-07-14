@@ -1,21 +1,18 @@
 ﻿// Novelty Search (NS) and Minimal Criteria Novelty Search (MCNS)
-
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class NoveltySearchGA : GeneticAlgorithm
 {
-    public Population population = new Population();
-    public Population noveltyArchive = new Population();
+    public Population population = new();
+    public Population noveltyArchive = new();
 
     // Used to keep track of all the feasible Individuals
-    public Population feasibleIndividuals = new Population();
+    public Population feasibleIndividuals = new();
 
     public int currentIndividual;
     public bool initialisedPopulation;
-    public Individual fittestIndividualDiversity = new Individual();
-    public Individual fittestIndividualActual = new Individual();
+    public Individual fittestIndividualDiversity = new();
+    public Individual fittestIndividualActual = new();
     private int fittestGeneration;
     public float fittest = 0;
     public float fitness = 0;
@@ -54,9 +51,9 @@ public class NoveltySearchGA : GeneticAlgorithm
         if (generation <= maxGeneration ^ (terminate || currentTestRun >= testRuns))
         {
             totalTime += Time.deltaTime;
-            int minutes = Mathf.FloorToInt(totalTime / 60F);
-            int seconds = Mathf.FloorToInt(totalTime - minutes * 60);
-            time = string.Format("{0:0}:{1:00}", minutes, seconds);
+            var minutes = Mathf.FloorToInt(totalTime / 60F);
+            var seconds = Mathf.FloorToInt(totalTime - minutes * 60);
+            time = $"{minutes:0}:{seconds:00}";
 
             // Will spawn infeasible levels and evaluate them
             DisplayPopulation(population);
@@ -104,13 +101,9 @@ public class NoveltySearchGA : GeneticAlgorithm
                 }
                 totalTime = 0;
                 currentIndividual = 0;
-
                 feasibleIndividualCount = 0;
-
                 initialisedPopulation = false;
-
                 generation = 1;
-
                 fittest = 0;
             }
             else
@@ -164,9 +157,9 @@ public class NoveltySearchGA : GeneticAlgorithm
 
                 // Calculate fitness
                 float averageDiversity = 0;
-                int divisor = 0;
+                var divisor = 0;
                 // Compare current individual to neighbours in the population
-                for (int neighbour = 0; neighbour < 2; neighbour++)
+                for (var neighbour = 0; neighbour < 2; neighbour++)
                 {
                     if (currentIndividual < pop.Size() - 1)
                     {
@@ -183,7 +176,7 @@ public class NoveltySearchGA : GeneticAlgorithm
                     }
                 }
                 // Compare current individual with novelty archive
-                for (int i = 0; i < noveltyArchive.Size(); i++)
+                for (var i = 0; i < noveltyArchive.Size(); i++)
                 {
                     averageDiversity += pop.individuals[currentIndividual].GetDiversity(noveltyArchive.individuals[i]);
                     divisor++;
@@ -209,11 +202,8 @@ public class NoveltySearchGA : GeneticAlgorithm
                         }
                     }
                 }
-                //Debug.Log(averageDiversity);
-
-                //pop.individuals[currentIndividual].fitness = CalculateCombinedFitness(); //(genomeLength - connectedComponents) + shortestPathCost / 10 + kConnectivity;
                 FitnessVisualizerEditor.values.Add(pop.individuals[currentIndividual].fitness);
-                float actualFitness = CalculateCombinedFitness();
+                var actualFitness = CalculateCombinedFitness();
                 FitnessVisualizerEditor.values2.Add(CalculateCombinedFitness());
 
                 fitness = actualFitness;

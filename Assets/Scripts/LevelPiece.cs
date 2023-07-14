@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 [Serializable]
-public class LevelPiece : DesignElement
+public class LevelPiece : IEquatable<LevelPiece>
 {
-    [SerializeField]
     public enum Type
     {
         Cross,
@@ -25,9 +22,13 @@ public class LevelPiece : DesignElement
         Room3_Trap,
         Room4_Trap
     }
+    
     [SerializeField]
     public Type type;
-    //public List<Vector2> trapPositions;
+    [SerializeField]
+    public Vector2 position;
+    [SerializeField]
+    public float rotation;
     public LevelPiece(Vector2 position, float rotation, Type type)
     {
         this.position = position;
@@ -35,10 +36,10 @@ public class LevelPiece : DesignElement
         this.type = type;
     }
 
-    public override bool Equals(DesignElement other)
+    public bool Equals(LevelPiece other)
     {
-        var otherLP = (LevelPiece)other;
-        return (rotation == otherLP.rotation
-            && type == otherLP.type);
+        var otherLP = other;
+        return rotation == otherLP.rotation
+               && type == otherLP.type;
     }
 }

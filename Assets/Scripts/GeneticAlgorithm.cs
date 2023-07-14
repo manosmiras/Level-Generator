@@ -156,7 +156,7 @@ public abstract class GeneticAlgorithm
         var individual = new Individual();
 
         // Clear
-        individual.designElements.Clear();
+        individual.levelPieces.Clear();
         for (var i = 0; i < genomeLength; i++)
         {
             float rotation = Random.Range(0, 4);
@@ -166,7 +166,7 @@ public abstract class GeneticAlgorithm
             if(i == 0 || i == genomeLength - 1)
                 roomType = Random.Range(0, 8);
             var piece = new LevelPiece(Vector2.zero, rotation, (LevelPiece.Type)roomType);
-            individual.designElements.Add(piece);
+            individual.levelPieces.Add(piece);
 
         }
         pop.Add(individual);
@@ -176,7 +176,7 @@ public abstract class GeneticAlgorithm
     {
         var offspring = new Individual();
         // Loop through all design elements
-        for (int i = 0; i < individual1.designElements.Count; i++)
+        for (int i = 0; i < individual1.levelPieces.Count; i++)
         {
             if (individual1.fitness > individual2.fitness)
             {
@@ -184,12 +184,12 @@ public abstract class GeneticAlgorithm
                 // 60% chance to copy design element from individual 1
                 if (rand <= uniformRate)
                 {
-                    offspring.designElements.Add(individual1.designElements[i]);
+                    offspring.levelPieces.Add(individual1.levelPieces[i]);
                 }
                 // 40% chance to copy design element from individual 2
                 else
                 {
-                    offspring.designElements.Add(individual2.designElements[i]);
+                    offspring.levelPieces.Add(individual2.levelPieces[i]);
                 }
             }
             else
@@ -198,12 +198,12 @@ public abstract class GeneticAlgorithm
                 // 60% chance to copy design element from individual 2
                 if (rand <= uniformRate)
                 {
-                    offspring.designElements.Add(individual2.designElements[i]);
+                    offspring.levelPieces.Add(individual2.levelPieces[i]);
                 }
                 // 40% chance to copy design element from individual 1
                 else
                 {
-                    offspring.designElements.Add(individual1.designElements[i]);
+                    offspring.levelPieces.Add(individual1.levelPieces[i]);
                 }
             }
         }
@@ -216,18 +216,18 @@ public abstract class GeneticAlgorithm
         var point = genomeLength / 2;
         var rand = Random.Range(0.0f, 1.0f);
         // Loop through all design elements
-        for (var i = 0; i < individual1.designElements.Count; i++)
+        for (var i = 0; i < individual1.levelPieces.Count; i++)
         {
             if (rand <= 0.5)
             {
                 // Copies half of individual 1 and half of individual 2
                 if (i <= point)
                 {
-                    offspring.designElements.Add(individual1.designElements[i]);
+                    offspring.levelPieces.Add(individual1.levelPieces[i]);
                 }
                 else
                 {
-                    offspring.designElements.Add(individual2.designElements[i]);
+                    offspring.levelPieces.Add(individual2.levelPieces[i]);
                 }
             }
             else
@@ -235,11 +235,11 @@ public abstract class GeneticAlgorithm
                 // Copies half of individual 1 and half of individual 2
                 if (i <= point)
                 {
-                    offspring.designElements.Add(individual2.designElements[i]);
+                    offspring.levelPieces.Add(individual2.levelPieces[i]);
                 }
                 else
                 {
-                    offspring.designElements.Add(individual1.designElements[i]);
+                    offspring.levelPieces.Add(individual1.levelPieces[i]);
                 }
             }
         }
@@ -267,33 +267,33 @@ public abstract class GeneticAlgorithm
     private void Mutate(Individual individual)
     {
         // Loop through genes
-        for (var i = 0; i < individual.designElements.Count; i++)
+        for (var i = 0; i < individual.levelPieces.Count; i++)
         {
 
             var mutationType = Random.Range(0, 2);
             if (mutationType == 0)
             {
-                MutateRotation(individual.designElements[i]);
+                MutateRotation(individual.levelPieces[i]);
             }
             else if (mutationType == 1)
             {
-                MutateLevelPiece((LevelPiece)individual.designElements[i], i);
+                MutateLevelPiece((LevelPiece)individual.levelPieces[i], i);
             }
 
         }
     }
 
-    private void MutateRotation(DesignElement designElement)
+    private void MutateRotation(LevelPiece levelPiece)
     {
         // Select a random rotation between 0, 90, 180, 270 degrees
         float rotation = Random.Range(0, 4);
         // Keep rotating until value is different
-        while (rotation * 90f == designElement.rotation)
+        while (rotation * 90f == levelPiece.rotation)
         {
             rotation = Random.Range(0, 4);
         }
         rotation *= 90f;
-        designElement.rotation = rotation;
+        levelPiece.rotation = rotation;
     }
 
     void MutateLevelPiece(LevelPiece levelPiece, int i)
@@ -354,25 +354,21 @@ public abstract class GeneticAlgorithm
         return normalizedConnectedComponentsScore;
     }
 
-    private float CalculatePathFitness()
+    private float CalculatePathFitness(int minNodes = 0, int maxNodes = 144)
     {
         // Normalized path cost
-        var maxNodes = 144;
-        var minNodes = 0; //minNodes = 12;
         var maxPathCost = (genomeLength - 1) * maxNodes;
-        var minPathCost = ((genomeLength / 2) - 1) * minNodes;
+        var minPathCost = (genomeLength / 2 - 1) * minNodes;
         var normalizedShortestPathCost = (LevelGenerator.shortestPathCost - minPathCost) / (maxPathCost - minPathCost);
 
         return normalizedShortestPathCost;
     }
 
-    public float CalculateObjectiveFitness()
+    public float CalculateObjectiveFitness(int minNodes = 0, int maxNodes = 144)
     {
         // Normalized path cost
-        var maxNodes = 144;
-        var minNodes = 0; //minNodes = 12;
         var maxPathCost = (genomeLength - 1) * maxNodes;
-        var minPathCost = ((genomeLength / 2) - 1) * minNodes;
+        var minPathCost = (genomeLength / 2 - 1) * minNodes;
         var normalizedShortestPathCost = (LevelGenerator.shortestPathCost - minPathCost) / (maxPathCost - minPathCost);
 
         // Normalized K-Vertex-Connectivity
