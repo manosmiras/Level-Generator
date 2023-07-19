@@ -314,12 +314,11 @@ public class LevelGenerator : MonoBehaviour
 
         generated = true;
         // Initialise pathfinding
-        Grid grid = aStar.GetComponentInChildren<Grid>();
+        var grid = aStar.GetComponentInChildren<Grid>();
         grid.gridWorldSize.x = xMax * (10 + (10 * grid.nodeRadius));
         grid.gridWorldSize.y = yMax * (10 + (10 * grid.nodeRadius));
         Instantiate(aStar, new Vector3(-7.5f, 0, -7.5f), new Quaternion());
-        Vector3 furthest = new Vector3();
-        furthest = piecePositions[genomeLength - 1];
+        var furthest = piecePositions[genomeLength - 1];
 
         HideCeiling(!displayCeiling);
         if (init)
@@ -336,16 +335,16 @@ public class LevelGenerator : MonoBehaviour
 
     List<GameObject> CollectLevelPieces()
     {
-        GameObject[] corners = GameObject.FindGameObjectsWithTag("Corner");
-        GameObject[] crosses = GameObject.FindGameObjectsWithTag("Cross");
-        GameObject[] halls = GameObject.FindGameObjectsWithTag("Hall");
-        GameObject[] t_junctions = GameObject.FindGameObjectsWithTag("T_Junction");
-        GameObject[] rooms1 = GameObject.FindGameObjectsWithTag("Room1");
-        GameObject[] rooms2 = GameObject.FindGameObjectsWithTag("Room2");
-        GameObject[] rooms3 = GameObject.FindGameObjectsWithTag("Room3");
-        GameObject[] rooms4 = GameObject.FindGameObjectsWithTag("Room4");
+        var corners = GameObject.FindGameObjectsWithTag("Corner");
+        var crosses = GameObject.FindGameObjectsWithTag("Cross");
+        var halls = GameObject.FindGameObjectsWithTag("Hall");
+        var t_junctions = GameObject.FindGameObjectsWithTag("T_Junction");
+        var rooms1 = GameObject.FindGameObjectsWithTag("Room1");
+        var rooms2 = GameObject.FindGameObjectsWithTag("Room2");
+        var rooms3 = GameObject.FindGameObjectsWithTag("Room3");
+        var rooms4 = GameObject.FindGameObjectsWithTag("Room4");
 
-        List<GameObject> levelPieces = new List<GameObject>(corners);
+        var levelPieces = new List<GameObject>(corners);
         levelPieces.AddRange(crosses);
         levelPieces.AddRange(halls);
         levelPieces.AddRange(t_junctions);
@@ -365,21 +364,18 @@ public class LevelGenerator : MonoBehaviour
     // Spawn walls on dead ends
     public void SpawnWallsOnDeadEnds()
     {
-        GameObject[] entryColliders = GameObject.FindGameObjectsWithTag("Entry_Colliders");
-        foreach (GameObject entryCollider in entryColliders)
+        var entryColliders = GameObject.FindGameObjectsWithTag("Entry_Colliders");
+        foreach (var entryCollider in entryColliders)
         {
-            DisconnectChecker dc = entryCollider.GetComponent<DisconnectChecker>();
-            //Debug.Log(dc.didCollide);
+            var dc = entryCollider.GetComponent<DisconnectChecker>();
 
             if (!dc.didCollide)
             {
-                Transform[] children = entryCollider.GetComponentsInChildren<Transform>(true);
-                //Debug.Log(children.Length);
-                foreach (Transform child in children)
+                var children = entryCollider.GetComponentsInChildren<Transform>(true);
+                foreach (var child in children)
                 {
                     if (child.name.Contains("Wall with Collider"))
                     {
-                        //Debug.Log("Setting wall active");
                         child.gameObject.SetActive(true);
                     }
                 }
@@ -390,8 +386,8 @@ public class LevelGenerator : MonoBehaviour
 
     void HideCeiling(bool hide)
     {
-        GameObject[] ceilings = GameObject.FindGameObjectsWithTag("Ceiling");
-        foreach (GameObject ceiling in ceilings)
+        var ceilings = GameObject.FindGameObjectsWithTag("Ceiling");
+        foreach (var ceiling in ceilings)
         {
             ceiling.SetActive(!hide);
         }
